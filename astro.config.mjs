@@ -38,10 +38,8 @@ export default defineConfig({
 					label: 'Reference',
 					autogenerate: { directory: 'reference' },
 				},
-				{
-					label: 'Wiki',
-					autogenerate: { directory: 'wiki' },
-				},
+				// Wiki pages appear directly in sidebar without grouping
+				{ autogenerate: { directory: 'wiki' } },
 			],
 		}),
 	],
