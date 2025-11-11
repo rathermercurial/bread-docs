@@ -21,9 +21,18 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
     name: 'github-wiki-sync',
     hooks: {
       'astro:config:done': async ({ logger }) => {
-        const octokit = new Octokit({ auth: options.token });
+        // Validate configuration
+        if (!options.token) {
+          logger.error('GITHUB_TOKEN is not set. Please configure your .env file.');
+          throw new Error('GITHUB_TOKEN environment variable is required');
+        }
 
         logger.info('Starting GitHub wiki sync...');
+        logger.info(`Repository: ${options.owner}/${options.repo}`);
+        logger.info(`Wiki path: ${options.wikiPath}`);
+        logger.info(`Token configured: ${options.token.substring(0, 8)}...`);
+
+        const octokit = new Octokit({ auth: options.token });
 
         try {
           // Get the default branch
@@ -110,6 +119,16 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
           logger.error('Failed to sync wiki from GitHub:');
           if (error instanceof Error) {
             logger.error(error.message);
+
+            // Provide helpful troubleshooting tips
+            if (error.message.includes('Not Found')) {
+              logger.error('');
+              logger.error('Troubleshooting tips:');
+              logger.error('1. Verify the GITHUB_TOKEN in your .env file has access to the repository');
+              logger.error('2. Confirm the repository owner and name are correct');
+              logger.error('3. Check that the token has not expired');
+              logger.error('4. Ensure the token has "repo" scope for private repositories');
+            }
           }
           throw error;
         }
