@@ -52,21 +52,13 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
             recursive: 'true',
           });
 
-          // Filter for markdown files in the wiki path, excluding readme files
-          const wikiFiles = tree.tree.filter((item) => {
-            if (item.type !== 'blob' || !item.path) return false;
-            if (!item.path.startsWith(options.wikiPath + '/')) return false;
-            if (!item.path.endsWith('.md')) return false;
-
-            // Exclude readme files (case-insensitive)
-            const filename = item.path.split('/').pop()?.toLowerCase();
-            if (filename === 'readme.md') {
-              logger.info(`Skipping readme file: ${item.path}`);
-              return false;
-            }
-
-            return true;
-          });
+          // Filter for markdown files in the wiki path
+          const wikiFiles = tree.tree.filter(
+            (item) =>
+              item.type === 'blob' &&
+              item.path?.startsWith(options.wikiPath + '/') &&
+              item.path?.endsWith('.md')
+          );
 
           logger.info(`Found ${wikiFiles.length} wiki files`);
 
@@ -76,8 +68,6 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
 
           // Track all image references across all files
           const allImageReferences = new Set<string>();
-          let syncedCount = 0;
-          let skippedCount = 0;
 
           // Download each markdown file
           for (const file of wikiFiles) {
@@ -95,16 +85,6 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
 
             // Extract the relative path within wiki/
             const relativePath = file.path.substring(options.wikiPath.length + 1);
-
-            // Validate against Starlight schema
-            const validation = validateStarlightSchema(markdown, relativePath);
-            if (!validation.valid) {
-              logger.warn(`Skipping invalid file: ${relativePath}`);
-              validation.errors.forEach((error) => logger.warn(`  - ${error}`));
-              skippedCount++;
-              continue;
-            }
-
             const outputPath = path.join(wikiContentDir, relativePath);
 
             // Create subdirectories if needed
@@ -113,16 +93,12 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
             // Write the markdown file
             await fs.writeFile(outputPath, markdown, 'utf-8');
             logger.info(`Synced: ${relativePath}`);
-            syncedCount++;
 
             // Extract image references from this file
             const images = extractImageReferences(markdown);
             images.forEach((img) => allImageReferences.add(img));
           }
 
-          logger.info(
-            `Sync summary: ${syncedCount} files synced, ${skippedCount} files skipped`
-          );
           logger.info(`Extracted ${allImageReferences.size} unique image references`);
 
           // Download attachments
@@ -159,69 +135,6 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
       },
     },
   };
-}
-
-/**
- * Parse frontmatter from markdown content
- * Returns { frontmatter, content, hasFrontmatter }
- */
-function parseFrontmatter(markdown: string): {
-  frontmatter: Record<string, any>;
-  content: string;
-  hasFrontmatter: boolean;
-} {
-  const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
-  const match = markdown.match(frontmatterRegex);
-
-  if (!match) {
-    return { frontmatter: {}, content: markdown, hasFrontmatter: false };
-  }
-
-  const frontmatterText = match[1];
-  const content = match[2];
-
-  // Simple YAML parsing for key-value pairs
-  const frontmatter: Record<string, any> = {};
-  const lines = frontmatterText.split('\n');
-
-  for (const line of lines) {
-    const colonIndex = line.indexOf(':');
-    if (colonIndex > 0) {
-      const key = line.substring(0, colonIndex).trim();
-      const value = line.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
-      frontmatter[key] = value;
-    }
-  }
-
-  return { frontmatter, content, hasFrontmatter: true };
-}
-
-/**
- * Validate that markdown content has required Starlight schema fields
- * Returns { valid: boolean, errors: string[] }
- */
-function validateStarlightSchema(
-  markdown: string,
-  filename: string
-): { valid: boolean; errors: string[] } {
-  const { frontmatter, hasFrontmatter } = parseFrontmatter(markdown);
-  const errors: string[] = [];
-
-  // Starlight requires a title field
-  if (!hasFrontmatter) {
-    errors.push('Missing frontmatter block (needs --- at start and end)');
-  }
-
-  if (!frontmatter.title) {
-    errors.push('Missing required field: title');
-  }
-
-  // Check for null/empty values in optional fields (Starlight doesn't allow null)
-  if ('description' in frontmatter && !frontmatter.description) {
-    errors.push('Field "description" is empty or null (should be a string or omitted entirely)');
-  }
-
-  return { valid: errors.length === 0, errors };
 }
 
 /**
