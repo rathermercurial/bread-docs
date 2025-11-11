@@ -20,7 +20,16 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
   return {
     name: 'github-wiki-sync',
     hooks: {
-      'astro:config:done': async ({ logger }) => {
+      'astro:config:done': async ({ logger, config }) => {
+        // Only sync during builds, not during dev/preview
+        const isDevMode = process.argv.includes('dev') || process.argv.includes('preview');
+
+        if (isDevMode) {
+          logger.info('Dev/preview mode detected - skipping GitHub sync');
+          logger.info('Content will be synced on next build');
+          return;
+        }
+
         // Validate configuration
         if (!options.token) {
           logger.error('GITHUB_TOKEN is not set. Please configure your .env file.');
