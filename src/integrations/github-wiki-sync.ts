@@ -52,13 +52,21 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
             recursive: 'true',
           });
 
-          // Filter for markdown files in the wiki path
-          const wikiFiles = tree.tree.filter(
-            (item) =>
-              item.type === 'blob' &&
-              item.path?.startsWith(options.wikiPath + '/') &&
-              item.path?.endsWith('.md')
-          );
+          // Filter for markdown files in the wiki path, excluding readme files
+          const wikiFiles = tree.tree.filter((item) => {
+            if (item.type !== 'blob' || !item.path) return false;
+            if (!item.path.startsWith(options.wikiPath + '/')) return false;
+            if (!item.path.endsWith('.md')) return false;
+
+            // Exclude readme files (case-insensitive)
+            const filename = item.path.split('/').pop()?.toLowerCase();
+            if (filename === 'readme.md') {
+              logger.info(`Skipping readme file: ${item.path}`);
+              return false;
+            }
+
+            return true;
+          });
 
           logger.info(`Found ${wikiFiles.length} wiki files`);
 
