@@ -26,10 +26,7 @@ export default defineConfig({
 		starlight({
 			title: 'Breadchain Docs',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/BreadchainCoop' }],
-			sidebar: [
-				// Wiki pages appear directly in sidebar without grouping
-				{ autogenerate: { directory: 'wiki' } },
-			],
+			// No sidebar config - Starlight auto-generates all content at root level
 		}),
 	],
 	markdown: {
