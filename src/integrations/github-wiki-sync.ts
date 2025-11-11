@@ -20,7 +20,7 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
   return {
     name: 'github-wiki-sync',
     hooks: {
-      'astro:config:setup': async ({ logger }) => {
+      'astro:config:done': async ({ logger }) => {
         const octokit = new Octokit({ auth: options.token });
 
         logger.info('Starting GitHub wiki sync...');
