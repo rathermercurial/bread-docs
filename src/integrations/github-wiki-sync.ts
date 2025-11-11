@@ -216,6 +216,11 @@ function validateStarlightSchema(
     errors.push('Missing required field: title');
   }
 
+  // Check for null/empty values in optional fields (Starlight doesn't allow null)
+  if ('description' in frontmatter && !frontmatter.description) {
+    errors.push('Field "description" is empty or null (should be a string or omitted entirely)');
+  }
+
   return { valid: errors.length === 0, errors };
 }
 
