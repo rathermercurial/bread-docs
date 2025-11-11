@@ -48,13 +48,13 @@ export default defineConfig({
 							return [`/attachments/${filename}`];
 						}
 
-						// Handle page links: [[Page Name]] -> /wiki/page-name
+						// Handle page links: [[Page Name]] -> /page-name
 						const slug = name
 							.toLowerCase()
 							.replace(/\s+/g, '-')
 							.replace(/[^\w-]/g, ''); // Remove special chars
 
-						return [`/wiki/${slug}`];
+						return [`/${slug}`];
 					},
 				},
 			],

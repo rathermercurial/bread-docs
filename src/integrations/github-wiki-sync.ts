@@ -70,9 +70,9 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
 
           logger.info(`Found ${wikiFiles.length} wiki files`);
 
-          // Create wiki directory in content
-          const wikiContentDir = path.join(process.cwd(), options.contentDir, 'wiki');
-          await fs.mkdir(wikiContentDir, { recursive: true });
+          // Create content directory
+          const contentDir = path.join(process.cwd(), options.contentDir);
+          await fs.mkdir(contentDir, { recursive: true });
 
           // Track all image references across all files
           const allImageReferences = new Set<string>();
@@ -93,7 +93,7 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
 
             // Extract the relative path within wiki/
             const relativePath = file.path.substring(options.wikiPath.length + 1);
-            const outputPath = path.join(wikiContentDir, relativePath);
+            const outputPath = path.join(contentDir, relativePath);
 
             // Create subdirectories if needed
             await fs.mkdir(path.dirname(outputPath), { recursive: true });
