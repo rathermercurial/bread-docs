@@ -3,6 +3,10 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import wikiLinkPlugin from '@flowershow/remark-wiki-link';
 import githubWikiSync from './src/integrations/github-wiki-sync.ts';
+import { loadEnv } from 'vite';
+
+// Load environment variables
+const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
 
 // Helper to determine if link is an image
 function isImageFile(name) {
@@ -16,10 +20,10 @@ export default defineConfig({
 	integrations: [
 		// Sync wiki content from GitHub before build
 		githubWikiSync({
-			token: process.env.GITHUB_TOKEN || '',
-			owner: process.env.GITHUB_REPO_OWNER || 'BreadchainCoop',
-			repo: process.env.GITHUB_REPO_NAME || 'shared-obsidian',
-			wikiPath: process.env.GITHUB_WIKI_PATH || 'wiki',
+			token: env.GITHUB_TOKEN || '',
+			owner: env.GITHUB_REPO_OWNER || 'BreadchainCoop',
+			repo: env.GITHUB_REPO_NAME || 'shared-obsidian',
+			wikiPath: env.GITHUB_WIKI_PATH || 'wiki',
 			contentDir: 'src/content/docs',
 			attachmentsDir: 'public/attachments',
 		}),
