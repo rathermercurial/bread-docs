@@ -1,19 +1,11 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import wikiLinkPlugin from '@flowershow/remark-wiki-link';
 import githubWikiSync from './src/integrations/github-wiki-sync.ts';
 import { loadEnv } from 'vite';
 
 // Load environment variables
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
-
-// Helper to determine if link is an image
-function isImageFile(name) {
-	const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'apng', 'bmp', 'ico'];
-	const ext = name.split('.').pop()?.toLowerCase();
-	return ext && imageExts.includes(ext);
-}
 
 // https://astro.build/config
 export default defineConfig({
@@ -33,31 +25,4 @@ export default defineConfig({
 			// No sidebar config - Starlight auto-generates all content at root level
 		}),
 	],
-	markdown: {
-		remarkPlugins: [
-			[
-				wikiLinkPlugin,
-				{
-					pathFormat: 'obsidian-absolute',
-					aliasDivider: '|',
-					// Custom resolver for wiki links and images
-					wikiLinkResolver: (name) => {
-						// Handle image links: [[image.png]] -> /attachments/image.png
-						if (isImageFile(name)) {
-							const filename = name.split('/').pop(); // Handle subdirs
-							return [`/attachments/${filename}`];
-						}
-
-						// Handle page links: [[Page Name]] -> /page-name
-						const slug = name
-							.toLowerCase()
-							.replace(/\s+/g, '-')
-							.replace(/[^\w-]/g, ''); // Remove special chars
-
-						return [`/${slug}`];
-					},
-				},
-			],
-		],
-	},
 });
