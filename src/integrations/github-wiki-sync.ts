@@ -2,6 +2,7 @@ import type { AstroIntegration } from 'astro';
 import { Octokit } from 'octokit';
 import fs from 'fs/promises';
 import path from 'path';
+import { loadCache, saveCache, fileExists } from '../lib/github-cache.js';
 
 interface GitHubWikiSyncOptions {
   token: string;
@@ -53,6 +54,41 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
           const defaultBranch = repo.default_branch;
           logger.info(`Using branch: ${defaultBranch}`);
 
+          // Load cache
+          const cache = await loadCache();
+
+          // Get current commit SHA for caching
+          const { data: commit } = await octokit.rest.repos.getCommit({
+            owner: options.owner,
+            repo: options.repo,
+            ref: defaultBranch,
+          });
+
+          const currentRepoSha = commit.sha;
+
+          // Fast path: Repository unchanged since last sync
+          if (cache.repositorySha === currentRepoSha) {
+            logger.info('Repository SHA unchanged since last sync');
+
+            // Verify all cached files still exist locally
+            const fileChecks = await Promise.all(
+              Object.values(cache.files).map((f) => fileExists(f.localPath))
+            );
+
+            const attachmentChecks = await Promise.all(
+              Object.values(cache.attachments).map((a) => fileExists(a.localPath))
+            );
+
+            if (fileChecks.every(Boolean) && attachmentChecks.every(Boolean)) {
+              logger.info(
+                `All ${fileChecks.length} files and ${attachmentChecks.length} attachments present - skipping sync`
+              );
+              return; // EXIT - No sync needed!
+            }
+
+            logger.warn('Some cached files missing, performing sync');
+          }
+
           // Get the repository tree
           const { data: tree } = await octokit.rest.git.getTree({
             owner: options.owner,
@@ -60,6 +96,39 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
             tree_sha: defaultBranch,
             recursive: 'true',
           });
+
+          // Build attachment index from tree (Option D)
+          const attachmentIndex = new Map<string, { path: string; sha: string }>();
+          const duplicateImages = new Map<string, string[]>();
+
+          for (const item of tree.tree) {
+            if (item.type === 'blob' && item.path && isImageFile(item.path)) {
+              const filename = item.path.split('/').pop()!;
+
+              // Track duplicates
+              if (attachmentIndex.has(filename)) {
+                const existing = attachmentIndex.get(filename)!;
+                if (!duplicateImages.has(filename)) {
+                  duplicateImages.set(filename, [existing.path]);
+                }
+                duplicateImages.get(filename)!.push(item.path);
+              }
+
+              // Store in index (last one wins if duplicates)
+              attachmentIndex.set(filename, {
+                path: item.path,
+                sha: item.sha!,
+              });
+            }
+          }
+
+          // Warn about duplicates
+          for (const [filename, paths] of duplicateImages) {
+            logger.warn(`Duplicate image filename: ${filename}`);
+            paths.forEach((p) => logger.warn(`  - ${p}`));
+          }
+
+          logger.info(`Indexed ${attachmentIndex.size} attachments in repository`);
 
           // Filter for markdown files in the wiki path, excluding readme files
           const wikiFiles = tree.tree.filter((item) => {
@@ -86,50 +155,154 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
           // Track all image references across all files
           const allImageReferences = new Set<string>();
 
-          // Download each markdown file
+          // Download each markdown file with file-level caching
+          let syncedCount = 0;
+          let cachedCount = 0;
+
           for (const file of wikiFiles) {
             if (!file.path || !file.sha) continue;
 
-            // Get file content
+            const relativePath = file.path.substring(options.wikiPath.length + 1);
+            const outputPath = path.join(contentDir, relativePath);
+
+            // Check cache
+            const cached = cache.files[relativePath];
+
+            if (cached && cached.sha === file.sha) {
+              // File unchanged
+              if (await fileExists(cached.localPath)) {
+                logger.info(`Cached: ${relativePath}`);
+                cachedCount++;
+
+                // Still need to extract image references for later
+                const markdown = await fs.readFile(cached.localPath, 'utf-8');
+                const images = extractImageReferences(markdown);
+                images.forEach((img) => allImageReferences.add(img));
+
+                continue; // Skip download
+              }
+            }
+
+            // File is new or changed - download it
+            logger.info(`Syncing: ${relativePath}`);
+
             const { data: content } = await octokit.rest.git.getBlob({
               owner: options.owner,
               repo: options.repo,
               file_sha: file.sha,
             });
 
-            // Decode base64 content
             const markdown = Buffer.from(content.content, 'base64').toString('utf-8');
-
-            // Extract the relative path within wiki/
-            const relativePath = file.path.substring(options.wikiPath.length + 1);
-            const outputPath = path.join(contentDir, relativePath);
 
             // Create subdirectories if needed
             await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
             // Write the markdown file
             await fs.writeFile(outputPath, markdown, 'utf-8');
-            logger.info(`Synced: ${relativePath}`);
+            syncedCount++;
+
+            // Update cache entry
+            cache.files[relativePath] = {
+              sha: file.sha,
+              syncedAt: new Date().toISOString(),
+              localPath: outputPath,
+            };
 
             // Extract image references from this file
             const images = extractImageReferences(markdown);
             images.forEach((img) => allImageReferences.add(img));
           }
 
+          logger.info(`Files: ${syncedCount} synced, ${cachedCount} cached`);
+
+          // Clean up deleted files
+          const currentPaths = new Set(
+            wikiFiles.map((f) => f.path!.substring(options.wikiPath.length + 1))
+          );
+
+          for (const [cachedPath, cachedFile] of Object.entries(cache.files)) {
+            if (!currentPaths.has(cachedPath)) {
+              logger.info(`Removing deleted file: ${cachedPath}`);
+              await fs.unlink(cachedFile.localPath).catch(() => {});
+              delete cache.files[cachedPath];
+            }
+          }
+
           logger.info(`Extracted ${allImageReferences.size} unique image references`);
 
-          // Download attachments
-          if (allImageReferences.size > 0) {
-            await downloadAttachments(
-              octokit,
-              options.owner,
-              options.repo,
-              defaultBranch,
-              Array.from(allImageReferences),
-              options.attachmentsDir,
-              logger
-            );
+          // Download attachments using tree index
+          const attachmentsPath = path.join(process.cwd(), options.attachmentsDir);
+          await fs.mkdir(attachmentsPath, { recursive: true });
+
+          let attachmentsSynced = 0;
+          let attachmentsCached = 0;
+
+          for (const imageName of allImageReferences) {
+            const localPath = path.join(attachmentsPath, imageName);
+            const imageInfo = attachmentIndex.get(imageName);
+
+            if (!imageInfo) {
+              logger.warn(`Image not found in repository: ${imageName}`);
+              continue;
+            }
+
+            // Check cache
+            const cached = cache.attachments[imageName];
+
+            if (cached && cached.sha === imageInfo.sha) {
+              if (await fileExists(cached.localPath)) {
+                logger.info(`Cached attachment: ${imageName}`);
+                attachmentsCached++;
+                continue; // Skip download
+              }
+            }
+
+            // Download attachment
+            logger.info(`Downloading: ${imageName} (from ${imageInfo.path})`);
+
+            const { data: content } = await octokit.rest.repos.getContent({
+              owner: options.owner,
+              repo: options.repo,
+              path: imageInfo.path,
+              ref: defaultBranch,
+            });
+
+            if ('content' in content) {
+              const imageBuffer = Buffer.from(content.content, 'base64');
+              await fs.writeFile(localPath, imageBuffer);
+              attachmentsSynced++;
+
+              // Update cache
+              cache.attachments[imageName] = {
+                sha: imageInfo.sha,
+                sourceUrl: imageInfo.path,
+                syncedAt: new Date().toISOString(),
+                localPath: localPath,
+                referencedBy: [], // Will be populated below
+              };
+            }
           }
+
+          logger.info(`Attachments: ${attachmentsSynced} synced, ${attachmentsCached} cached`);
+
+          // Clean up unreferenced attachments
+          for (const [imageName, cached] of Object.entries(cache.attachments)) {
+            if (!allImageReferences.has(imageName)) {
+              logger.info(`Removing unreferenced attachment: ${imageName}`);
+              await fs.unlink(cached.localPath).catch(() => {});
+              delete cache.attachments[imageName];
+            }
+          }
+
+          // Save cache
+          cache.repositorySha = currentRepoSha;
+          cache.lastSync = new Date().toISOString();
+
+          await saveCache(cache);
+
+          logger.info(
+            `Cache updated: ${Object.keys(cache.files).length} files, ${Object.keys(cache.attachments).length} attachments tracked`
+          );
 
           logger.info('GitHub wiki sync completed successfully');
         } catch (error) {
@@ -198,83 +371,4 @@ function isImageFile(filename: string): boolean {
   const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'apng', 'bmp', 'ico'];
   const ext = filename.split('.').pop()?.toLowerCase();
   return ext ? imageExtensions.includes(ext) : false;
-}
-
-/**
- * Download attachments from GitHub repository to local filesystem
- */
-async function downloadAttachments(
-  octokit: Octokit,
-  owner: string,
-  repo: string,
-  branch: string,
-  imageReferences: string[],
-  attachmentsDir: string,
-  logger: any
-): Promise<void> {
-  // Create attachments directory
-  const attachmentsPath = path.join(process.cwd(), attachmentsDir);
-  await fs.mkdir(attachmentsPath, { recursive: true });
-
-  logger.info(`Downloading ${imageReferences.length} attachments...`);
-
-  // Try to find each image in common attachment locations
-  const searchPaths = ['attachments', 'assets', 'images', '.attachments'];
-
-  for (const imageRef of imageReferences) {
-    const filename = imageRef.split('/').pop()!;
-    let downloaded = false;
-
-    // If the image reference includes a path, try that first
-    if (imageRef.includes('/')) {
-      try {
-        const { data } = await octokit.rest.repos.getContent({
-          owner,
-          repo,
-          path: imageRef,
-          ref: branch,
-        });
-
-        if ('content' in data) {
-          const imageBuffer = Buffer.from(data.content, 'base64');
-          await fs.writeFile(path.join(attachmentsPath, filename), imageBuffer);
-          logger.info(`Downloaded: ${filename} (from ${imageRef})`);
-          downloaded = true;
-        }
-      } catch (error) {
-        // Continue to try other paths
-      }
-    }
-
-    // If not found yet, search in common attachment directories
-    if (!downloaded) {
-      for (const searchPath of searchPaths) {
-        try {
-          const filePath = `${searchPath}/${filename}`;
-          const { data } = await octokit.rest.repos.getContent({
-            owner,
-            repo,
-            path: filePath,
-            ref: branch,
-          });
-
-          if ('content' in data) {
-            const imageBuffer = Buffer.from(data.content, 'base64');
-            await fs.writeFile(path.join(attachmentsPath, filename), imageBuffer);
-            logger.info(`Downloaded: ${filename} (from ${filePath})`);
-            downloaded = true;
-            break;
-          }
-        } catch (error) {
-          // Continue searching
-        }
-      }
-    }
-
-    if (!downloaded) {
-      logger.warn(`Could not find attachment: ${imageRef}`);
-    }
-  }
-
-  logger.info('Attachment download completed');
 }
