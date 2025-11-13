@@ -1,19 +1,22 @@
 import { visit } from 'unist-util-visit';
 
 /**
- * Remark plugin to strip 'wiki/' prefix from markdown links
+ * Remark plugin to strip 'wiki/' prefix from markdown links and images
  *
  * Transforms:
  * - [text](wiki/page.md) -> [text](/page)
  * - [text](wiki/page) -> [text](/page)
  * - [text](/wiki/page) -> [text](/page)
+ * - ![alt](wiki/image.png) -> ![alt](/attachments/image.png)
+ * - ![alt](/wiki/image.png) -> ![alt](/attachments/image.png)
  *
  * Handles both relative and absolute wiki paths, removes .md extension,
  * and converts to root-level paths matching the site structure.
  */
 export default function remarkStripWikiPrefix() {
   return (tree) => {
-    visit(tree, 'link', (node) => {
+    // Process both link and image nodes
+    visit(tree, ['link', 'image'], (node) => {
       if (node.url) {
         let url = node.url;
 
@@ -27,13 +30,21 @@ export default function remarkStripWikiPrefix() {
           return;
         }
 
+        // Check if this is an image file
+        const isImage = node.type === 'image' || isImageFile(url);
+
         // Strip leading 'wiki/' or '/wiki/'
+        let hadWikiPrefix = false;
         if (url.startsWith('wiki/')) {
           url = url.substring(5); // Remove 'wiki/'
+          hadWikiPrefix = true;
         } else if (url.startsWith('/wiki/')) {
           url = url.substring(6); // Remove '/wiki/'
-        } else {
-          // No wiki prefix, leave as-is
+          hadWikiPrefix = true;
+        }
+
+        // If no wiki prefix, leave as-is
+        if (!hadWikiPrefix) {
           return;
         }
 
@@ -50,20 +61,36 @@ export default function remarkStripWikiPrefix() {
           url = url.substring(0, hashIndex);
         }
 
-        // Convert to slug format (lowercase, hyphens)
-        url = url
-          .toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/[^\w\-\/]/g, '');
+        // For images, route to /attachments/ directory
+        if (isImage) {
+          // Extract just the filename (handle nested paths)
+          const filename = url.split('/').pop();
+          node.url = `/attachments/${filename}${hash}`;
+        } else {
+          // For regular links, convert to slug format (lowercase, hyphens)
+          url = url
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-\/]/g, '');
 
-        // Ensure leading slash for root-level path
-        if (!url.startsWith('/')) {
-          url = '/' + url;
+          // Ensure leading slash for root-level path
+          if (!url.startsWith('/')) {
+            url = '/' + url;
+          }
+
+          // Re-attach hash/anchor
+          node.url = url + hash;
         }
-
-        // Re-attach hash/anchor
-        node.url = url + hash;
       }
     });
   };
+}
+
+/**
+ * Check if a filename is an image based on extension
+ */
+function isImageFile(filename) {
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'apng', 'bmp', 'ico'];
+  const ext = filename.split('.').pop()?.toLowerCase();
+  return ext && imageExtensions.includes(ext);
 }
