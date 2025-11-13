@@ -21,6 +21,7 @@ export default defineConfig({
 		}),
 		starlight({
 			title: 'Breadchain Docs',
+			defaultColorScheme: 'light',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/BreadchainCoop' }],
 			customCss: [
 				'./src/styles/fonts.css',
