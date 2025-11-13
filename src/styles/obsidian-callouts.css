@@ -29,17 +29,17 @@
 
 /* Fix callout title layout - ensure icon and text are inline */
 .callout-title {
-	display: flex !important;
-	align-items: center !important;
-	gap: 0.5rem !important;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .callout-title-icon {
-	display: flex !important;
-	align-items: center !important;
-	flex-shrink: 0 !important;
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
 }
 
 .callout-title-text {
-	flex: 1 !important;
+	flex: 1;
 }
