@@ -27,20 +27,27 @@ export default defineConfig({
 			[
 				wikiLinkPlugin,
 				{
+					format: 'shortestPossible',
 					aliasDivider: '|',
-					wikiLinkResolver: (name) => {
+					urlResolver: ({ filePath, isEmbed, heading }) => {
+						console.log('[urlResolver] Input:', { filePath, isEmbed, heading });
+
 						// Handle image embeds: ![[image.png]] -> /attachments/image.png
-						if (isImageFile(name)) {
-							const filename = name.split('/').pop();
-							return [`/attachments/${filename}`];
+						if (isEmbed && isImageFile(filePath)) {
+							const filename = filePath.split('/').pop();
+							const result = `/attachments/${filename}`;
+							console.log('[urlResolver] Image output:', result);
+							return result;
 						}
 
 						// Strip wiki/ prefix and /index suffix
-						let linkName = name;
+						let linkName = filePath;
 						if (linkName.startsWith('wiki/')) {
 							linkName = linkName.substring(5);
+							console.log('[urlResolver] Stripped wiki/ prefix, now:', linkName);
 						} else if (linkName.startsWith('/wiki/')) {
 							linkName = linkName.substring(6);
+							console.log('[urlResolver] Stripped /wiki/ prefix, now:', linkName);
 						}
 
 						// Remove /index or /index.md suffix
@@ -59,7 +66,12 @@ export default defineConfig({
 							.replace(/[^\w\-\/]/g, '');
 
 						// Ensure leading slash
-						return slug.startsWith('/') ? [slug] : [`/${slug}`];
+						const result = slug.startsWith('/') ? `/${slug}` : slug;
+
+						// Append heading anchor if present
+						const finalUrl = heading ? `${result}#${heading}` : result;
+						console.log('[urlResolver] Final output:', finalUrl);
+						return finalUrl;
 					},
 					className: 'internal-link',
 					newClassName: 'internal-link-new',
