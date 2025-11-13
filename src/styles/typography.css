@@ -1,0 +1,163 @@
+/* Bread Design System - Typography System */
+/* Source: temp/bread-design-tokens.md */
+
+/* ===== HEADING 1 ===== */
+h1,
+.text-h1 {
+  font-family: var(--font-breadDisplay);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 3rem; /* 48px mobile */
+  line-height: 36px;
+}
+
+@media (min-width: 768px) {
+  h1,
+  .text-h1 {
+    font-size: 96px;
+    line-height: 76px;
+  }
+}
+
+@media (min-width: 1280px) {
+  h1,
+  .text-h1 {
+    font-size: 7rem; /* 112px */
+    line-height: 83px;
+  }
+}
+
+/* ===== HEADING 2 ===== */
+h2,
+.text-h2 {
+  font-family: var(--font-breadDisplay);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  font-size: 3rem; /* 48px */
+  line-height: 36px;
+}
+
+@media (min-width: 1280px) {
+  h2,
+  .text-h2 {
+    font-size: 80px;
+    line-height: 63px;
+  }
+}
+
+/* ===== HEADING 3 ===== */
+h3,
+.text-h3 {
+  font-family: var(--font-breadDisplay);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-size: 1.5rem; /* 24px mobile */
+  line-height: 20px;
+}
+
+@media (min-width: 768px) {
+  h3,
+  .text-h3 {
+    font-size: 2.5rem; /* 40px */
+    line-height: 36px;
+  }
+}
+
+@media (min-width: 1280px) {
+  h3,
+  .text-h3 {
+    font-size: 3rem; /* 48px */
+    line-height: 48px;
+  }
+}
+
+/* ===== HEADING 4 ===== */
+h4,
+.text-h4 {
+  font-family: var(--font-breadBody);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 24px;
+}
+
+@media (min-width: 1280px) {
+  h4,
+  .text-h4 {
+    font-size: 2rem; /* 32px */
+    line-height: 2rem;
+  }
+}
+
+/* ===== HEADING 5 ===== */
+h5,
+.text-h5 {
+  font-family: var(--font-breadBody);
+  font-weight: 400;
+  font-size: 1rem; /* 16px */
+}
+
+@media (min-width: 1280px) {
+  h5,
+  .text-h5 {
+    font-size: 1.5rem; /* 24px */
+    line-height: 24px;
+  }
+}
+
+/* ===== HEADING 6 ===== */
+h6,
+.text-h6 {
+  font-family: var(--font-breadBody);
+  font-weight: 700;
+  font-size: 1rem; /* 16px */
+  line-height: 1.5;
+}
+
+/* ===== BODY TEXT ===== */
+p,
+.text-body {
+  font-family: var(--font-breadBody);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-body-bold {
+  font-family: var(--font-breadBody);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+/* ===== CAPTION TEXT ===== */
+.text-caption {
+  font-family: var(--font-breadBody);
+  font-size: 0.7rem; /* ~11px */
+  line-height: 1.4;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.font-display {
+  font-family: var(--font-breadDisplay);
+}
+
+.font-body {
+  font-family: var(--font-breadBody);
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.font-black {
+  font-weight: 900;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-regular {
+  font-weight: 400;
+}

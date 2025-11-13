@@ -22,6 +22,14 @@ export default defineConfig({
 		starlight({
 			title: 'Breadchain Docs',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/BreadchainCoop' }],
+			customCss: [
+				'./src/styles/fonts.css',
+				'./src/styles/tokens.css',
+				'./src/styles/theme.css',
+				'./src/styles/typography.css',
+				'./src/styles/components.css',
+				'./src/styles/global.css',
+			],
 			// No sidebar config - Starlight auto-generates all content at root level
 		}),
 	],
