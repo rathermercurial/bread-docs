@@ -114,7 +114,29 @@
 /* Ensure theme toggle has proper contrast */
 starlight-theme-select button,
 starlight-theme-select select {
-  color: var(--sl-color-gray-6);
+  color: var(--sl-color-gray-6) !important;
+  background-color: var(--sl-color-gray-1);
+  border-color: var(--sl-color-gray-4);
+}
+
+/* Theme toggle icon (the sun/moon/auto icon) */
+starlight-theme-select svg,
+starlight-theme-select .icon {
+  color: var(--sl-color-gray-6) !important;
+  fill: currentColor;
+}
+
+/* Dropdown arrow for theme select */
+starlight-theme-select .caret,
+starlight-theme-select svg.caret {
+  color: var(--sl-color-gray-6) !important;
+  opacity: 1 !important;
+}
+
+/* Select element text */
+starlight-theme-select select option {
+  color: var(--sl-color-text);
+  background-color: var(--sl-color-bg);
 }
 
 /* Ensure "On this page" links have proper contrast */
