@@ -43,7 +43,7 @@ Links directly to a specific heading on a page.
 
 The wikilink resolver uses the following rules:
 
-1. **Shortest path matching**: Links use the shortest possible path (`obsidian-short` format)
+1. **Shortest path matching**: Links use the shortest possible path (`shortestPossible` format)
 2. **Automatic wiki/ prefix stripping**: Links from source content with `wiki/` prefix are automatically cleaned
 3. **Root-level resolution**: All links resolve to root level (`/page-name`, not `/wiki/page-name`)
 4. **Slug transformation**:
@@ -249,17 +249,19 @@ Transforms Obsidian wikilinks and embeds into standard HTML:
 - Handles image embeds `![[image.png]]`
 - Custom resolver function for URL generation
 - CSS classes for styling
-- Shortest path matching (`obsidian-short` format)
+- Shortest path matching (`shortestPossible` format)
 
 **Configuration** (see `astro.config.mjs`):
 ```javascript
 [wikiLinkPlugin, {
-  pathFormat: 'obsidian-short',  // Shortest path matching
+  format: 'shortestPossible',  // Shortest path matching
   aliasDivider: '|',
-  wikiLinkResolver: (name) => {
+  urlResolver: ({ filePath, isEmbed, heading }) => {
     // Strips wiki/ prefix if present in wikilinks
+    // Removes /index and .md suffixes
     // Converts to slug format
     // Routes images to /attachments/
+    // Handles heading anchors
   },
   className: 'internal-link',
   newClassName: 'internal-link-new',
@@ -315,7 +317,7 @@ export default defineConfig({
       // IMPORTANT: Order matters! Strip wiki/ prefix first
       remarkStripWikiPrefix,
       [wikiLinkPlugin, {
-        pathFormat: 'obsidian-short',  // Shortest path
+        format: 'shortestPossible',  // Shortest path
         // ... other config
       }],
     ],
@@ -334,17 +336,19 @@ export default defineConfig({
 
 ### Customizing Link Resolution
 
-To change how wikilinks are resolved, modify the `wikiLinkResolver` function in `astro.config.mjs`:
+To change how wikilinks are resolved, modify the `urlResolver` function in `astro.config.mjs`:
 
 ```javascript
-wikiLinkResolver: (name) => {
+urlResolver: ({ filePath, isEmbed, heading }) => {
   // Example: Add a wiki/ prefix
-  const slug = name.toLowerCase().replace(/\s+/g, '-');
-  return [`/wiki/${slug}`];
+  const slug = filePath.toLowerCase().replace(/\s+/g, '-');
+  const url = `/wiki/${slug}`;
+  return heading ? `${url}#${heading}` : url;
 
   // Or: Use a different slugification
-  const slug = someCustomSlugify(name);
-  return [`/${slug}`];
+  const slug = someCustomSlugify(filePath);
+  const url = `/${slug}`;
+  return heading ? `${url}#${heading}` : url;
 }
 ```
 
@@ -565,10 +569,16 @@ Screenshot of the dashboard:
 
 ## Version History
 
+- **v1.3** (2025-01-13) - Fixed wikilink plugin API usage
+  - Corrected plugin configuration to use proper API: `format` instead of `pathFormat`, `urlResolver` instead of `wikiLinkResolver`
+  - Updated urlResolver function signature to match plugin spec: `({ filePath, isEmbed, heading }) => string`
+  - This fixes the issue where wiki/ prefix was not being stripped from wikilinks
+  - Added comprehensive debug logging to diagnose link transformation
+
 - **v1.2** (2025-01-13) - Wiki prefix stripping and shortest path support
   - Added custom `remark-strip-wiki-prefix` plugin
   - Automatic removal of `wiki/` prefix from standard markdown links
-  - Changed to `obsidian-short` path format for shortest path matching
+  - Changed to `shortestPossible` path format for shortest path matching
   - Improved link resolution to match source content strategy
   - Fixed callout title layout (icon and text inline)
 
