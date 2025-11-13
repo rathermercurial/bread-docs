@@ -139,6 +139,36 @@ starlight-theme-select select option {
   background-color: var(--sl-color-bg);
 }
 
+/* Theme select dropdown open state */
+starlight-theme-select select:focus,
+starlight-theme-select select[aria-expanded="true"] {
+  color: var(--sl-color-gray-6) !important;
+  background-color: var(--sl-color-bg);
+  border-color: var(--sl-color-text-accent);
+}
+
+/* Theme menu items in dropdown */
+starlight-theme-select option,
+starlight-theme-select [role="option"] {
+  color: var(--sl-color-gray-6) !important;
+  background-color: var(--sl-color-bg);
+}
+
+starlight-theme-select option:hover,
+starlight-theme-select [role="option"]:hover {
+  color: var(--sl-color-text-accent) !important;
+  background-color: var(--sl-color-gray-2);
+}
+
+/* Selected theme option */
+starlight-theme-select option:checked,
+starlight-theme-select option[aria-selected="true"],
+starlight-theme-select [role="option"][aria-selected="true"] {
+  color: var(--sl-color-text-accent) !important;
+  background-color: var(--sl-color-gray-2);
+  font-weight: 700;
+}
+
 /* Ensure "On this page" links have proper contrast */
 .right-sidebar a {
   color: var(--sl-color-gray-5);
