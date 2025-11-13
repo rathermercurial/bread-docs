@@ -5,17 +5,11 @@ import githubWikiSync from './src/integrations/github-wiki-sync.ts';
 import { loadEnv } from 'vite';
 import wikiLinkPlugin from '@flowershow/remark-wiki-link';
 import rehypeCallouts from 'rehype-callouts';
-import remarkStripWikiPrefix from './src/plugins/remark-strip-wiki-prefix.js';
+import remarkStripWikiPrefix from './src/plugins/remark-strip-wiki-prefix.ts';
+import { isImageFile, stripWikiPrefix, slugify, removeIndexSuffix, ensureLeadingSlash } from './src/lib/markdown-utils.ts';
 
 // Load environment variables
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
-
-// Helper function to check if a link target is an image file
-function isImageFile(name) {
-	const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'apng', 'bmp', 'ico'];
-	const ext = name.split('.').pop()?.toLowerCase();
-	return ext && imageExtensions.includes(ext);
-}
 
 // https://astro.build/config
 export default defineConfig({
@@ -36,31 +30,11 @@ export default defineConfig({
 							return `/attachments/${filename}`;
 						}
 
-						// Strip wiki/ prefix and /index suffix
-						let linkName = filePath;
-						if (linkName.startsWith('wiki/')) {
-							linkName = linkName.substring(5);
-						} else if (linkName.startsWith('/wiki/')) {
-							linkName = linkName.substring(6);
-						}
-
-						// Remove /index or /index.md suffix
-						if (linkName.endsWith('/index.md')) {
-							linkName = linkName.substring(0, linkName.length - 9);
-						} else if (linkName.endsWith('/index')) {
-							linkName = linkName.substring(0, linkName.length - 6);
-						} else if (linkName.endsWith('.md')) {
-							linkName = linkName.substring(0, linkName.length - 3);
-						}
-
-						// Convert to slug format
-						const slug = linkName
-							.toLowerCase()
-							.replace(/\s+/g, '-')
-							.replace(/[^\w\-\/]/g, '');
-
-						// Ensure leading slash
-						const result = slug.startsWith('/') ? `/${slug}` : slug;
+						// Process the path using shared utilities
+						let linkName = stripWikiPrefix(filePath);
+						linkName = removeIndexSuffix(linkName);
+						const slug = slugify(linkName);
+						const result = ensureLeadingSlash(slug);
 
 						// Append heading anchor if present
 						return heading ? `${result}#${heading}` : result;

@@ -3,6 +3,7 @@ import { Octokit } from 'octokit';
 import fs from 'fs/promises';
 import path from 'path';
 import { loadCache, saveCache, fileExists } from '../lib/github-cache.js';
+import { isImageFile } from '../lib/markdown-utils.js';
 
 interface GitHubWikiSyncOptions {
   token: string;
@@ -362,13 +363,4 @@ function extractImageReferences(markdown: string): string[] {
   }
 
   return Array.from(images);
-}
-
-/**
- * Check if a filename is an image based on extension
- */
-function isImageFile(filename: string): boolean {
-  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'apng', 'bmp', 'ico'];
-  const ext = filename.split('.').pop()?.toLowerCase();
-  return ext ? imageExtensions.includes(ext) : false;
 }
