@@ -25,40 +25,44 @@
   --sl-color-bg: var(--color-paper-main);
   --sl-color-bg-nav: var(--color-paper-0);
   --sl-color-bg-sidebar: var(--color-paper-1);
-  --sl-color-gray-1: var(--color-paper-0);
-  --sl-color-gray-2: var(--color-paper-1);
-  --sl-color-gray-3: var(--color-paper-2);
-  --sl-color-gray-4: #c9c9c9;
-  --sl-color-gray-5: var(--color-surface-grey);
-  --sl-color-gray-6: var(--color-surface-ink);
 
-  /* Text colors */
-  --sl-color-text: var(--color-text-standard);
+  /* Gray scale - ensure proper contrast */
+  --sl-color-gray-1: #fdfcf9;
+  --sl-color-gray-2: #f0ebe0;
+  --sl-color-gray-3: #e0d9ca;
+  --sl-color-gray-4: #a8a8a8;
+  --sl-color-gray-5: #666666;
+  --sl-color-gray-6: #1b201a;
+
+  /* Text colors - ensure readability */
+  --sl-color-text: #1b201a;
   --sl-color-text-accent: var(--color-primary-orange);
-  --sl-color-white: var(--color-surface-ink);
-  --sl-color-black: var(--color-paper-main);
+  --sl-color-white: #1b201a;
+  --sl-color-black: #f6f3eb;
 }
 
 /* ===== DARK MODE ===== */
 :root[data-theme="dark"] {
   /* Backgrounds */
-  --sl-color-bg: #1a1a1a;
-  --sl-color-bg-nav: #0f0f0f;
+  --sl-color-bg: #0f0f0f;
+  --sl-color-bg-nav: #0a0a0a;
   --sl-color-bg-sidebar: #141414;
-  --sl-color-gray-1: #2a2a2a;
-  --sl-color-gray-2: #333333;
-  --sl-color-gray-3: #3d3d3d;
-  --sl-color-gray-4: #474747;
-  --sl-color-gray-5: #858585;
-  --sl-color-gray-6: #e0e0e0;
 
-  /* Text colors */
-  --sl-color-text: #e0e0e0;
+  /* Gray scale - ensure proper contrast */
+  --sl-color-gray-1: #1a1a1a;
+  --sl-color-gray-2: #262626;
+  --sl-color-gray-3: #333333;
+  --sl-color-gray-4: #5c5c5c;
+  --sl-color-gray-5: #999999;
+  --sl-color-gray-6: #e8e8e8;
+
+  /* Text colors - ensure readability */
+  --sl-color-text: #e8e8e8;
   --sl-color-text-accent: var(--color-primary-orange);
   --sl-color-white: #ffffff;
   --sl-color-black: #000000;
 
-  /* Accent colors remain the same */
+  /* Accent colors */
   --sl-color-accent-low: var(--color-orange-1);
   --sl-color-accent: var(--color-primary-orange);
   --sl-color-accent-high: var(--color-orange-0);
