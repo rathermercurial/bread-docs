@@ -27,50 +27,41 @@ export default defineConfig({
 			[
 				wikiLinkPlugin,
 				{
-					pathFormat: 'raw', // Use raw format to process paths as-is
 					aliasDivider: '|',
 					wikiLinkResolver: (name) => {
-						// Debug logging
-						console.log('[wikiLinkResolver] Input name:', name);
-
 						// Handle image embeds: ![[image.png]] -> /attachments/image.png
 						if (isImageFile(name)) {
-							const filename = name.split('/').pop(); // Handle paths like 'folder/image.png'
-							const result = [`/attachments/${filename}`];
-							console.log('[wikiLinkResolver] Image result:', result);
-							return result;
+							const filename = name.split('/').pop();
+							return [`/attachments/${filename}`];
 						}
 
-						// Handle page links: [[Page Name]] -> /page-name (root level, shortest path)
-						// Strip any wiki/ prefix if present in the wikilink itself
+						// Strip wiki/ prefix and /index suffix
 						let linkName = name;
 						if (linkName.startsWith('wiki/')) {
 							linkName = linkName.substring(5);
-							console.log('[wikiLinkResolver] Stripped wiki/ prefix, new linkName:', linkName);
 						} else if (linkName.startsWith('/wiki/')) {
 							linkName = linkName.substring(6);
-							console.log('[wikiLinkResolver] Stripped /wiki/ prefix, new linkName:', linkName);
 						}
 
+						// Remove /index or /index.md suffix
+						if (linkName.endsWith('/index.md')) {
+							linkName = linkName.substring(0, linkName.length - 9);
+						} else if (linkName.endsWith('/index')) {
+							linkName = linkName.substring(0, linkName.length - 6);
+						} else if (linkName.endsWith('.md')) {
+							linkName = linkName.substring(0, linkName.length - 3);
+						}
+
+						// Convert to slug format
 						const slug = linkName
 							.toLowerCase()
-							.replace(/\s+/g, '-') // spaces to hyphens
-							.replace(/[^\w\-\/]/g, ''); // remove special chars, keep slashes for nested paths
+							.replace(/\s+/g, '-')
+							.replace(/[^\w\-\/]/g, '');
 
-						// Ensure leading slash for root-level path
-						let result;
-						if (!slug.startsWith('/')) {
-							result = [`/${slug}`];
-						} else {
-							result = [slug];
-						}
-
-						console.log('[wikiLinkResolver] Final result:', result);
-						return result;
+						// Ensure leading slash
+						return slug.startsWith('/') ? [slug] : [`/${slug}`];
 					},
-					// Add CSS class to all wiki links for styling
 					className: 'internal-link',
-					// Add CSS class to links that don't have matching pages
 					newClassName: 'internal-link-new',
 				},
 			],
