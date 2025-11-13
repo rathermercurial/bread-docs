@@ -1,30 +1,37 @@
 /* Obsidian-style markdown support for Starlight */
+/* Enhanced for Bread Design System */
 
 /* Internal link styling for wikilinks */
 .internal-link {
-	color: var(--sl-color-text-accent);
+	color: var(--color-primary-orange);
 	text-decoration: underline;
 	text-decoration-style: dotted;
+	text-decoration-color: var(--color-orange-0);
+	font-weight: 500;
 }
 
 .internal-link:hover {
+	color: var(--color-orange-1);
 	text-decoration-style: solid;
+	text-decoration-color: var(--color-orange-1);
 }
 
 /* Broken/missing internal links */
 .internal-link-new {
-	color: var(--sl-color-red);
+	color: var(--color-system-red);
 	text-decoration: underline;
 	text-decoration-style: dotted;
+	opacity: 0.8;
 }
 
 .internal-link-new:hover {
 	text-decoration-style: solid;
+	opacity: 1;
 }
 
 /*
  * Callout styles - rehype-callouts with theme: 'obsidian' provides base styling
- * Additional fixes for Starlight compatibility
+ * Additional fixes for Starlight compatibility and Bread Design System
  */
 
 /* Fix callout title layout - ensure icon and text are inline */
@@ -32,6 +39,8 @@
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
+	font-family: var(--font-breadBody);
+	font-weight: 700;
 }
 
 .callout-title-icon {
@@ -42,4 +51,21 @@
 
 .callout-title-text {
 	flex: 1;
+}
+
+/* Ensure callout content has proper contrast */
+.callout {
+	border-radius: 0; /* Bread uses sharp corners */
+	border-left-width: 4px;
+	font-family: var(--font-breadBody);
+}
+
+/* Enhance callout contrast for light mode */
+:root[data-theme="light"] .callout {
+	background-color: rgba(246, 243, 235, 0.5);
+}
+
+/* Enhance callout contrast for dark mode */
+:root[data-theme="dark"] .callout {
+	background-color: rgba(255, 255, 255, 0.05);
 }

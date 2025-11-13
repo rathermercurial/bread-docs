@@ -100,12 +100,9 @@ export default defineConfig({
 				'./src/styles/typography.css',
 				'./src/styles/components.css',
 				'./src/styles/global.css',
-			],
-			// No sidebar config - Starlight auto-generates all content at root level
-			customCss: [
-				// Custom styles for Obsidian callouts and wikilinks
 				'./src/styles/obsidian-callouts.css',
 			],
+			// No sidebar config - Starlight auto-generates all content at root level
 		}),
 	],
 });
