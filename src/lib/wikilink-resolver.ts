@@ -57,12 +57,12 @@ export function findDocumentFromLink(target: string, files: string[]): string | 
     normalizedTarget = normalizedTarget.substring(0, normalizedTarget.length - 6);
   }
 
-  // Try exact matches first
+  // Try exact matches first (with and without .md)
   for (const file of files) {
     const fileWithoutExt = file.endsWith('.md') ? file.substring(0, file.length - 3) : file;
 
     // Exact match
-    if (file === target || fileWithoutExt === normalizedTarget) {
+    if (file === target || file === `${target}.md` || fileWithoutExt === normalizedTarget) {
       return file;
     }
 
@@ -71,11 +71,32 @@ export function findDocumentFromLink(target: string, files: string[]): string | 
       return file;
     }
 
-    // Match filename only (shortest path)
-    const filename = fileWithoutExt.split('/').pop();
-    const targetFilename = normalizedTarget.split('/').pop();
-    if (filename === targetFilename) {
+    // Match with /index.md added
+    if (file === `${normalizedTarget}/index.md`) {
       return file;
+    }
+  }
+
+  // Try directory + index match
+  for (const file of files) {
+    const fileWithoutExt = file.endsWith('.md') ? file.substring(0, file.length - 3) : file;
+
+    // If target is "foo", match "foo/index.md"
+    if (fileWithoutExt === `${normalizedTarget}/index`) {
+      return file;
+    }
+  }
+
+  // Try filename-only matching (shortest path)
+  const targetFilename = normalizedTarget.split('/').pop();
+  if (targetFilename) {
+    for (const file of files) {
+      const fileWithoutExt = file.endsWith('.md') ? file.substring(0, file.length - 3) : file;
+      const filename = fileWithoutExt.split('/').pop();
+
+      if (filename === targetFilename || filename === `${targetFilename}/index`) {
+        return file;
+      }
     }
   }
 
@@ -133,6 +154,8 @@ export function resolveWikilink(filePath: string, heading?: string): string {
     } else {
       // File not found - fallback to slug-based resolution
       console.warn(`[wikilink-resolver] File not found for link: ${filePath}`);
+      console.warn(`[wikilink-resolver] Searched for: ${cleanPath}`);
+      console.warn(`[wikilink-resolver] Available files (${filePaths.length}): ${filePaths.slice(0, 5).join(', ')}${filePaths.length > 5 ? '...' : ''}`);
       let linkName = stripWikiPrefix(filePath);
       linkName = removeIndexSuffix(linkName);
       const slug = slugify(linkName);

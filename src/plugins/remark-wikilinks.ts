@@ -136,9 +136,15 @@ function replaceWikilinksinText(text: string): (Text | Link | Image)[] {
  */
 const remarkWikilinks: Plugin<[], Root> = () => {
   return (tree: Root) => {
-    visit(tree, 'paragraph', (node: Paragraph, index, parent) => {
+    // Process ALL nodes that can contain text, not just paragraphs
+    visit(tree, (node: any, index, parent: any) => {
+      // Process nodes that have children (paragraph, heading, listItem, blockquote, etc.)
+      if (!node.children || !Array.isArray(node.children)) {
+        return;
+      }
+
       let modified = false;
-      const newChildren: typeof node.children = [];
+      const newChildren: any[] = [];
 
       for (const child of node.children) {
         if (child.type === 'text') {
