@@ -23,7 +23,23 @@
 }
 
 /*
- * Callout styles are provided by rehype-callouts with theme: 'obsidian'
- * The plugin includes built-in CSS for Obsidian-style callouts with dark mode support
- * See: https://github.com/lin-stephanie/rehype-callouts
+ * Callout styles - rehype-callouts with theme: 'obsidian' provides base styling
+ * Additional fixes for Starlight compatibility
  */
+
+/* Fix callout title layout - ensure icon and text are inline */
+.callout-title {
+	display: flex !important;
+	align-items: center !important;
+	gap: 0.5rem !important;
+}
+
+.callout-title-icon {
+	display: flex !important;
+	align-items: center !important;
+	flex-shrink: 0 !important;
+}
+
+.callout-title-text {
+	flex: 1 !important;
+}
