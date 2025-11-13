@@ -4,7 +4,7 @@ Comprehensive documentation for Obsidian-flavored markdown features in Breadchai
 
 ## Overview
 
-Breadchain Docs now supports Obsidian-style markdown syntax, allowing you to write documentation using familiar Obsidian features like wikilinks, image embeds, and callouts. This is powered by a combination of remark plugins that transform Obsidian syntax during the build process.
+Breadchain Docs now supports Obsidian-style markdown syntax, allowing you to write documentation using familiar Obsidian features like wikilinks, image embeds, and callouts. This is powered by a combination of remark and rehype plugins that transform Obsidian syntax during the build process.
 
 ## Features
 
@@ -192,15 +192,16 @@ The Obsidian support is implemented through a plugin pipeline:
    ↓ Downloads markdown files and images
 2. Starlight Content Loader
    ↓ Discovers content files
-3. Remark Plugins (Markdown Processing)
+3. Remark Plugins (Markdown AST Processing)
    ↓ @flowershow/remark-wiki-link (wikilinks & embeds)
-   ↓ remark-obsidian-callout (callouts)
-4. Final HTML Output
+4. Rehype Plugins (HTML Processing)
+   ↓ rehype-callouts (callouts with built-in CSS)
+5. Final HTML Output
 ```
 
-### Remark Plugins
+### Plugins
 
-#### @flowershow/remark-wiki-link
+#### @flowershow/remark-wiki-link (Remark Plugin)
 
 **Package**: `@flowershow/remark-wiki-link@^3.1.2`
 
@@ -223,31 +224,39 @@ Transforms Obsidian wikilinks and embeds into standard HTML:
 }]
 ```
 
-#### remark-obsidian-callout
+#### rehype-callouts (Rehype Plugin)
 
-**Package**: `remark-obsidian-callout@^1.5.1`
+**Package**: `rehype-callouts@^1.5.0` (actively maintained)
 
 Transforms Obsidian callout syntax into styled HTML:
 - Parses `> [!type]` syntax
 - Supports foldable callouts (`-` and `+`)
-- Outputs semantic HTML with data attributes
-- Works with custom CSS for styling
+- Built-in Obsidian theme with CSS included
+- Outputs semantic HTML (uses `<div>` or `<details>` elements)
+- Automatic dark mode support
+
+**Configuration** (see `astro.config.mjs`):
+```javascript
+[rehypeCallouts, {
+  theme: 'obsidian',  // Uses built-in Obsidian theme
+}]
+```
+
+**Note**: This plugin replaced the unmaintained `remark-obsidian-callout` package.
 
 ### Custom CSS
 
 **File**: `src/styles/obsidian-callouts.css`
 
 Provides styling for:
-- All callout types with appropriate colors
-- Dark mode support
-- Foldable callout interactions
-- Internal link styling
-- Responsive design
+- Internal wikilink styling (`.internal-link`)
+- Broken link indicators (`.internal-link-new`)
+- Callout styles are provided by rehype-callouts built-in CSS
 
-The CSS integrates with Starlight's design tokens:
-- Uses CSS variables for theming
-- Respects dark/light mode preferences
-- Matches Starlight's visual style
+The plugin's built-in CSS:
+- Matches Obsidian's visual style
+- Automatic dark mode support
+- No additional configuration needed
 
 ## Configuration
 
@@ -255,13 +264,15 @@ The CSS integrates with Starlight's design tokens:
 
 ```javascript
 import wikiLinkPlugin from '@flowershow/remark-wiki-link';
-import remarkObsidianCallout from 'remark-obsidian-callout';
+import rehypeCallouts from 'rehype-callouts';
 
 export default defineConfig({
   markdown: {
     remarkPlugins: [
       [wikiLinkPlugin, { /* config */ }],
-      remarkObsidianCallout,
+    ],
+    rehypePlugins: [
+      [rehypeCallouts, { theme: 'obsidian' }],
     ],
   },
   integrations: [
@@ -371,10 +382,11 @@ Edit `src/styles/obsidian-callouts.css` to:
 
 ### Callouts not styled
 
-1. Verify `remark-obsidian-callout` is installed
-2. Check that custom CSS is loaded in Starlight config
-3. Clear `.astro` cache directory
-4. Inspect HTML for correct `data-callout` attributes
+1. Verify `rehype-callouts` is installed
+2. Check that plugin is configured in `rehypePlugins` array
+3. Ensure `theme: 'obsidian'` is set in plugin options
+4. Clear `.astro` cache directory
+5. Inspect HTML for correct callout structure
 
 ### Images not loading
 
@@ -498,15 +510,19 @@ Screenshot of the dashboard:
 ## Additional Resources
 
 - [Obsidian Documentation](https://help.obsidian.md/) - Official Obsidian docs
-- [Flowershow remark-wiki-link](https://github.com/flowershow/remark-wiki-link) - Plugin source
-- [remark-obsidian-callout](https://github.com/escwxyz/remark-obsidian-callout) - Callout plugin
+- [Flowershow remark-wiki-link](https://github.com/flowershow/remark-wiki-link) - Wikilink plugin source
+- [rehype-callouts](https://github.com/lin-stephanie/rehype-callouts) - Callout plugin (maintained)
 - [Starlight Documentation](https://starlight.astro.build/) - Framework docs
 - [Astro Markdown](https://docs.astro.build/en/guides/markdown-content/) - Markdown in Astro
 
 ## Version History
 
+- **v1.1** (2025-01-13) - Updated to maintained plugins
+  - Replaced `remark-obsidian-callout` with `rehype-callouts`
+  - Built-in Obsidian theme with automatic dark mode
+  - Improved callout styling and compatibility
+
 - **v1.0** (2025-01-13) - Initial implementation
   - Wikilink support via @flowershow/remark-wiki-link
-  - Callout support via remark-obsidian-callout
-  - Custom CSS for Starlight integration
+  - Callout support
   - Link resolution without wiki/ prefix

@@ -4,7 +4,7 @@ import starlight from '@astrojs/starlight';
 import githubWikiSync from './src/integrations/github-wiki-sync.ts';
 import { loadEnv } from 'vite';
 import wikiLinkPlugin from '@flowershow/remark-wiki-link';
-import remarkObsidianCallout from 'remark-obsidian-callout';
+import rehypeCallouts from 'rehype-callouts';
 
 // Load environment variables
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
@@ -20,7 +20,7 @@ function isImageFile(name) {
 export default defineConfig({
 	markdown: {
 		remarkPlugins: [
-			// 1. Transform Obsidian wikilinks to standard links
+			// Transform Obsidian wikilinks to standard links
 			[
 				wikiLinkPlugin,
 				{
@@ -47,8 +47,15 @@ export default defineConfig({
 					newClassName: 'internal-link-new',
 				},
 			],
-			// 2. Transform Obsidian callouts/admonitions
-			remarkObsidianCallout,
+		],
+		rehypePlugins: [
+			// Transform Obsidian callouts/admonitions (uses Obsidian theme by default)
+			[
+				rehypeCallouts,
+				{
+					theme: 'obsidian',
+				},
+			],
 		],
 	},
 	integrations: [
