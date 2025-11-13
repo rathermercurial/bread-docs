@@ -1,11 +1,22 @@
 /* Bread Design System - Starlight Theme Overrides */
 /* Maps Bread design tokens to Starlight CSS custom properties */
 
+/*
+ * ⚠️ ARCHITECTURAL NOTES:
+ *
+ * This file uses direct DOM selectors (starlight-theme-select, site-search, etc.)
+ * which are fragile and may break with Starlight updates. For production use,
+ * consider using Starlight's component override system instead.
+ *
+ * See ARCHITECTURE_AUDIT.md for detailed analysis and refactoring recommendations.
+ *
+ * Starlight version compatibility: 0.36.x
+ */
+
 :root {
   /* ===== FONTS ===== */
-  --sl-font: var(--font-breadBody);
   --sl-font-system: var(--font-breadBody);
-  --sl-font-code: 'Monaco', 'Courier New', monospace;
+  --sl-font-system-mono: 'Monaco', 'Courier New', monospace;
 
   /* ===== ACCENT COLOR (links, current nav item) ===== */
   --sl-color-accent-low: var(--color-orange-0);
