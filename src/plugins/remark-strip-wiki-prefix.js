@@ -19,7 +19,6 @@ export default function remarkStripWikiPrefix() {
     visit(tree, ['link', 'image'], (node) => {
       if (node.url) {
         let url = node.url;
-        const originalUrl = url;
 
         // Skip external links (http/https)
         if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -49,8 +48,6 @@ export default function remarkStripWikiPrefix() {
           return;
         }
 
-        console.log(`[remarkStripWikiPrefix] Processing ${node.type}: ${originalUrl}`);
-
         // Remove .md extension if present
         if (url.endsWith('.md')) {
           url = url.substring(0, url.length - 3);
@@ -69,7 +66,6 @@ export default function remarkStripWikiPrefix() {
           // Extract just the filename (handle nested paths)
           const filename = url.split('/').pop();
           node.url = `/attachments/${filename}${hash}`;
-          console.log(`[remarkStripWikiPrefix] Image transformed to: ${node.url}`);
         } else {
           // For regular links, convert to slug format (lowercase, hyphens)
           url = url
@@ -84,7 +80,6 @@ export default function remarkStripWikiPrefix() {
 
           // Re-attach hash/anchor
           node.url = url + hash;
-          console.log(`[remarkStripWikiPrefix] Link transformed to: ${node.url}`);
         }
       }
     });

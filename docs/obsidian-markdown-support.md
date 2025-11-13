@@ -573,7 +573,7 @@ Screenshot of the dashboard:
   - Corrected plugin configuration to use proper API: `format` instead of `pathFormat`, `urlResolver` instead of `wikiLinkResolver`
   - Updated urlResolver function signature to match plugin spec: `({ filePath, isEmbed, heading }) => string`
   - This fixes the issue where wiki/ prefix was not being stripped from wikilinks
-  - Added comprehensive debug logging to diagnose link transformation
+  - Cleaned and production-ready implementation
 
 - **v1.2** (2025-01-13) - Wiki prefix stripping and shortest path support
   - Added custom `remark-strip-wiki-prefix` plugin
