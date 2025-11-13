@@ -1,0 +1,45 @@
+/* Obsidian-style markdown support for Starlight */
+
+/* Internal link styling for wikilinks */
+.internal-link {
+	color: var(--sl-color-text-accent);
+	text-decoration: underline;
+	text-decoration-style: dotted;
+}
+
+.internal-link:hover {
+	text-decoration-style: solid;
+}
+
+/* Broken/missing internal links */
+.internal-link-new {
+	color: var(--sl-color-red);
+	text-decoration: underline;
+	text-decoration-style: dotted;
+}
+
+.internal-link-new:hover {
+	text-decoration-style: solid;
+}
+
+/*
+ * Callout styles - rehype-callouts with theme: 'obsidian' provides base styling
+ * Additional fixes for Starlight compatibility
+ */
+
+/* Fix callout title layout - ensure icon and text are inline */
+.callout-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.callout-title-icon {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.callout-title-text {
+	flex: 1;
+}
