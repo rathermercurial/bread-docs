@@ -27,7 +27,7 @@ export default defineConfig({
 			[
 				wikiLinkPlugin,
 				{
-					pathFormat: 'obsidian-short', // Use shortest path matching
+					pathFormat: 'raw', // Use raw format to process paths as-is
 					aliasDivider: '|',
 					wikiLinkResolver: (name) => {
 						// Handle image embeds: ![[image.png]] -> /attachments/image.png
@@ -41,6 +41,8 @@ export default defineConfig({
 						let linkName = name;
 						if (linkName.startsWith('wiki/')) {
 							linkName = linkName.substring(5);
+						} else if (linkName.startsWith('/wiki/')) {
+							linkName = linkName.substring(6);
 						}
 
 						const slug = linkName
@@ -48,7 +50,11 @@ export default defineConfig({
 							.replace(/\s+/g, '-') // spaces to hyphens
 							.replace(/[^\w\-\/]/g, ''); // remove special chars, keep slashes for nested paths
 
-						return [`/${slug}`];
+						// Ensure leading slash for root-level path
+						if (!slug.startsWith('/')) {
+							return [`/${slug}`];
+						}
+						return [slug];
 					},
 					// Add CSS class to all wiki links for styling
 					className: 'internal-link',
