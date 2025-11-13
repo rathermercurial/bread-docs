@@ -3,8 +3,8 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import githubWikiSync from './src/integrations/github-wiki-sync.ts';
 import { loadEnv } from 'vite';
-import rehypeCallouts from 'rehype-callouts';
 import remarkStripWikiPrefix from './src/plugins/remark-strip-wiki-prefix.ts';
+import remarkObsidianToStarlight from './src/plugins/remark-obsidian-to-starlight.ts';
 import remarkWikilinks from './src/plugins/remark-wikilinks.ts';
 
 // Load environment variables
@@ -16,17 +16,10 @@ export default defineConfig({
 		remarkPlugins: [
 			// Strip wiki/ prefix from standard markdown links
 			remarkStripWikiPrefix,
+			// Transform Obsidian callouts to Starlight asides
+			remarkObsidianToStarlight,
 			// Transform Obsidian wikilinks to standard links (custom implementation)
 			remarkWikilinks,
-		],
-		rehypePlugins: [
-			// Transform Obsidian callouts/admonitions (uses Obsidian theme by default)
-			[
-				rehypeCallouts,
-				{
-					theme: 'obsidian',
-				},
-			],
 		],
 	},
 	integrations: [

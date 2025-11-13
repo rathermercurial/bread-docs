@@ -11,6 +11,18 @@
 	text-decoration-style: solid;
 }
 
+/* Embedded links (document embeds) */
+.internal-link-embed {
+	color: var(--sl-color-text-accent);
+	text-decoration: underline;
+	text-decoration-style: dotted;
+	font-style: italic;
+}
+
+.internal-link-embed:hover {
+	text-decoration-style: solid;
+}
+
 /* Broken/missing internal links */
 .internal-link-new {
 	color: var(--sl-color-red);
@@ -23,23 +35,7 @@
 }
 
 /*
- * Callout styles - rehype-callouts with theme: 'obsidian' provides base styling
- * Additional fixes for Starlight compatibility
+ * Callouts are now handled by Starlight's native aside components
+ * Obsidian callout syntax (> [!note]) is transformed to Starlight asides (:::note)
+ * No additional CSS needed - Starlight provides full styling
  */
-
-/* Fix callout title layout - ensure icon and text are inline */
-.callout-title {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-}
-
-.callout-title-icon {
-	display: flex;
-	align-items: center;
-	flex-shrink: 0;
-}
-
-.callout-title-text {
-	flex: 1;
-}
