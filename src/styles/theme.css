@@ -148,3 +148,76 @@ starlight-theme-select select option {
 .right-sidebar a[aria-current="true"] {
   color: var(--sl-color-text-accent);
 }
+
+/* Search bar styling */
+site-search,
+site-search button {
+  color: var(--sl-color-gray-6) !important;
+}
+
+/* Search icon */
+site-search svg,
+site-search .search-icon {
+  color: var(--sl-color-gray-6) !important;
+}
+
+/* Search placeholder text */
+site-search input::placeholder {
+  color: var(--sl-color-gray-5) !important;
+  opacity: 1 !important;
+}
+
+/* Search hotkey label (Ctrl+K) */
+site-search kbd,
+site-search .search-hint {
+  color: var(--sl-color-gray-6) !important;
+  background-color: var(--sl-color-gray-2);
+  border-color: var(--sl-color-gray-4);
+}
+
+/* Search modal/dialog */
+dialog[data-search-modal],
+.search-modal {
+  background-color: var(--sl-color-bg);
+  color: var(--sl-color-text);
+}
+
+/* Search results */
+.search-result,
+.search-result-item {
+  color: var(--sl-color-text) !important;
+}
+
+.search-result a {
+  color: var(--sl-color-text) !important;
+}
+
+.search-result a:hover {
+  color: var(--sl-color-text-accent) !important;
+}
+
+/* Search result highlights */
+.search-result mark,
+.search-result em {
+  background-color: var(--color-orange-0);
+  color: var(--sl-color-text);
+}
+
+/* Next/Previous page navigation buttons */
+.pagination-links,
+.prev-next-links {
+  color: var(--sl-color-gray-6);
+}
+
+.pagination-links a,
+.prev-next-links a {
+  color: var(--sl-color-gray-6) !important;
+  background-color: var(--sl-color-gray-1);
+  border-color: var(--sl-color-gray-3);
+}
+
+.pagination-links a:hover,
+.prev-next-links a:hover {
+  color: var(--sl-color-text-accent) !important;
+  background-color: var(--sl-color-gray-2);
+}
