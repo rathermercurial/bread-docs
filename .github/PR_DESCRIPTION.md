@@ -71,6 +71,35 @@ All styles organized in `src/styles/`:
 
 None. This is purely a visual enhancement that maintains all existing functionality.
 
+## Architecture & Technical Debt
+
+⚠️ **Important:** This implementation has been audited and contains known technical debt. See `ARCHITECTURE_AUDIT.md` for full analysis.
+
+### Key Findings
+
+**Works but has fragility:**
+- ✅ Functionally complete and visually correct
+- ⚠️ Uses 27 `!important` declarations (fighting CSS specificity)
+- ⚠️ Direct DOM selectors (fragile to Starlight updates)
+- ⚠️ 7 CSS files (could consolidate to 3-4)
+- ⚠️ Recommended: Component overrides for long-term robustness
+
+**Compatibility:**
+- Tested with Starlight v0.36.2
+- May break with Starlight updates
+- Warnings added to code
+
+**Recommendations:**
+1. **Safe to merge** for MVP/documentation site
+2. **Schedule refactoring** for production use
+3. **Consider component overrides** over CSS specificity wars
+
+See `ARCHITECTURE_AUDIT.md` for:
+- Detailed technical analysis
+- Comparison with Starlight best practices
+- Recommended refactoring plan
+- Alternative approaches
+
 ## Next Steps (Optional)
 
 1. **Add Custom Fonts**: Place the 5 WOFF2 font files in `public/fonts/` for full typography:
