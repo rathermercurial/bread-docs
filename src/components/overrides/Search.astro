@@ -1,0 +1,58 @@
+---
+import StarlightSearch from '@astrojs/starlight/components/Search.astro';
+---
+
+<div class="bread-search">
+  <StarlightSearch {...Astro.props} />
+</div>
+
+<style>
+/* Search bar button and icon styling */
+.bread-search :global(button),
+.bread-search :global(svg),
+.bread-search :global(.search-icon) {
+  color: var(--sl-color-gray-6);
+}
+
+/* Search placeholder text */
+.bread-search :global(input::placeholder) {
+  color: var(--sl-color-gray-5);
+  opacity: 1;
+}
+
+/* Search hotkey label (Ctrl+K) */
+.bread-search :global(kbd),
+.bread-search :global(.search-hint) {
+  color: var(--sl-color-gray-6);
+  background-color: var(--sl-color-gray-2);
+  border-color: var(--sl-color-gray-4);
+}
+
+/* Search modal/dialog */
+.bread-search :global(dialog[data-search-modal]),
+.bread-search :global(.search-modal) {
+  background-color: var(--sl-color-bg);
+  color: var(--sl-color-text);
+}
+
+/* Search results */
+.bread-search :global(.search-result),
+.bread-search :global(.search-result-item) {
+  color: var(--sl-color-text);
+}
+
+.bread-search :global(.search-result a) {
+  color: var(--sl-color-text);
+}
+
+.bread-search :global(.search-result a:hover) {
+  color: var(--sl-color-text-accent);
+}
+
+/* Search result highlights */
+.bread-search :global(.search-result mark),
+.bread-search :global(.search-result em) {
+  background-color: var(--color-orange-0);
+  color: var(--sl-color-text);
+}
+</style>

@@ -93,13 +93,12 @@ export default defineConfig({
 		starlight({
 			title: 'Breadchain Docs',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/BreadchainCoop' }],
+			components: {
+				ThemeSelect: './src/components/overrides/ThemeSelect.astro',
+				Search: './src/components/overrides/Search.astro',
+			},
 			customCss: [
-				'./src/styles/fonts.css',
-				'./src/styles/tokens.css',
-				'./src/styles/theme.css',
-				'./src/styles/typography.css',
-				'./src/styles/components.css',
-				'./src/styles/global.css',
+				'./src/styles/bread-theme.css',
 				'./src/styles/obsidian-callouts.css',
 			],
 			// No sidebar config - Starlight auto-generates all content at root level
