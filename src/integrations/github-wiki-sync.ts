@@ -305,6 +305,19 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
             `Cache updated: ${Object.keys(cache.files).length} files, ${Object.keys(cache.attachments).length} attachments tracked`
           );
 
+          // Generate manifest of synced files for wikilink resolution
+          const manifest = {
+            files: wikiFiles.map((file) => ({
+              path: file.path!.substring(options.wikiPath.length + 1),
+              fullPath: file.path!,
+            })),
+            generatedAt: new Date().toISOString(),
+          };
+
+          const manifestPath = path.join(contentDir, '.synced-files.json');
+          await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+          logger.info(`Generated file manifest: ${manifest.files.length} files`);
+
           logger.info('GitHub wiki sync completed successfully');
         } catch (error) {
           logger.error('Failed to sync wiki from GitHub:');
