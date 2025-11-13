@@ -30,10 +30,15 @@ export default defineConfig({
 					pathFormat: 'raw', // Use raw format to process paths as-is
 					aliasDivider: '|',
 					wikiLinkResolver: (name) => {
+						// Debug logging
+						console.log('[wikiLinkResolver] Input name:', name);
+
 						// Handle image embeds: ![[image.png]] -> /attachments/image.png
 						if (isImageFile(name)) {
 							const filename = name.split('/').pop(); // Handle paths like 'folder/image.png'
-							return [`/attachments/${filename}`];
+							const result = [`/attachments/${filename}`];
+							console.log('[wikiLinkResolver] Image result:', result);
+							return result;
 						}
 
 						// Handle page links: [[Page Name]] -> /page-name (root level, shortest path)
@@ -41,8 +46,10 @@ export default defineConfig({
 						let linkName = name;
 						if (linkName.startsWith('wiki/')) {
 							linkName = linkName.substring(5);
+							console.log('[wikiLinkResolver] Stripped wiki/ prefix, new linkName:', linkName);
 						} else if (linkName.startsWith('/wiki/')) {
 							linkName = linkName.substring(6);
+							console.log('[wikiLinkResolver] Stripped /wiki/ prefix, new linkName:', linkName);
 						}
 
 						const slug = linkName
@@ -51,10 +58,15 @@ export default defineConfig({
 							.replace(/[^\w\-\/]/g, ''); // remove special chars, keep slashes for nested paths
 
 						// Ensure leading slash for root-level path
+						let result;
 						if (!slug.startsWith('/')) {
-							return [`/${slug}`];
+							result = [`/${slug}`];
+						} else {
+							result = [slug];
 						}
-						return [slug];
+
+						console.log('[wikiLinkResolver] Final result:', result);
+						return result;
 					},
 					// Add CSS class to all wiki links for styling
 					className: 'internal-link',
