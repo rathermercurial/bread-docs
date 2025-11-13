@@ -6,6 +6,12 @@ Documentation site for Breadchain, built with Astro and Starlight. Features auto
 
 ## Features
 
+- **Bread Design System v1**: Custom theming using Bread Cooperative brand colors, fonts, and components
+  - Custom Bread Display and Body fonts (fallback to system fonts)
+  - Bread orange accent colors throughout
+  - High contrast for accessibility (WCAG AA)
+  - Sharp corners and "lifted" button effects
+  - Full dark/light mode support
 - **GitHub Wiki Sync**: Automatically syncs content from a GitHub wiki repository at build time
 - **Obsidian Markdown Support**: Full support for Obsidian-style syntax
   - Wikilinks: `[[page]]` and `[[page|alias]]`
@@ -83,7 +89,13 @@ npm run preview
 │   ├── plugins/
 │   │   └── remark-strip-wiki-prefix.js  # Custom remark plugin
 │   └── styles/
-│       └── obsidian-callouts.css  # Styling for Obsidian features
+│       ├── fonts.css       # Bread font declarations
+│       ├── tokens.css      # Design system tokens
+│       ├── theme.css       # Starlight theme overrides
+│       ├── typography.css  # Typography styles
+│       ├── components.css  # Bread components
+│       ├── global.css      # Utility classes
+│       └── obsidian-callouts.css  # Obsidian feature styling
 ├── docs/
 │   └── obsidian-markdown-support.md  # Comprehensive documentation
 ├── astro.config.mjs        # Astro configuration with plugins
@@ -133,6 +145,21 @@ npm run preview
 Supported callout types: note, tip, warning, danger, success, question, example, bug, and more.
 
 For complete documentation, see [docs/obsidian-markdown-support.md](docs/obsidian-markdown-support.md)
+
+## Design System
+
+The site uses the **Bread Cooperative Design System v1**, which includes:
+
+- **Colors**: Orange (#ea6023), Jade (#286b63), Blue (#1c5bb9) primary colors with paper backgrounds (#f6f3eb)
+- **Typography**: Custom Bread Display (headings) and Bread Body (text) fonts with system font fallbacks
+- **Components**: Lifted buttons with shadow effects, sharp corners, high-contrast UI elements
+- **Accessibility**: High contrast ratios for readability in both light and dark modes
+
+Custom fonts can be added to `public/fonts/` when available:
+- `PogacaDisplayBlack.woff2`, `PogacaDisplayBold.woff2`, `PogacaDisplayRegular.woff2`
+- `PogacaBodyBold.woff2`, `PogacaBodyRegular.woff2`
+
+Design tokens reference: `temp/bread-design-tokens.md`
 
 ## Dependencies
 
