@@ -3,12 +3,54 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import githubWikiSync from './src/integrations/github-wiki-sync.ts';
 import { loadEnv } from 'vite';
+import wikiLinkPlugin from '@flowershow/remark-wiki-link';
+import remarkObsidianCallout from 'remark-obsidian-callout';
 
 // Load environment variables
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
 
+// Helper function to check if a link target is an image file
+function isImageFile(name) {
+	const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'apng', 'bmp', 'ico'];
+	const ext = name.split('.').pop()?.toLowerCase();
+	return ext && imageExtensions.includes(ext);
+}
+
 // https://astro.build/config
 export default defineConfig({
+	markdown: {
+		remarkPlugins: [
+			// 1. Transform Obsidian wikilinks to standard links
+			[
+				wikiLinkPlugin,
+				{
+					pathFormat: 'obsidian-absolute',
+					aliasDivider: '|',
+					wikiLinkResolver: (name) => {
+						// Handle image embeds: ![[image.png]] -> /attachments/image.png
+						if (isImageFile(name)) {
+							const filename = name.split('/').pop(); // Handle paths like 'folder/image.png'
+							return [`/attachments/${filename}`];
+						}
+
+						// Handle page links: [[Page Name]] -> /page-name (root level, no wiki/ prefix)
+						const slug = name
+							.toLowerCase()
+							.replace(/\s+/g, '-') // spaces to hyphens
+							.replace(/[^\w\-\/]/g, ''); // remove special chars, keep slashes for nested paths
+
+						return [`/${slug}`];
+					},
+					// Add CSS class to all wiki links for styling
+					className: 'internal-link',
+					// Add CSS class to links that don't have matching pages
+					newClassName: 'internal-link-new',
+				},
+			],
+			// 2. Transform Obsidian callouts/admonitions
+			remarkObsidianCallout,
+		],
+	},
 	integrations: [
 		// Sync wiki content from GitHub before build
 		githubWikiSync({
@@ -23,6 +65,10 @@ export default defineConfig({
 			title: 'Breadchain Docs',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/BreadchainCoop' }],
 			// No sidebar config - Starlight auto-generates all content at root level
+			customCss: [
+				// Custom styles for Obsidian callouts and wikilinks
+				'./src/styles/obsidian-callouts.css',
+			],
 		}),
 	],
 });
