@@ -43,13 +43,31 @@ Links directly to a specific heading on a page.
 
 The wikilink resolver uses the following rules:
 
-1. **No wiki/ prefix**: Links resolve to root level (`/page-name`, not `/wiki/page-name`)
-2. **Slug transformation**:
+1. **Shortest path matching**: Links use the shortest possible path (`obsidian-short` format)
+2. **Automatic wiki/ prefix stripping**: Links from source content with `wiki/` prefix are automatically cleaned
+3. **Root-level resolution**: All links resolve to root level (`/page-name`, not `/wiki/page-name`)
+4. **Slug transformation**:
    - Converts to lowercase
    - Replaces spaces with hyphens
-   - Removes special characters
-   - Preserves forward slashes for nested paths
-3. **Image detection**: Automatically detects image files and routes them to `/attachments/`
+   - Removes special characters (except slashes for nested paths)
+   - Removes `.md` extensions
+5. **Image detection**: Automatically detects image files and routes them to `/attachments/`
+
+#### Standard Markdown Links
+
+Standard markdown links are also processed to match the site structure:
+
+```markdown
+<!-- Source content (from GitHub wiki/) -->
+[Link text](wiki/page-name.md)
+[Another link](/wiki/some-page)
+
+<!-- Automatically transformed to -->
+[Link text](/page-name)
+[Another link](/some-page)
+```
+
+This ensures compatibility with content authored in GitHub wikis or other systems that use `wiki/` prefixes.
 
 ### 2. Image Embeds
 
@@ -193,13 +211,34 @@ The Obsidian support is implemented through a plugin pipeline:
 2. Starlight Content Loader
    ↓ Discovers content files
 3. Remark Plugins (Markdown AST Processing)
-   ↓ @flowershow/remark-wiki-link (wikilinks & embeds)
+   ↓ a. remark-strip-wiki-prefix (clean wiki/ from standard links)
+   ↓ b. @flowershow/remark-wiki-link (wikilinks & embeds)
 4. Rehype Plugins (HTML Processing)
    ↓ rehype-callouts (callouts with built-in CSS)
 5. Final HTML Output
 ```
 
 ### Plugins
+
+#### remark-strip-wiki-prefix (Custom Remark Plugin)
+
+**Location**: `src/plugins/remark-strip-wiki-prefix.js`
+
+Transforms standard markdown links to strip `wiki/` prefix:
+- Removes `wiki/` or `/wiki/` from link URLs
+- Removes `.md` extensions
+- Converts to slug format (lowercase, hyphens)
+- Preserves anchors/hashes
+- Ensures root-level paths (`/page-name`)
+
+**Examples:**
+```markdown
+[text](wiki/page.md)      → [text](/page)
+[text](/wiki/some-page)   → [text](/some-page)
+[text](wiki/Page Name.md) → [text](/page-name)
+```
+
+This plugin runs **first** to clean standard markdown links before wikilink processing.
 
 #### @flowershow/remark-wiki-link (Remark Plugin)
 
@@ -210,14 +249,17 @@ Transforms Obsidian wikilinks and embeds into standard HTML:
 - Handles image embeds `![[image.png]]`
 - Custom resolver function for URL generation
 - CSS classes for styling
+- Shortest path matching (`obsidian-short` format)
 
 **Configuration** (see `astro.config.mjs`):
 ```javascript
 [wikiLinkPlugin, {
-  pathFormat: 'obsidian-absolute',
+  pathFormat: 'obsidian-short',  // Shortest path matching
   aliasDivider: '|',
   wikiLinkResolver: (name) => {
-    // Custom resolution logic
+    // Strips wiki/ prefix if present in wikilinks
+    // Converts to slug format
+    // Routes images to /attachments/
   },
   className: 'internal-link',
   newClassName: 'internal-link-new',
@@ -265,11 +307,17 @@ The plugin's built-in CSS:
 ```javascript
 import wikiLinkPlugin from '@flowershow/remark-wiki-link';
 import rehypeCallouts from 'rehype-callouts';
+import remarkStripWikiPrefix from './src/plugins/remark-strip-wiki-prefix.js';
 
 export default defineConfig({
   markdown: {
     remarkPlugins: [
-      [wikiLinkPlugin, { /* config */ }],
+      // IMPORTANT: Order matters! Strip wiki/ prefix first
+      remarkStripWikiPrefix,
+      [wikiLinkPlugin, {
+        pathFormat: 'obsidian-short',  // Shortest path
+        // ... other config
+      }],
     ],
     rehypePlugins: [
       [rehypeCallouts, { theme: 'obsidian' }],
@@ -516,6 +564,13 @@ Screenshot of the dashboard:
 - [Astro Markdown](https://docs.astro.build/en/guides/markdown-content/) - Markdown in Astro
 
 ## Version History
+
+- **v1.2** (2025-01-13) - Wiki prefix stripping and shortest path support
+  - Added custom `remark-strip-wiki-prefix` plugin
+  - Automatic removal of `wiki/` prefix from standard markdown links
+  - Changed to `obsidian-short` path format for shortest path matching
+  - Improved link resolution to match source content strategy
+  - Fixed callout title layout (icon and text inline)
 
 - **v1.1** (2025-01-13) - Updated to maintained plugins
   - Replaced `remark-obsidian-callout` with `rehype-callouts`

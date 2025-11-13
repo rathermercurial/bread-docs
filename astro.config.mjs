@@ -5,6 +5,7 @@ import githubWikiSync from './src/integrations/github-wiki-sync.ts';
 import { loadEnv } from 'vite';
 import wikiLinkPlugin from '@flowershow/remark-wiki-link';
 import rehypeCallouts from 'rehype-callouts';
+import remarkStripWikiPrefix from './src/plugins/remark-strip-wiki-prefix.js';
 
 // Load environment variables
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
@@ -20,11 +21,13 @@ function isImageFile(name) {
 export default defineConfig({
 	markdown: {
 		remarkPlugins: [
-			// Transform Obsidian wikilinks to standard links
+			// Strip wiki/ prefix from standard markdown links
+			remarkStripWikiPrefix,
+			// Transform Obsidian wikilinks to standard links (shortest path)
 			[
 				wikiLinkPlugin,
 				{
-					pathFormat: 'obsidian-absolute',
+					pathFormat: 'obsidian-short', // Use shortest path matching
 					aliasDivider: '|',
 					wikiLinkResolver: (name) => {
 						// Handle image embeds: ![[image.png]] -> /attachments/image.png
@@ -33,8 +36,14 @@ export default defineConfig({
 							return [`/attachments/${filename}`];
 						}
 
-						// Handle page links: [[Page Name]] -> /page-name (root level, no wiki/ prefix)
-						const slug = name
+						// Handle page links: [[Page Name]] -> /page-name (root level, shortest path)
+						// Strip any wiki/ prefix if present in the wikilink itself
+						let linkName = name;
+						if (linkName.startsWith('wiki/')) {
+							linkName = linkName.substring(5);
+						}
+
+						const slug = linkName
 							.toLowerCase()
 							.replace(/\s+/g, '-') // spaces to hyphens
 							.replace(/[^\w\-\/]/g, ''); // remove special chars, keep slashes for nested paths
