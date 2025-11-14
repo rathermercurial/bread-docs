@@ -10,16 +10,17 @@ Documentation site for Breadchain, built with Astro and Starlight. Features auto
   - Custom Bread Display and Body fonts (fallback to system fonts)
   - Bread orange accent colors throughout
   - High contrast for accessibility (WCAG AA)
-  - Sharp corners and "lifted" button effects
+  - Sharp corners and paper-textured backgrounds
   - Full dark/light mode support
+  - Component overrides for robust theming
 - **GitHub Wiki Sync**: Automatically syncs content from a GitHub wiki repository at build time
 - **Obsidian Markdown Support**: Full support for Obsidian-style syntax
-  - Wikilinks: `[[page]]` and `[[page|alias]]`
+  - Wikilinks: `[[page]]` and `[[page|alias]]` with file-based resolution
   - Image embeds: `![[image.png]]`
-  - Callouts/Admonitions: `> [!note]`, `> [!warning]`, etc.
+  - Callouts/Admonitions: `> [!note]`, `> [!warning]`, etc. (converts to Starlight native asides)
   - Heading anchors: `[[page#heading]]`
-- **Automatic Link Resolution**: Strips `wiki/` prefixes and resolves to clean URLs
-- **Dark Mode**: Built-in dark mode support via Starlight
+- **Custom Markdown Plugins**: TypeScript-based plugins for robust Obsidian markdown transformation
+- **Dark Mode**: Built-in dark mode support via Starlight with system default
 
 ## Getting Started
 
@@ -82,20 +83,26 @@ npm run preview
 ├── public/
 │   └── attachments/        # Images synced from wiki
 ├── src/
+│   ├── components/
+│   │   └── overrides/      # Starlight component overrides
+│   │       ├── ThemeSelect.astro  # Custom theme toggle
+│   │       └── Search.astro       # Custom search styling
 │   ├── content/
 │   │   └── docs/           # Markdown content synced from wiki
 │   ├── integrations/
 │   │   └── github-wiki-sync.ts  # GitHub sync integration
+│   ├── lib/
+│   │   ├── markdown-utils.ts      # Shared markdown utilities
+│   │   └── wikilink-resolver.ts   # File-based wikilink resolution
 │   ├── plugins/
-│   │   └── remark-strip-wiki-prefix.js  # Custom remark plugin
+│   │   ├── remark-obsidian-to-starlight.ts  # Callout transformation
+│   │   ├── remark-strip-wiki-prefix.ts      # Strip wiki/ prefixes
+│   │   └── remark-wikilinks.ts              # Wikilink parser
 │   └── styles/
-│       ├── fonts.css       # Bread font declarations
-│       ├── tokens.css      # Design system tokens
-│       ├── theme.css       # Starlight theme overrides
-│       ├── typography.css  # Typography styles
-│       ├── components.css  # Bread components
-│       ├── global.css      # Utility classes
-│       └── obsidian-callouts.css  # Obsidian feature styling
+│       ├── bread-theme.css        # Complete design system (fonts + tokens + theme)
+│       └── obsidian-callouts.css  # Wikilink and aside styling
+├── .docs/
+│   └── architectural-analysis.md  # Content loader research
 ├── docs/
 │   └── obsidian-markdown-support.md  # Comprehensive documentation
 ├── astro.config.mjs        # Astro configuration with plugins
@@ -105,12 +112,13 @@ npm run preview
 ## How It Works
 
 1. **Build Time**: The GitHub Wiki Sync integration downloads markdown files and images from the configured GitHub wiki repository
-2. **Markdown Processing**: Content is processed through a pipeline of remark and rehype plugins:
-   - `remark-strip-wiki-prefix`: Strips `wiki/` from standard markdown links
-   - `@flowershow/remark-wiki-link`: Transforms Obsidian wikilinks to HTML
-   - `rehype-callouts`: Transforms Obsidian callouts to styled components
-3. **Static Generation**: Starlight generates static HTML from the processed markdown
-4. **Deployment**: The static site can be deployed to any hosting platform
+2. **Markdown Processing**: Content is processed through a custom pipeline of remark plugins:
+   - `remark-strip-wiki-prefix`: Strips `wiki/` prefixes from standard markdown links
+   - `remark-obsidian-to-starlight`: Transforms Obsidian callouts (`> [!note]`) to Starlight native asides (`:::note`)
+   - `remark-wikilinks`: Parses wikilinks with file-based resolution using synced files manifest
+3. **Component Overrides**: Custom Starlight components provide robust theming without CSS specificity wars
+4. **Static Generation**: Starlight generates static HTML from the processed markdown
+5. **Deployment**: The static site can be deployed to any hosting platform
 
 ## Obsidian Markdown Features
 
@@ -152,8 +160,16 @@ The site uses the **Bread Cooperative Design System v1**, which includes:
 
 - **Colors**: Orange (#ea6023), Jade (#286b63), Blue (#1c5bb9) primary colors with paper backgrounds (#f6f3eb)
 - **Typography**: Custom Bread Display (headings) and Bread Body (text) fonts with system font fallbacks
-- **Components**: Lifted buttons with shadow effects, sharp corners, high-contrast UI elements
-- **Accessibility**: High contrast ratios for readability in both light and dark modes
+- **Components**: Component overrides for ThemeSelect and Search with scoped styling
+- **Accessibility**: WCAG AA high contrast ratios for readability in both light and dark modes
+- **Architecture**: Zero `!important` declarations, proper CSS cascade, robust to framework updates
+
+### Implementation Details
+
+- **Consolidated CSS**: 2 files (354 lines) instead of 7 files (888 lines) - 60% reduction
+- **Component Overrides**: ThemeSelect.astro and Search.astro for maintainable customization
+- **Starlight Integration**: Uses official CSS custom properties and component override system
+- **Obsidian Styling**: Enhanced wikilinks and Starlight native asides with Bread branding
 
 Custom fonts can be added to `public/fonts/` when available:
 - `PogacaDisplayBlack.woff2`, `PogacaDisplayBold.woff2`, `PogacaDisplayRegular.woff2`
@@ -165,10 +181,16 @@ Design tokens reference: `temp/bread-design-tokens.md`
 
 - **astro** (^5.6.1): Static site generator
 - **@astrojs/starlight** (^0.36.2): Documentation theme
-- **@flowershow/remark-wiki-link** (^3.1.2): Wikilink support
-- **rehype-callouts** (^2.1.2): Callout/admonition support
-- **octokit** (^5.0.5): GitHub API client
-- **unist-util-visit** (^5.0.0): AST traversal for plugins
+- **octokit** (^5.0.5): GitHub API client for wiki sync
+- **unist-util-visit** (^5.0.0): AST traversal for custom remark plugins
+- **sharp** (^0.34.2): Image optimization
+
+### Custom Implementation (No External Dependencies)
+
+All Obsidian markdown support is implemented via custom TypeScript plugins:
+- No `@flowershow/remark-wiki-link` dependency (custom wikilink parser)
+- No `rehype-callouts` dependency (custom callout transformer to Starlight asides)
+- File-based wikilink resolution using synced files manifest
 
 ## Contributing
 
