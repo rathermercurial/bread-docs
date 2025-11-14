@@ -19,7 +19,12 @@ import { isImageFile, stripWikiPrefix, slugify, ensureLeadingSlash } from '../li
 const remarkStripWikiPrefix: Plugin<[], Root> = () => {
   return (tree: Root) => {
     // Process both link and image nodes
-    visit(tree, ['link', 'image'], (node: Link | Image) => {
+    visit(tree, ['link', 'image'], (node) => {
+      // Type guard to ensure node is Link or Image
+      if (node.type !== 'link' && node.type !== 'image') {
+        return;
+      }
+
       if (!node.url) {
         return;
       }

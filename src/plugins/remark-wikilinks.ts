@@ -1,6 +1,6 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
-import type { Root, Text, Paragraph, Link, Image } from 'mdast';
+import type { Root, Text, Link, Image } from 'mdast';
 import { isImageFile } from '../lib/markdown-utils.js';
 import { resolveWikilink } from '../lib/wikilink-resolver.js';
 
@@ -137,7 +137,7 @@ function replaceWikilinksinText(text: string): (Text | Link | Image)[] {
 const remarkWikilinks: Plugin<[], Root> = () => {
   return (tree: Root) => {
     // Process ALL nodes that can contain text, not just paragraphs
-    visit(tree, (node: any, index, parent: any) => {
+    visit(tree, (node: any) => {
       // Process nodes that have children (paragraph, heading, listItem, blockquote, etc.)
       if (!node.children || !Array.isArray(node.children)) {
         return;
