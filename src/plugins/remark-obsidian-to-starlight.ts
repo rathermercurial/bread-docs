@@ -100,6 +100,15 @@ const remarkObsidianToStarlight: Plugin<[], Root> = () => {
         directiveChildren.push(node.children[i]);
       }
 
+      console.debug(`[obsidian-to-starlight] Transforming callout:`, {
+        type: calloutInfo.type,
+        title: calloutInfo.title,
+        totalChildren: node.children.length,
+        contentChildren: directiveChildren.length,
+        firstChildType: node.children[0]?.type,
+        childTypes: node.children.map((c: any) => c.type),
+      });
+
       // Create directive node in the format Starlight expects
       // This matches the format that remark-directive creates from :::note syntax
       const directiveNode: any = {
