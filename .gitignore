@@ -2,6 +2,11 @@
 dist/
 .astro/
 
+# Synced content (generated at build time by github-wiki-sync)
+src/content/docs/
+public/attachments/
+.synced-files.json
+
 # Dependencies
 node_modules/
 

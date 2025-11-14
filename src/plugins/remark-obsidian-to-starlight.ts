@@ -66,7 +66,7 @@ const remarkObsidianToStarlight: Plugin<[], Root> = () => {
         return;
       }
 
-      const [fullMatch, type, , titleText] = calloutMatch;
+      const [_fullMatch, type, , titleText] = calloutMatch;
       const calloutInfo = { type: type.toLowerCase(), title: titleText?.trim() || undefined };
 
       // Map Obsidian type to Starlight type

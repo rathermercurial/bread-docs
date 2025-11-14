@@ -142,7 +142,7 @@ function convertToSidebarItems(
 				return a[0].localeCompare(b[0]);
 			});
 
-		for (const [name, value] of entries) {
+		for (const [_name, value] of entries) {
 			if (value instanceof Map) {
 				// Subfolder - process recursively
 				const subItems = convertToSidebarItems(value, `${indexPage.slug}/`, depth + 1);
