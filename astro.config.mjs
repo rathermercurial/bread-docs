@@ -6,9 +6,13 @@ import { loadEnv } from 'vite';
 import wikiLinkPlugin from '@flowershow/remark-wiki-link';
 import rehypeCallouts from 'rehype-callouts';
 import remarkStripWikiPrefix from './src/plugins/remark-strip-wiki-prefix.js';
+import { generateSidebar } from './src/lib/generate-sidebar.ts';
 
 // Load environment variables
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
+
+// Generate sidebar from content directory
+const sidebar = await generateSidebar('src/content/docs');
 
 // Helper function to check if a link target is an image file
 function isImageFile(name) {
@@ -93,7 +97,12 @@ export default defineConfig({
 		starlight({
 			title: 'Breadchain Docs',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/BreadchainCoop' }],
-			// No sidebar config - Starlight auto-generates all content at root level
+			// Custom sidebar - folder entries link to their index pages
+			sidebar: sidebar,
+			// Override Sidebar to use custom SidebarSublist with clickable folder labels
+			components: {
+				Sidebar: './src/components/starlight/Sidebar.astro',
+			},
 			customCss: [
 				// Custom styles for Obsidian callouts and wikilinks
 				'./src/styles/obsidian-callouts.css',
