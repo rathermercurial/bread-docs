@@ -151,8 +151,9 @@ const remarkObsidianToStarlight: Plugin<[], Root> = () => {
         title: calloutInfo.title,
         totalChildren: node.children.length,
         contentChildren: directiveChildren.length,
-        firstChildPreview: getNodePreview(node.children[0]),
-        childPreviews: node.children.map(getNodePreview),
+        textAfterMarker: textAfterMarker.substring(0, 50),
+        contentInlineNodesCount: contentInlineNodes.length,
+        firstTextNodeValue: firstTextNode.value.substring(0, 100),
       });
 
       if (directiveChildren.length === 0) {
@@ -160,6 +161,7 @@ const remarkObsidianToStarlight: Plugin<[], Root> = () => {
           type: calloutInfo.type,
           title: calloutInfo.title,
           totalChildren: node.children.length,
+          firstTextValue: firstTextNode.value.substring(0, 100),
         });
       }
 
