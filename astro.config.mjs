@@ -35,11 +35,15 @@ export default defineConfig({
 		starlight({
 			title: 'Breadchain Docs',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/BreadchainCoop' }],
-			// No sidebar config - Starlight auto-generates all content at root level
+			components: {
+				ThemeSelect: './src/components/overrides/ThemeSelect.astro',
+				Search: './src/components/overrides/Search.astro',
+			},
 			customCss: [
-				// Custom styles for Obsidian callouts and wikilinks
+				'./src/styles/bread-theme.css',
 				'./src/styles/obsidian-callouts.css',
 			],
+			// No sidebar config - Starlight auto-generates all content at root level
 		}),
 	],
 });
