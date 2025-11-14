@@ -34,39 +34,6 @@ const calloutTypeMap: Record<string, string> = {
 };
 
 /**
- * Parse an Obsidian callout header line
- * Format: [!type] Optional Title
- * Or: [!type]+ Optional Title (expanded)
- * Or: [!type]- Optional Title (collapsed)
- */
-function parseCalloutHeader(text: string): { type: string; title?: string } | null {
-  // Match [!type] or [!type]+ or [!type]-
-  const match = text.match(/^\[!(\w+)\]([-+])?\s*(.*)?$/);
-  if (!match) return null;
-
-  const [, type, , title] = match;
-  return {
-    type: type.toLowerCase(),
-    title: title?.trim() || undefined,
-  };
-}
-
-/**
- * Extract ALL text content from a node, recursively traversing inline elements
- */
-function extractText(node: any): string {
-  if (node.type === 'text') {
-    return node.value;
-  }
-
-  if (node.children && Array.isArray(node.children)) {
-    return node.children.map(extractText).join('');
-  }
-
-  return '';
-}
-
-/**
  * Transform Obsidian callouts to Starlight aside directive nodes
  */
 const remarkObsidianToStarlight: Plugin<[], Root> = () => {
@@ -95,8 +62,7 @@ const remarkObsidianToStarlight: Plugin<[], Root> = () => {
       const calloutMatch = firstTextNode.value.match(/^\[!(\w+)\]([-+])?\s*(.*)?$/m);
 
       if (!calloutMatch) {
-        // Not a callout
-        console.debug(`[obsidian-to-starlight] Skipping blockquote, first text: "${firstTextNode.value.substring(0, 50)}"`);
+        // Not a callout - skip this blockquote
         return;
       }
 
@@ -136,33 +102,6 @@ const remarkObsidianToStarlight: Plugin<[], Root> = () => {
       // Add all subsequent children from the blockquote (other paragraphs, lists, etc.)
       for (let i = 1; i < node.children.length; i++) {
         directiveChildren.push(node.children[i]);
-      }
-
-      // Helper to get preview of node content
-      const getNodePreview = (n: any): string => {
-        if (n.type === 'paragraph') return extractText(n).substring(0, 50);
-        if (n.type === 'list') return `[list with ${n.children?.length || 0} items]`;
-        if (n.type === 'code') return '[code block]';
-        return `[${n.type}]`;
-      };
-
-      console.debug(`[obsidian-to-starlight] Transforming callout:`, {
-        type: calloutInfo.type,
-        title: calloutInfo.title,
-        totalChildren: node.children.length,
-        contentChildren: directiveChildren.length,
-        textAfterMarker: textAfterMarker.substring(0, 50),
-        contentInlineNodesCount: contentInlineNodes.length,
-        firstTextNodeValue: firstTextNode.value.substring(0, 100),
-      });
-
-      if (directiveChildren.length === 0) {
-        console.warn(`[obsidian-to-starlight] Callout has no content children!`, {
-          type: calloutInfo.type,
-          title: calloutInfo.title,
-          totalChildren: node.children.length,
-          firstTextValue: firstTextNode.value.substring(0, 100),
-        });
       }
 
       // Create directive node in the format Starlight expects

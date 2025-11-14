@@ -4,7 +4,13 @@ Comprehensive documentation for Obsidian-flavored markdown features in Breadchai
 
 ## Overview
 
-Breadchain Docs now supports Obsidian-style markdown syntax, allowing you to write documentation using familiar Obsidian features like wikilinks, image embeds, and callouts. This is powered by a combination of remark and rehype plugins that transform Obsidian syntax during the build process.
+Breadchain Docs now supports Obsidian-style markdown syntax, allowing you to write documentation using familiar Obsidian features like wikilinks, image embeds, and callouts. This is powered by custom remark plugins that transform Obsidian syntax into Starlight's native components during the build process.
+
+**Key Architecture Decisions:**
+- **File-based wikilink resolution** using a manifest generated from synced files
+- **Native Starlight asides** for callouts instead of custom HTML/CSS
+- **Custom TypeScript plugins** for full control and maintainability
+- **Zero external dependencies** for Obsidian features (all custom implementations)
 
 ## Features
 
@@ -41,17 +47,23 @@ Links directly to a specific heading on a page.
 
 #### Link Resolution Strategy
 
-The wikilink resolver uses the following rules:
+The wikilink resolver uses **file-based resolution** with a manifest of synced files:
 
-1. **Shortest path matching**: Links use the shortest possible path (`shortestPossible` format)
-2. **Automatic wiki/ prefix stripping**: Links from source content with `wiki/` prefix are automatically cleaned
-3. **Root-level resolution**: All links resolve to root level (`/page-name`, not `/wiki/page-name`)
-4. **Slug transformation**:
+1. **Manifest Generation**: During build, `github-wiki-sync` creates `.synced-files.json` containing all synced files
+2. **File Matching**: Wikilinks are matched against actual files using multiple strategies:
+   - Exact matches (with/without `.md` extension)
+   - Directory + `index.md` patterns
+   - Filename-only matching (shortest path wins)
+   - Fuzzy matching (ends with target)
+3. **Automatic wiki/ prefix stripping**: Links from source content with `wiki/` prefix are automatically cleaned
+4. **Root-level resolution**: All links resolve to root level (`/page-name`, not `/wiki/page-name`)
+5. **Slug transformation**:
    - Converts to lowercase
    - Replaces spaces with hyphens
    - Removes special characters (except slashes for nested paths)
-   - Removes `.md` extensions
-5. **Image detection**: Automatically detects image files and routes them to `/attachments/`
+   - Removes `.md` extensions and `/index` suffixes
+6. **Image detection**: Automatically detects image files and routes them to `/attachments/`
+7. **Fallback**: If no file match is found, falls back to slug-based resolution with a warning
 
 #### Standard Markdown Links
 
@@ -90,9 +102,9 @@ Embed images using Obsidian's double-bracket syntax:
 ![Alt text](/attachments/image.png)
 ```
 
-### 3. Callouts (Admonitions)
+### 3. Callouts (Asides)
 
-Callouts are styled boxes that highlight important information. They use Obsidian's blockquote syntax with special metadata.
+Callouts are styled boxes that highlight important information. They use Obsidian's blockquote syntax and are transformed into **Starlight's native aside components**, ensuring consistent styling with the rest of your documentation.
 
 #### Basic Callout Syntax
 
@@ -102,20 +114,24 @@ Callouts are styled boxes that highlight important information. They use Obsidia
 > Can span multiple lines.
 ```
 
+#### How It Works
+
+Obsidian callouts are transformed at build time into Starlight's `:::note` directive syntax (internally as AST nodes). This means:
+- **Native Starlight styling** is automatically applied
+- **No custom CSS** required for callouts
+- **Consistent with Starlight theme** and automatic dark mode support
+- **All Starlight aside features** work (icons, colors, etc.)
+
 #### Supported Callout Types
 
-| Type | Use Case | Color |
-|------|----------|-------|
-| `note`, `info` | General information | Blue |
-| `tip`, `hint`, `important` | Helpful suggestions | Green |
-| `warning`, `caution`, `attention` | Potential issues | Orange |
-| `danger`, `error` | Critical warnings | Red |
-| `success`, `check`, `done` | Positive outcomes | Green |
-| `question`, `help`, `faq` | Questions & answers | Purple |
-| `abstract`, `summary`, `tldr` | Summaries | Cyan |
-| `quote`, `cite` | Quotations | Gray |
-| `example` | Examples & demos | Purple |
-| `bug` | Bug reports | Red |
+Obsidian callout types are mapped to Starlight aside types:
+
+| Obsidian Type | Starlight Type | Use Case |
+|---------------|----------------|----------|
+| `note`, `info`, `question`, `todo`, `abstract`, `summary`, `quote` | `note` | General information |
+| `tip`, `example`, `success` | `tip` | Helpful suggestions |
+| `warning`, `caution` | `caution` | Potential issues |
+| `danger`, `error`, `bug` | `danger` | Critical warnings |
 
 #### Callout Examples
 
@@ -203,32 +219,43 @@ Internal links created by wikilinks have special styling:
 
 ### Architecture
 
-The Obsidian support is implemented through a plugin pipeline:
+The Obsidian support is implemented through a custom plugin pipeline:
 
 ```
 1. GitHub Wiki Sync (Build Time)
    ↓ Downloads markdown files and images
+   ↓ Generates .synced-files.json manifest
 2. Starlight Content Loader
    ↓ Discovers content files
 3. Remark Plugins (Markdown AST Processing)
    ↓ a. remark-strip-wiki-prefix (clean wiki/ from standard links)
-   ↓ b. @flowershow/remark-wiki-link (wikilinks & embeds)
-4. Rehype Plugins (HTML Processing)
-   ↓ rehype-callouts (callouts with built-in CSS)
+   ↓ b. remark-obsidian-to-starlight (transform callouts to Starlight asides)
+   ↓ c. remark-wikilinks (custom wikilink plugin with file-based resolution)
+4. Starlight Processing
+   ↓ Renders aside directives using native Starlight components
 5. Final HTML Output
 ```
 
+**Key Design Decisions:**
+- **All plugins are custom TypeScript implementations** for full control
+- **No external Obsidian plugin dependencies** (easier to maintain)
+- **File-based wikilink resolution** using manifest from github-wiki-sync
+- **Native Starlight integration** for callouts (better styling consistency)
+- **Shared utilities** in `src/lib/markdown-utils.ts` to eliminate code duplication
+
 ### Plugins
 
-#### remark-strip-wiki-prefix (Custom Remark Plugin)
+#### remark-strip-wiki-prefix
 
-**Location**: `src/plugins/remark-strip-wiki-prefix.js`
+**Location**: `src/plugins/remark-strip-wiki-prefix.ts`
+**Type**: Custom TypeScript remark plugin
 
 Transforms standard markdown links to strip `wiki/` prefix:
 - Removes `wiki/` or `/wiki/` from link URLs
 - Removes `.md` extensions
 - Converts to slug format (lowercase, hyphens)
 - Preserves anchors/hashes
+- Routes images to `/attachments/`
 - Ensures root-level paths (`/page-name`)
 
 **Examples:**
@@ -236,97 +263,108 @@ Transforms standard markdown links to strip `wiki/` prefix:
 [text](wiki/page.md)      → [text](/page)
 [text](/wiki/some-page)   → [text](/some-page)
 [text](wiki/Page Name.md) → [text](/page-name)
+![](wiki/image.png)       → ![](/attachments/image.png)
 ```
 
-This plugin runs **first** to clean standard markdown links before wikilink processing.
+This plugin runs **first** to clean standard markdown links before other processing.
 
-#### @flowershow/remark-wiki-link (Remark Plugin)
+#### remark-obsidian-to-starlight
 
-**Package**: `@flowershow/remark-wiki-link@^3.1.2`
+**Location**: `src/plugins/remark-obsidian-to-starlight.ts`
+**Type**: Custom TypeScript remark plugin
 
-Transforms Obsidian wikilinks and embeds into standard HTML:
-- Parses `[[target]]` and `[[target|alias]]` syntax
+Transforms Obsidian callouts into Starlight's native aside components:
+- Detects `> [!type]` syntax in blockquotes
+- Extracts callout type and optional title
+- Preserves all content including inline formatting (bold, links, etc.)
+- Handles multi-line callouts where content is merged into a single paragraph
+- Maps Obsidian types to Starlight aside types
+- Creates `containerDirective` AST nodes that Starlight renders as native asides
+
+**Callout Type Mapping:**
+```javascript
+note, info, question, todo, abstract, summary, quote → note
+tip, example, success → tip
+warning, caution → caution
+danger, error, bug → danger
+```
+
+**Note**: Foldable callouts (`-` and `+` markers) are detected but not currently implemented. The marker is removed from the title.
+
+#### remark-wikilinks
+
+**Location**: `src/plugins/remark-wikilinks.ts`
+**Type**: Custom TypeScript remark plugin
+
+Transforms Obsidian wikilinks and embeds using file-based resolution:
+- Parses `[[target]]`, `[[target|alias]]`, `[[target#heading]]` syntax
 - Handles image embeds `![[image.png]]`
-- Custom resolver function for URL generation
-- CSS classes for styling
-- Shortest path matching (`shortestPossible` format)
+- Uses `wikilink-resolver.ts` for file-based URL resolution
+- Processes all nodes (paragraphs, headings, lists, etc.)
+- Adds `.internal-link` CSS class to all wikilinks
+- Works at AST level to preserve inline formatting
 
-**Configuration** (see `astro.config.mjs`):
-```javascript
-[wikiLinkPlugin, {
-  format: 'shortestPossible',  // Shortest path matching
-  aliasDivider: '|',
-  urlResolver: ({ filePath, isEmbed, heading }) => {
-    // Strips wiki/ prefix if present in wikilinks
-    // Removes /index and .md suffixes
-    // Converts to slug format
-    // Routes images to /attachments/
-    // Handles heading anchors
-  },
-  className: 'internal-link',
-  newClassName: 'internal-link-new',
-}]
-```
+**Resolution Process:**
+1. Parse wikilink syntax to extract target, alias, and heading
+2. Strip `wiki/` prefix if present
+3. Look up target in `.synced-files.json` manifest
+4. Match using multiple strategies (exact, directory+index, filename-only, fuzzy)
+5. Convert matched file path to URL slug
+6. Add heading anchor if specified
+7. Create link or image node in AST
 
-#### rehype-callouts (Rehype Plugin)
+#### Shared Utilities
 
-**Package**: `rehype-callouts@^1.5.0` (actively maintained)
+**Location**: `src/lib/markdown-utils.ts`
 
-Transforms Obsidian callout syntax into styled HTML:
-- Parses `> [!type]` syntax
-- Supports foldable callouts (`-` and `+`)
-- Built-in Obsidian theme with CSS included
-- Outputs semantic HTML (uses `<div>` or `<details>` elements)
-- Automatic dark mode support
+Common functions used across multiple plugins:
+- `isImageFile(filename)` - Detect image files by extension
+- `stripWikiPrefix(path)` - Remove `wiki/` or `/wiki/` prefix
+- `slugify(text)` - Convert text to URL-safe slug
+- `removeIndexSuffix(path)` - Remove `/index.md` and `/index` suffixes
+- `ensureLeadingSlash(path)` - Ensure path starts with `/`
 
-**Configuration** (see `astro.config.mjs`):
-```javascript
-[rehypeCallouts, {
-  theme: 'obsidian',  // Uses built-in Obsidian theme
-}]
-```
+**Location**: `src/lib/wikilink-resolver.ts`
 
-**Note**: This plugin replaced the unmaintained `remark-obsidian-callout` package.
+File-based wikilink resolution:
+- `loadManifestSync()` - Load `.synced-files.json` with caching
+- `findDocumentFromLink(target, files)` - Match target against file list
+- `resolveWikilink(filePath, heading?)` - Main resolution function
 
 ### Custom CSS
 
 **File**: `src/styles/obsidian-callouts.css`
 
-Provides styling for:
+Provides minimal styling for:
 - Internal wikilink styling (`.internal-link`)
 - Broken link indicators (`.internal-link-new`)
-- Callout styles are provided by rehype-callouts built-in CSS
 
-The plugin's built-in CSS:
-- Matches Obsidian's visual style
-- Automatic dark mode support
-- No additional configuration needed
+**Note**: Callout/aside styling is provided entirely by Starlight's native aside components. No custom CSS is needed for callouts.
 
 ## Configuration
 
 ### astro.config.mjs
 
 ```javascript
-import wikiLinkPlugin from '@flowershow/remark-wiki-link';
-import rehypeCallouts from 'rehype-callouts';
-import remarkStripWikiPrefix from './src/plugins/remark-strip-wiki-prefix.js';
+import remarkStripWikiPrefix from './src/plugins/remark-strip-wiki-prefix.ts';
+import remarkObsidianToStarlight from './src/plugins/remark-obsidian-to-starlight.ts';
+import remarkWikilinks from './src/plugins/remark-wikilinks.ts';
 
 export default defineConfig({
   markdown: {
     remarkPlugins: [
-      // IMPORTANT: Order matters! Strip wiki/ prefix first
-      remarkStripWikiPrefix,
-      [wikiLinkPlugin, {
-        format: 'shortestPossible',  // Shortest path
-        // ... other config
-      }],
-    ],
-    rehypePlugins: [
-      [rehypeCallouts, { theme: 'obsidian' }],
+      // IMPORTANT: Order matters!
+      remarkStripWikiPrefix,        // 1. Strip wiki/ prefix from standard links
+      remarkObsidianToStarlight,    // 2. Transform callouts to Starlight asides
+      remarkWikilinks,              // 3. Transform wikilinks (uses file-based resolution)
     ],
   },
   integrations: [
-    githubWikiSync({ /* config */ }),
+    githubWikiSync({
+      // Generates .synced-files.json manifest during sync
+      contentDir: 'src/content/docs',
+      // ... other config
+    }),
     starlight({
       customCss: ['./src/styles/obsidian-callouts.css'],
     }),
@@ -336,29 +374,44 @@ export default defineConfig({
 
 ### Customizing Link Resolution
 
-To change how wikilinks are resolved, modify the `urlResolver` function in `astro.config.mjs`:
+To change how wikilinks are resolved, modify `src/lib/wikilink-resolver.ts`:
 
-```javascript
-urlResolver: ({ filePath, isEmbed, heading }) => {
-  // Example: Add a wiki/ prefix
-  const slug = filePath.toLowerCase().replace(/\s+/g, '-');
-  const url = `/wiki/${slug}`;
-  return heading ? `${url}#${heading}` : url;
+```typescript
+export function resolveWikilink(filePath: string, heading?: string): string {
+  const manifest = loadManifestSync();
 
-  // Or: Use a different slugification
-  const slug = someCustomSlugify(filePath);
-  const url = `/${slug}`;
-  return heading ? `${url}#${heading}` : url;
+  if (manifest && manifest.files.length > 0) {
+    const filePaths = manifest.files.map((f) => f.path);
+    const cleanPath = stripWikiPrefix(filePath);
+    const matchedFile = findDocumentFromLink(cleanPath, filePaths);
+
+    if (matchedFile) {
+      // Customize how matched files are converted to URLs
+      let urlPath = removeIndexSuffix(matchedFile);
+      urlPath = slugify(urlPath);  // Modify slugify() for different behavior
+      resolvedPath = ensureLeadingSlash(urlPath);
+    }
+  }
+
+  return heading ? `${resolvedPath}#${heading}` : resolvedPath;
 }
 ```
 
-### Customizing Callout Styles
+### Customizing Callout Type Mapping
 
-Edit `src/styles/obsidian-callouts.css` to:
-- Change callout colors
-- Add new callout types
-- Adjust spacing and borders
-- Modify dark mode appearance
+To change how Obsidian callout types map to Starlight aside types, edit `src/plugins/remark-obsidian-to-starlight.ts`:
+
+```typescript
+const calloutTypeMap: Record<string, string> = {
+  note: 'note',
+  tip: 'tip',
+  info: 'note',
+  warning: 'caution',
+  caution: 'caution',
+  danger: 'danger',
+  // Add your custom mappings here
+  custom: 'tip',
+};
 
 ## Best Practices
 
@@ -427,18 +480,25 @@ Edit `src/styles/obsidian-callouts.css` to:
 
 ### Wikilinks not transforming
 
-1. Check that `@flowershow/remark-wiki-link` is installed
-2. Verify `astro.config.mjs` has the plugin configured
+1. Check that `.synced-files.json` manifest exists in `src/content/docs/`
+2. Verify `github-wiki-sync` integration is configured and ran successfully
 3. Restart the dev server after config changes
 4. Check for syntax errors in wikilinks
+5. Look for warnings in build output (e.g., "File not found for link: X")
 
-### Callouts not styled
+### Callouts not rendering as asides
 
-1. Verify `rehype-callouts` is installed
-2. Check that plugin is configured in `rehypePlugins` array
-3. Ensure `theme: 'obsidian'` is set in plugin options
+1. Verify callout syntax starts with `> [!type]` exactly
+2. Check that `remark-obsidian-to-starlight` is in `remarkPlugins` array
+3. Ensure plugin runs **before** `remark-wikilinks` (order matters)
 4. Clear `.astro` cache directory
-5. Inspect HTML for correct callout structure
+5. Inspect HTML - should see `<aside class="starlight-aside">`
+
+### Callout content missing
+
+This was a known issue where callouts appeared but had no content:
+- **Fixed in v2.0** - Content is now properly extracted from multi-line callouts
+- If still occurring, ensure you're using the latest version of `remark-obsidian-to-starlight.ts`
 
 ### Images not loading
 
@@ -451,8 +511,8 @@ Edit `src/styles/obsidian-callouts.css` to:
 
 1. Check for valid markdown syntax
 2. Ensure all wikilinks use proper format
-3. Verify callout syntax is correct
-4. Check for conflicting remark plugins
+3. Verify callout syntax is correct (must start with `> [!type]`)
+4. Check `.synced-files.json` is being generated during build
 
 ## Migration Guide
 
@@ -562,12 +622,26 @@ Screenshot of the dashboard:
 ## Additional Resources
 
 - [Obsidian Documentation](https://help.obsidian.md/) - Official Obsidian docs
-- [Flowershow remark-wiki-link](https://github.com/flowershow/remark-wiki-link) - Wikilink plugin source
-- [rehype-callouts](https://github.com/lin-stephanie/rehype-callouts) - Callout plugin (maintained)
 - [Starlight Documentation](https://starlight.astro.build/) - Framework docs
 - [Astro Markdown](https://docs.astro.build/en/guides/markdown-content/) - Markdown in Astro
+- [remark](https://github.com/remarkjs/remark) - Markdown processor
+- [unist-util-visit](https://github.com/syntax-tree/unist-util-visit) - AST traversal utility
 
 ## Version History
+
+- **v2.0** (2025-01-14) - Complete custom implementation
+  - **Breaking changes**: Removed all external Obsidian plugin dependencies
+  - Replaced `@flowershow/remark-wiki-link` with custom `remark-wikilinks.ts`
+  - Replaced `rehype-callouts` with custom `remark-obsidian-to-starlight.ts`
+  - Implemented file-based wikilink resolution using manifest from `github-wiki-sync`
+  - Callouts now transform to Starlight's native aside components for consistent styling
+  - Fixed callout content extraction - properly handles multi-line callouts where markdown parser merges lines
+  - Fixed inline formatting preservation in callouts (bold, links, emphasis, etc.)
+  - Added shared utilities in `src/lib/markdown-utils.ts` to eliminate code duplication
+  - Converted all plugins to TypeScript for better type safety
+  - Created `src/lib/wikilink-resolver.ts` for sophisticated file matching strategies
+  - All plugins now work at AST level instead of string manipulation
+  - Production-ready implementation with full control over behavior
 
 - **v1.3** (2025-01-13) - Fixed wikilink plugin API usage
   - Corrected plugin configuration to use proper API: `format` instead of `pathFormat`, `urlResolver` instead of `wikiLinkResolver`
