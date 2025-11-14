@@ -52,13 +52,18 @@ function parseCalloutHeader(text: string): { type: string; title?: string } | nu
 }
 
 /**
- * Extract text content from a paragraph node
+ * Extract ALL text content from a node, recursively traversing inline elements
  */
-function extractText(node: Paragraph): string {
-  return node.children
-    .filter((child): child is Text => child.type === 'text')
-    .map((child) => child.value)
-    .join('');
+function extractText(node: any): string {
+  if (node.type === 'text') {
+    return node.value;
+  }
+
+  if (node.children && Array.isArray(node.children)) {
+    return node.children.map(extractText).join('');
+  }
+
+  return '';
 }
 
 /**
@@ -71,12 +76,19 @@ const remarkObsidianToStarlight: Plugin<[], Root> = () => {
 
       // Check if first child is a paragraph starting with [!type]
       const firstChild = node.children[0];
-      if (!firstChild || firstChild.type !== 'paragraph') return;
+      if (!firstChild || firstChild.type !== 'paragraph') {
+        // Not a callout - regular blockquote
+        return;
+      }
 
       const firstText = extractText(firstChild);
       const calloutInfo = parseCalloutHeader(firstText);
 
-      if (!calloutInfo) return;
+      if (!calloutInfo) {
+        // Blockquote doesn't start with [!type] - not an Obsidian callout
+        console.debug(`[obsidian-to-starlight] Skipping blockquote, first line: "${firstText.substring(0, 50)}"`);
+        return;
+      }
 
       // Map Obsidian type to Starlight type
       const starlightType = calloutTypeMap[calloutInfo.type] || 'note';
