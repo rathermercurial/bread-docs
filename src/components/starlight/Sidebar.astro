@@ -1,0 +1,23 @@
+---
+/**
+ * Custom Sidebar component override for Starlight.
+ *
+ * This component replaces the default Starlight Sidebar to enable a custom
+ * SidebarSublist implementation that makes folder labels clickable links to
+ * their index pages.
+ */
+import type { SidebarEntry, SidebarLink } from '@astrojs/starlight/utils/routing/types';
+import MobileMenuFooter from 'virtual:starlight/components/MobileMenuFooter';
+import SidebarPersister from '@astrojs/starlight/components/SidebarPersister.astro';
+import SidebarSublist from './SidebarSublist.astro';
+
+const { sidebar } = Astro.locals.starlightRoute;
+---
+
+<SidebarPersister>
+	<SidebarSublist sublist={sidebar} />
+</SidebarPersister>
+
+<div class="md:sl-hidden">
+	<MobileMenuFooter />
+</div>
