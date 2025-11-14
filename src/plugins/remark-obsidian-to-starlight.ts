@@ -81,21 +81,59 @@ const remarkObsidianToStarlight: Plugin<[], Root> = () => {
         return;
       }
 
-      const firstText = extractText(firstChild);
-      const calloutInfo = parseCalloutHeader(firstText);
+      // Get the inline children of the first paragraph
+      const firstParagraph = firstChild as Paragraph;
+      const inlineChildren = firstParagraph.children;
 
-      if (!calloutInfo) {
-        // Blockquote doesn't start with [!type] - not an Obsidian callout
-        console.debug(`[obsidian-to-starlight] Skipping blockquote, first line: "${firstText.substring(0, 50)}"`);
+      // Check if the first inline node is a text node starting with [!type]
+      if (!inlineChildren || inlineChildren.length === 0) return;
+
+      const firstInline = inlineChildren[0];
+      if (firstInline.type !== 'text') return;
+
+      const firstTextNode = firstInline as Text;
+      const calloutMatch = firstTextNode.value.match(/^\[!(\w+)\]([-+])?\s*(.*)?$/m);
+
+      if (!calloutMatch) {
+        // Not a callout
+        console.debug(`[obsidian-to-starlight] Skipping blockquote, first text: "${firstTextNode.value.substring(0, 50)}"`);
         return;
       }
+
+      const [fullMatch, type, , titleText] = calloutMatch;
+      const calloutInfo = { type: type.toLowerCase(), title: titleText?.trim() || undefined };
 
       // Map Obsidian type to Starlight type
       const starlightType = calloutTypeMap[calloutInfo.type] || 'note';
 
-      // Build the directive content (skip the header line, keep rest of blockquote content)
+      // Build the directive content
       const directiveChildren: any[] = [];
 
+      // Remove the callout marker from the first text node and keep remaining content
+      const textAfterMarker = firstTextNode.value.replace(/^\[!\w+\]([-+])?\s*[^\n]*\n?/, '').trim();
+
+      // Build content from the modified first paragraph
+      const contentInlineNodes: any[] = [];
+
+      // If there's text after the marker in the first text node, keep it
+      if (textAfterMarker) {
+        contentInlineNodes.push({ type: 'text', value: textAfterMarker });
+      }
+
+      // Add all remaining inline nodes from the first paragraph (after the first text node)
+      for (let i = 1; i < inlineChildren.length; i++) {
+        contentInlineNodes.push(inlineChildren[i]);
+      }
+
+      // If we have content from the first paragraph, create a paragraph node
+      if (contentInlineNodes.length > 0) {
+        directiveChildren.push({
+          type: 'paragraph',
+          children: contentInlineNodes,
+        });
+      }
+
+      // Add all subsequent children from the blockquote (other paragraphs, lists, etc.)
       for (let i = 1; i < node.children.length; i++) {
         directiveChildren.push(node.children[i]);
       }
