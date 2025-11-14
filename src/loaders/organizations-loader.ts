@@ -1,9 +1,11 @@
 /**
- * Organizations Collection Loader
+ * Organizations Collection Loader (DOAP-inspired)
  *
- * Loads organization data from GitHub repository
- * Supports member projects, angel minters, and marketplace listings
- * in a single unified collection using boolean flags
+ * Loads organization/project data from GitHub repository
+ * For organizations: member projects, angel minters, etc.
+ * See: https://en.wikipedia.org/wiki/DOAP
+ *
+ * Note: Marketplace listings are in the separate 'offers' collection
  */
 
 import { createGitHubDataLoader, parseMarkdownFile, parseJsonFile } from '../lib/data-loader-base';
@@ -24,10 +26,9 @@ export interface OrganizationEntry extends BaseDataEntry {
   longDescription?: string;
   content?: string; // Markdown content if using .md files
 
-  // Categorization - this is the key part!
+  // Organization type flags
   isMemberProject: boolean;
   isAngelMinter: boolean;
-  isMarketplace: boolean;
 
   // Assets
   logo?: string;
@@ -87,10 +88,9 @@ function parseOrganizationFile(content: string, filePath: string): OrganizationE
     longDescription: parsed.longDescription,
     content: parsed.content,
 
-    // Default all flags to false
+    // Organization type flags (default to false)
     isMemberProject: parsed.isMemberProject ?? false,
     isAngelMinter: parsed.isAngelMinter ?? false,
-    isMarketplace: parsed.isMarketplace ?? false,
 
     // Assets
     logo: parsed.logo,

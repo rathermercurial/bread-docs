@@ -3,14 +3,16 @@ import { docsLoader } from '@astrojs/starlight/loaders';
 import { docsSchema } from '@astrojs/starlight/schema';
 import { createOrganizationsLoader } from './loaders/organizations-loader';
 import { createContributorsLoader } from './loaders/contributors-loader';
+import { createOffersLoader } from './loaders/offers-loader';
 import { loadEnv } from 'vite';
 
 // Load environment variables
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
 
 /**
- * Organizations Collection Schema
- * Unified schema for member projects, angel minters, and marketplace listings
+ * Organizations Collection Schema (DOAP-inspired)
+ * For organizations/projects: member projects, angel minters, etc.
+ * See: https://en.wikipedia.org/wiki/DOAP
  */
 const organizationsSchema = z.object({
 	// Identity
@@ -23,10 +25,9 @@ const organizationsSchema = z.object({
 	longDescription: z.string().optional(),
 	content: z.string().optional(), // Markdown content if using .md files
 
-	// Categorization - use boolean flags for flexible organization types
+	// Organization type flags
 	isMemberProject: z.boolean().default(false),
 	isAngelMinter: z.boolean().default(false),
-	isMarketplace: z.boolean().default(false),
 
 	// Assets
 	logo: z.string().optional(),
@@ -59,8 +60,59 @@ const organizationsSchema = z.object({
 });
 
 /**
- * Contributors Collection Schema
+ * Offers Collection Schema (schema.org/Offer inspired)
+ * For marketplace listings: products, services, and goods being offered
+ * See: https://schema.org/Offer
+ */
+const offersSchema = z.object({
+	// Identity
+	id: z.string(),
+	name: z.string(),
+	slug: z.string().optional(),
+
+	// Description
+	description: z.string(),
+	longDescription: z.string().optional(),
+	content: z.string().optional(), // Markdown content if using .md files
+
+	// Offer details (schema.org/Offer)
+	price: z.number().optional(),
+	priceCurrency: z.string().optional(), // ISO 4217 (USD, ETH, etc.)
+	availability: z
+		.enum(['InStock', 'OutOfStock', 'PreOrder', 'Discontinued', 'LimitedAvailability'])
+		.optional(),
+
+	// Seller/Provider (reference to organization)
+	seller: z.string().optional(), // Organization ID
+	sellerName: z.string().optional(),
+
+	// Assets
+	image: z.string().optional(),
+	images: z.array(z.string()).default([]),
+
+	// Web presence
+	url: z.string().url().optional(),
+	itemOffered: z.string().optional(), // Type of thing being offered
+
+	// Categorization
+	category: z.string().optional(),
+	tags: z.array(z.string()).default([]),
+
+	// Metadata
+	status: z.enum(['active', 'sold', 'archived']).default('active'),
+	validFrom: z.string().datetime().optional(),
+	validThrough: z.string().datetime().optional(),
+
+	// Dates
+	createdAt: z.string().datetime().optional(),
+	updatedAt: z.string().datetime().optional(),
+	enrichedAt: z.string().datetime().optional(),
+});
+
+/**
+ * Contributors Collection Schema (FOAF-inspired)
  * For author credits, contributor profiles, and identity management
+ * See: https://en.wikipedia.org/wiki/FOAF
  */
 const contributorsSchema = z.object({
 	// Identity
@@ -112,7 +164,7 @@ export const collections = {
 	// Existing docs collection (Starlight)
 	docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
 
-	// Organizations collection (member projects, angel minters, marketplace)
+	// Organizations collection (DOAP-inspired: projects, cooperatives)
 	organizations: defineCollection({
 		loader: createOrganizationsLoader({
 			owner: env.GITHUB_REPO_OWNER || 'BreadchainCoop',
@@ -124,7 +176,19 @@ export const collections = {
 		schema: organizationsSchema,
 	}),
 
-	// Contributors collection (author profiles, credits)
+	// Offers collection (schema.org/Offer: marketplace listings)
+	offers: defineCollection({
+		loader: createOffersLoader({
+			owner: env.GITHUB_REPO_OWNER || 'BreadchainCoop',
+			repo: env.GITHUB_REPO_NAME || 'shared-obsidian',
+			token: env.GITHUB_TOKEN || '',
+			path: env.OFFERS_PATH || 'data/offers',
+			enableEnrichment: 'minimal',
+		}),
+		schema: offersSchema,
+	}),
+
+	// Contributors collection (FOAF-inspired: people, authors)
 	contributors: defineCollection({
 		loader: createContributorsLoader({
 			owner: env.GITHUB_REPO_OWNER || 'BreadchainCoop',

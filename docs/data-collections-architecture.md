@@ -2,7 +2,9 @@
 
 ## Overview
 
-This document describes the data collections architecture for Breadchain Docs, including the unified organizations collection, contributors collection, and the extensible enrichment plugin system.
+This document describes the data collections architecture for Breadchain Docs, including organizations (DOAP), offers (schema.org/Offer), contributors (FOAF), and the extensible enrichment plugin system.
+
+**See also**: [ONTOLOGY.md](./ONTOLOGY.md) for semantic model details
 
 ## Architecture Principles
 
@@ -14,26 +16,31 @@ This document describes the data collections architecture for Breadchain Docs, i
 
 ## Collections
 
-### Organizations Collection
+### Organizations Collection (DOAP-inspired)
 
-**Unified collection** for entities that can be:
-- Member projects
-- Angel minters
-- Marketplace listings
-- Or any combination (e.g., both member project AND angel minter)
+**For**: Organizations, projects, cooperatives - entities with agency
 
-Uses boolean flags (`isMemberProject`, `isAngelMinter`, `isMarketplace`) instead of separate collections.
+**Examples**: Member projects, angel minters, DAOs
+
+**Not for**: Marketplace listings (use Offers), people (use Contributors)
+
+**Ontology**: Based on [DOAP (Description of a Project)](https://en.wikipedia.org/wiki/DOAP)
+
+Uses boolean flags for organization types:
+- `isMemberProject` - Is this a member project?
+- `isAngelMinter` - Is this an angel minter?
+- Organizations can have multiple roles (e.g., both member + angel)
 
 **Location:** `src/content.config.ts` → `organizations`
 
-**Schema:** See `src/content.config.ts:15-59`
+**Schema:** See `src/content.config.ts`
 
 **Loader:** `src/loaders/organizations-loader.ts`
 
 #### Querying Organizations
 
 ```typescript
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 
 // Get all member projects
 const memberProjects = await getCollection('organizations',
@@ -50,16 +57,65 @@ const both = await getCollection('organizations',
   (org) => org.data.isMemberProject && org.data.isAngelMinter
 );
 
-// Get all marketplace listings
-const marketplace = await getCollection('organizations',
-  (org) => org.data.isMarketplace
-);
-
 // Get a specific organization
 const breadchain = await getEntry('organizations', 'breadchain');
 ```
 
-### Contributors Collection
+### Offers Collection (schema.org/Offer)
+
+**For**: Marketplace listings - products, services, goods being offered
+
+**Examples**: Products for sale, services, workshop tickets
+
+**Not for**: Organizations (use Organizations), sellers (reference via `seller` field)
+
+**Ontology**: Based on [schema.org/Offer](https://schema.org/Offer)
+
+Key properties:
+- `price`, `priceCurrency` - Pricing information
+- `availability` - Stock status
+- `seller` - Organization ID offering this (references Organizations collection)
+- `itemOffered` - Type of thing being offered
+
+**Location:** `src/content.config.ts` → `offers`
+
+**Schema:** See `src/content.config.ts`
+
+**Loader:** `src/loaders/offers-loader.ts`
+
+#### Querying Offers
+
+```typescript
+import { getCollection, getEntry } from 'astro:content';
+
+// Get all active offers
+const activeOffers = await getCollection('offers',
+  (offer) => offer.data.status === 'active'
+);
+
+// Get offers from a specific seller
+const breadchainOffers = await getCollection('offers',
+  (offer) => offer.data.seller === 'breadchain'
+);
+
+// Get in-stock offers
+const inStock = await getCollection('offers',
+  (offer) => offer.data.availability === 'InStock'
+);
+
+// Get a specific offer
+const offer = await getEntry('offers', 'sourdough-bread');
+```
+
+### Contributors Collection (FOAF-inspired)
+
+**For**: People - contributors, authors, community members
+
+**Examples**: Developers, organizers, artists
+
+**Not for**: Organizations (use Organizations), products (use Offers)
+
+**Ontology**: Based on [FOAF (Friend of a Friend)](https://en.wikipedia.org/wiki/FOAF)
 
 Collection for contributor profiles with support for enrichment from multiple sources:
 - Markdown content from source files
@@ -532,25 +588,49 @@ Contributors: {contributors.length}
 
 If you currently have separate directories for member-projects, angel-minters, marketplace:
 
+**For member-projects and angel-minters**:
 1. **Consolidate** into `data/organizations/`
 2. **Add boolean flags** to each file:
    ```json
    {
      "isMemberProject": true,
-     "isAngelMinter": false,
-     "isMarketplace": false
+     "isAngelMinter": false
    }
    ```
 3. **Update queries** to filter by flags instead of collection name
 
+**For marketplace listings**:
+1. **Move** to separate `data/offers/` directory
+2. **Convert** to offer schema:
+   ```json
+   {
+     "id": "sourdough-bread",
+     "name": "Artisan Sourdough Bread",
+     "description": "Fresh baked sourdough",
+     "price": 12.00,
+     "priceCurrency": "USD",
+     "seller": "breadchain",
+     "availability": "InStock"
+   }
+   ```
+3. **Reference** the selling organization via `seller` field
+
 ### Adding New Data
 
-To add a new organization or contributor:
+**To add an organization**:
+1. Create file: `data/organizations/myproject.md`
+2. Add required fields (id, name, description, flags)
+3. Commit and rebuild
 
-1. Create file in GitHub repo: `data/organizations/myproject.md`
-2. Add frontmatter with required fields
-3. Commit to GitHub
-4. Rebuild site (loaders fetch automatically)
+**To add a marketplace offer**:
+1. Create file: `data/offers/myoffer.json`
+2. Add required fields (id, name, description, seller)
+3. Commit and rebuild
+
+**To add a contributor**:
+1. Create file: `data/contributors/username.md`
+2. Add required fields (id, name)
+3. Commit and rebuild
 
 ## Troubleshooting
 

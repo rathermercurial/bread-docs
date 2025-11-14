@@ -1,8 +1,10 @@
 # Data Collection Examples
 
-This document provides example data files for organizations and contributors collections.
+This document provides example data files for organizations, offers, and contributors collections.
 
-## Organizations Collection
+**See also**: [ONTOLOGY.md](./ONTOLOGY.md) for semantic model details
+
+## Organizations Collection (DOAP-inspired)
 
 ### Example 1: JSON Format (Member Project + Angel Minter)
 
@@ -18,7 +20,6 @@ This document provides example data files for organizations and contributors col
 
   "isMemberProject": true,
   "isAngelMinter": true,
-  "isMarketplace": false,
 
   "logo": "/logos/breadchain.svg",
   "banner": "/banners/breadchain.jpg",
@@ -43,66 +44,7 @@ This document provides example data files for organizations and contributors col
 }
 ```
 
-### Example 2: Markdown Format (Marketplace Only)
-
-**File:** `data/organizations/marketplace-example.md`
-
-```markdown
----
-id: marketplace-example
-name: Example Marketplace
-description: A decentralized marketplace for community goods
-isMemberProject: false
-isAngelMinter: false
-isMarketplace: true
-website: https://marketplace.example
-tags: [marketplace, e-commerce]
-status: active
----
-
-# Example Marketplace
-
-This is an example of a marketplace listing using Markdown format.
-
-## About
-
-The markdown content section can contain detailed information about the marketplace,
-including features, how to use it, and other relevant details.
-
-## Features
-
-- Feature 1: Decentralized listings
-- Feature 2: Community governance
-- Feature 3: Token-gated access
-
-## How to Join
-
-Instructions for becoming a vendor or customer...
-```
-
-### Example 3: JSON Format (All Three Types)
-
-**File:** `data/organizations/hybrid-project.json`
-
-```json
-{
-  "id": "hybrid-project",
-  "name": "Hybrid Project",
-  "description": "An organization that serves multiple roles in the ecosystem",
-
-  "isMemberProject": true,
-  "isAngelMinter": true,
-  "isMarketplace": true,
-
-  "website": "https://hybrid.example",
-  "ethereumAddress": "0x9876543210987654321098765432109876543210",
-
-  "tags": ["multi-role", "ecosystem"],
-  "status": "active"
-}
-```
-
-### Example 4: Markdown Format (Member Project)
+### Example 2: Markdown Format (Member Project)
 
 **File:** `data/organizations/community-project.md`
 
@@ -115,7 +57,6 @@ description: A grassroots community initiative building local infrastructure
 longDescription: Extended description of the project, its mission, and impact on the community.
 isMemberProject: true
 isAngelMinter: false
-isMarketplace: false
 logo: /logos/community-project.png
 website: https://community.example
 github: community-project
@@ -166,7 +107,181 @@ We collaborate with several organizations in the ecosystem:
 - Email: hello@community.example
 ```
 
-## Contributors Collection
+### Example 3: JSON Format (Angel Minter Only)
+
+**File:** `data/organizations/angel-minter-example.json`
+
+```json
+{
+  "id": "angel-minter-example",
+  "name": "Example Angel Minter",
+  "description": "An organization that mints tokens for community projects",
+
+  "isMemberProject": false,
+  "isAngelMinter": true,
+
+  "website": "https://angelminter.example",
+  "ethereumAddress": "0x9876543210987654321098765432109876543210",
+
+  "tags": ["angel-minter", "defi"],
+  "status": "active"
+}
+```
+
+## Offers Collection (schema.org/Offer)
+
+### Example 1: JSON Format (Physical Product)
+
+**File:** `data/offers/sourdough-bread.json`
+
+```json
+{
+  "id": "sourdough-bread",
+  "name": "Artisan Sourdough Bread",
+  "slug": "sourdough-bread",
+  "description": "Fresh baked sourdough bread made with organic flour",
+  "longDescription": "Our signature sourdough is fermented for 24 hours using a 100-year-old starter culture. Made with locally-sourced organic flour and sea salt.",
+
+  "price": 12.00,
+  "priceCurrency": "USD",
+  "availability": "InStock",
+
+  "seller": "breadchain",
+  "sellerName": "Breadchain Cooperative",
+
+  "image": "/images/sourdough-bread.jpg",
+  "images": [
+    "/images/sourdough-bread-1.jpg",
+    "/images/sourdough-bread-2.jpg",
+    "/images/sourdough-bread-3.jpg"
+  ],
+
+  "url": "https://marketplace.breadchain.xyz/sourdough",
+  "itemOffered": "Food Product",
+
+  "category": "Food & Beverage",
+  "tags": ["bread", "sourdough", "organic", "artisan"],
+
+  "status": "active",
+  "validFrom": "2024-01-01T00:00:00Z",
+  "validThrough": "2025-12-31T23:59:59Z",
+
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-11-14T00:00:00Z"
+}
+```
+
+### Example 2: Markdown Format (Service)
+
+**File:** `data/offers/consulting-service.md`
+
+```markdown
+---
+id: consulting-service
+name: Web3 Consulting Service
+description: Expert consulting for DAO governance and tokenomics
+price: 150
+priceCurrency: USD
+availability: InStock
+seller: community-project
+sellerName: Community Project
+itemOffered: Service
+category: Consulting
+tags: [web3, dao, governance, consulting]
+status: active
+---
+
+# Web3 Consulting Service
+
+## What We Offer
+
+Comprehensive consulting services for DAOs and web3 projects, including:
+
+- Governance framework design
+- Tokenomics modeling
+- Smart contract architecture review
+- Community management strategies
+
+## Pricing
+
+$150/hour with discounts for:
+- Community members: 20% off
+- Long-term engagements: Custom pricing
+
+## How It Works
+
+1. **Initial Consultation** (free) - 30-minute discovery call
+2. **Proposal** - Detailed scope and timeline
+3. **Engagement** - Weekly check-ins and deliverables
+4. **Follow-up** - Ongoing support available
+
+## Book Now
+
+Contact us at consulting@community.example or through our Discord.
+```
+
+### Example 3: JSON Format (Digital Product)
+
+**File:** `data/offers/nft-collection.json`
+
+```json
+{
+  "id": "genesis-nft-collection",
+  "name": "Genesis Collection NFTs",
+  "description": "Limited edition NFT collection supporting public goods",
+
+  "price": 0.05,
+  "priceCurrency": "ETH",
+  "availability": "LimitedAvailability",
+
+  "seller": "breadchain",
+
+  "image": "/images/nft-preview.png",
+
+  "url": "https://mint.breadchain.xyz",
+  "itemOffered": "Digital Product",
+
+  "category": "NFT",
+  "tags": ["nft", "digital-art", "public-goods"],
+
+  "status": "active",
+
+  "createdAt": "2024-06-01T00:00:00Z"
+}
+```
+
+### Example 4: Out of Stock Product
+
+**File:** `data/offers/workshop-ticket.json`
+
+```json
+{
+  "id": "dao-workshop-ticket",
+  "name": "DAO Governance Workshop Ticket",
+  "description": "Full-day workshop on DAO governance best practices",
+
+  "price": 50,
+  "priceCurrency": "USD",
+  "availability": "OutOfStock",
+
+  "seller": "community-project",
+  "sellerName": "Community Project",
+
+  "itemOffered": "Event Ticket",
+
+  "category": "Event",
+  "tags": ["workshop", "dao", "governance", "education"],
+
+  "status": "sold",
+  "validFrom": "2024-09-01T00:00:00Z",
+  "validThrough": "2024-09-15T00:00:00Z",
+
+  "createdAt": "2024-08-01T00:00:00Z",
+  "updatedAt": "2024-09-10T00:00:00Z"
+}
+```
+
+## Contributors Collection (FOAF-inspired)
 
 ### Example 1: JSON Format (Basic Profile)
 
@@ -223,7 +338,7 @@ hatsRoles:
 twitter: bob_contracts
 website: https://bobsmith.dev
 roles: [Smart Contract Developer, Auditor]
-organizations: [breadchain, hybrid-project]
+organizations: [breadchain]
 isActive: true
 joinedAt: "2023-02-10T00:00:00Z"
 ---
@@ -306,7 +421,7 @@ Feel free to reach out for collaborations or consulting work:
   "website": "https://charlie.example",
 
   "roles": ["Community Lead", "Facilitator", "Organizer"],
-  "organizations": ["breadchain", "community-project", "hybrid-project"],
+  "organizations": ["breadchain", "community-project"],
 
   "isActive": true,
   "joinedAt": "2023-04-01T00:00:00Z"
@@ -362,7 +477,44 @@ const memberProjects = await getCollection('organizations',
 ))}
 ```
 
-### Display Organization Detail Page
+### Display Marketplace Offers
+
+```astro
+---
+// src/pages/marketplace.astro
+import { getCollection, getEntry } from 'astro:content';
+
+const activeOffers = await getCollection('offers',
+  (offer) => offer.data.status === 'active' && offer.data.availability === 'InStock'
+);
+---
+
+<h1>Marketplace</h1>
+
+{activeOffers.map((offer) => (
+  <div class="offer-card">
+    {offer.data.image && <img src={offer.data.image} alt={offer.data.name} />}
+    <h2>{offer.data.name}</h2>
+    <p>{offer.data.description}</p>
+
+    <div class="price">
+      {offer.data.price} {offer.data.priceCurrency}
+    </div>
+
+    {offer.data.sellerName && (
+      <div class="seller">
+        Sold by: {offer.data.sellerName}
+      </div>
+    )}
+
+    {offer.data.url && (
+      <a href={offer.data.url}>View Offer</a>
+    )}
+  </div>
+))}
+```
+
+### Display Organization with Their Offers
 
 ```astro
 ---
@@ -378,6 +530,11 @@ export async function getStaticPaths() {
 }
 
 const { org } = Astro.props;
+
+// Get all offers from this organization
+const orgOffers = await getCollection('offers',
+  (offer) => offer.data.seller === org.id
+);
 ---
 
 <article>
@@ -390,6 +547,21 @@ const { org } = Astro.props;
 
   {org.data.content && (
     <div class="content" set:html={org.data.content} />
+  )}
+
+  {orgOffers.length > 0 && (
+    <section class="offers">
+      <h2>Marketplace Offerings</h2>
+      <div class="offers-grid">
+        {orgOffers.map((offer) => (
+          <div class="offer-card">
+            <h3>{offer.data.name}</h3>
+            <p>{offer.data.description}</p>
+            <div class="price">{offer.data.price} {offer.data.priceCurrency}</div>
+          </div>
+        ))}
+      </div>
+    </section>
   )}
 
   <aside>
@@ -411,7 +583,6 @@ const { org } = Astro.props;
       <dd>
         {org.data.isMemberProject && <span>Member Project</span>}
         {org.data.isAngelMinter && <span>Angel Minter</span>}
-        {org.data.isMarketplace && <span>Marketplace</span>}
       </dd>
     </dl>
   </aside>
@@ -516,7 +687,12 @@ const author = await getEntry('contributors', 'alice');
 - `description` - Short description
 - `isMemberProject` - Boolean flag
 - `isAngelMinter` - Boolean flag
-- `isMarketplace` - Boolean flag
+
+### Required Fields (Offers)
+
+- `id` - Unique identifier
+- `name` - Display name
+- `description` - Short description
 
 ### Required Fields (Contributors)
 
@@ -533,3 +709,6 @@ All other fields are optional and will use defaults from the schema.
 4. **Dates in ISO 8601** - Format: `2024-11-14T00:00:00Z`
 5. **URLs must be valid** - Schema validates URL format
 6. **Tags are arrays** - Even for single tags: `["tag"]`
+7. **Seller references** - Offers should reference organization IDs via `seller` field
+8. **Price currencies** - Use ISO 4217 codes (USD, EUR, ETH, etc.)
+9. **Availability values** - Use schema.org values: InStock, OutOfStock, PreOrder, Discontinued, LimitedAvailability
