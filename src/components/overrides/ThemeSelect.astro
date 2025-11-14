@@ -1,0 +1,66 @@
+---
+// Import Starlight's default component
+import StarlightThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+---
+
+<div class="bread-theme-select">
+  <StarlightThemeSelect {...Astro.props} />
+</div>
+
+<style>
+/* All theme toggle styling here - no !important needed */
+.bread-theme-select :global(select),
+.bread-theme-select :global(button) {
+  color: var(--sl-color-gray-6);
+  background-color: var(--sl-color-gray-1);
+  border-color: var(--sl-color-gray-4);
+}
+
+.bread-theme-select :global(svg),
+.bread-theme-select :global(.icon) {
+  color: var(--sl-color-gray-6);
+  fill: currentColor;
+}
+
+.bread-theme-select :global(.caret),
+.bread-theme-select :global(svg.caret) {
+  color: var(--sl-color-gray-6);
+  opacity: 1;
+}
+
+/* Select element text */
+.bread-theme-select :global(select option) {
+  color: var(--sl-color-gray-6);
+  background-color: var(--sl-color-bg);
+}
+
+/* Theme select dropdown states */
+.bread-theme-select :global(select:focus),
+.bread-theme-select :global(select[aria-expanded="true"]) {
+  color: var(--sl-color-gray-6);
+  background-color: var(--sl-color-bg);
+  border-color: var(--sl-color-text-accent);
+}
+
+/* Theme menu items in dropdown */
+.bread-theme-select :global(option),
+.bread-theme-select :global([role="option"]) {
+  color: var(--sl-color-gray-6);
+  background-color: var(--sl-color-bg);
+}
+
+.bread-theme-select :global(option:hover),
+.bread-theme-select :global([role="option"]:hover) {
+  color: var(--sl-color-text-accent);
+  background-color: var(--sl-color-gray-2);
+}
+
+/* Selected theme option */
+.bread-theme-select :global(option:checked),
+.bread-theme-select :global(option[aria-selected="true"]),
+.bread-theme-select :global([role="option"][aria-selected="true"]) {
+  color: var(--sl-color-text-accent);
+  background-color: var(--sl-color-gray-2);
+  font-weight: 700;
+}
+</style>
