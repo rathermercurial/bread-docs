@@ -1,6 +1,10 @@
 /* Obsidian-style markdown support for Starlight */
 /* Enhanced for Bread Design System */
 
+/* ===================================================================== */
+/* WIKILINK STYLES */
+/* ===================================================================== */
+
 /* Internal link styling for wikilinks */
 .internal-link {
 	color: var(--color-primary-orange);
@@ -16,6 +20,18 @@
 	text-decoration-color: var(--color-orange-1);
 }
 
+/* Embedded links (document embeds) */
+.internal-link-embed {
+	color: var(--sl-color-text-accent);
+	text-decoration: underline;
+	text-decoration-style: dotted;
+	font-style: italic;
+}
+
+.internal-link-embed:hover {
+	text-decoration-style: solid;
+}
+
 /* Broken/missing internal links */
 .internal-link-new {
 	color: var(--color-system-red);
@@ -29,43 +45,54 @@
 	opacity: 1;
 }
 
+/* ===================================================================== */
+/* CALLOUT/ASIDE STYLES */
+/* ===================================================================== */
+
 /*
- * Callout styles - rehype-callouts with theme: 'obsidian' provides base styling
- * Additional fixes for Starlight compatibility and Bread Design System
+ * Callouts are now handled by Starlight's native aside components
+ * Obsidian callout syntax (> [!note]) is transformed to Starlight asides (:::note)
+ * by the remark-obsidian-to-starlight plugin.
+ *
+ * Below are Bread Design System enhancements to Starlight's aside styling.
  */
 
-/* Fix callout title layout - ensure icon and text are inline */
-.callout-title {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
+/* Apply Bread Design System to Starlight asides */
+.sl-markdown-content aside {
+	border-radius: 0; /* Bread uses sharp corners */
+	font-family: var(--font-breadBody);
+	border-left-width: 4px;
+}
+
+/* Enhance aside title with Bread fonts */
+.sl-markdown-content aside .starlight-aside__title {
 	font-family: var(--font-breadBody);
 	font-weight: 700;
 }
 
-.callout-title-icon {
-	display: flex;
-	align-items: center;
-	flex-shrink: 0;
-}
-
-.callout-title-text {
-	flex: 1;
-}
-
-/* Ensure callout content has proper contrast */
-.callout {
-	border-radius: 0; /* Bread uses sharp corners */
-	border-left-width: 4px;
-	font-family: var(--font-breadBody);
-}
-
-/* Enhance callout contrast for light mode */
-:root[data-theme="light"] .callout {
+/* Light mode aside backgrounds */
+:root[data-theme="light"] .sl-markdown-content aside {
 	background-color: rgba(246, 243, 235, 0.5);
 }
 
-/* Enhance callout contrast for dark mode */
-:root[data-theme="dark"] .callout {
+/* Dark mode aside backgrounds */
+:root[data-theme="dark"] .sl-markdown-content aside {
 	background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Accent colors for specific aside types */
+.sl-markdown-content aside.note {
+	border-left-color: var(--color-primary-blue);
+}
+
+.sl-markdown-content aside.tip {
+	border-left-color: var(--color-system-green);
+}
+
+.sl-markdown-content aside.caution {
+	border-left-color: var(--color-system-warning);
+}
+
+.sl-markdown-content aside.danger {
+	border-left-color: var(--color-system-red);
 }
