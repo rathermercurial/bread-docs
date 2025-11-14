@@ -100,14 +100,30 @@ const remarkObsidianToStarlight: Plugin<[], Root> = () => {
         directiveChildren.push(node.children[i]);
       }
 
+      // Helper to get preview of node content
+      const getNodePreview = (n: any): string => {
+        if (n.type === 'paragraph') return extractText(n).substring(0, 50);
+        if (n.type === 'list') return `[list with ${n.children?.length || 0} items]`;
+        if (n.type === 'code') return '[code block]';
+        return `[${n.type}]`;
+      };
+
       console.debug(`[obsidian-to-starlight] Transforming callout:`, {
         type: calloutInfo.type,
         title: calloutInfo.title,
         totalChildren: node.children.length,
         contentChildren: directiveChildren.length,
-        firstChildType: node.children[0]?.type,
-        childTypes: node.children.map((c: any) => c.type),
+        firstChildPreview: getNodePreview(node.children[0]),
+        childPreviews: node.children.map(getNodePreview),
       });
+
+      if (directiveChildren.length === 0) {
+        console.warn(`[obsidian-to-starlight] Callout has no content children!`, {
+          type: calloutInfo.type,
+          title: calloutInfo.title,
+          totalChildren: node.children.length,
+        });
+      }
 
       // Create directive node in the format Starlight expects
       // This matches the format that remark-directive creates from :::note syntax
