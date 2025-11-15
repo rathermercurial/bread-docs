@@ -78,8 +78,7 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 						/>
 					)}
 					<div class="entity-title">
-						<h1>{entry.data.name}</h1>
-						{entityType === 'person' && 'jobTitle' in entry.data && entry.data.jobTitle && (
+								{entityType === 'person' && 'jobTitle' in entry.data && entry.data.jobTitle && (
 							<p class="job-title">{entry.data.jobTitle}</p>
 						)}
 						{entityType === 'organization' && 'legalName' in entry.data && entry.data.legalName && (
@@ -88,9 +87,6 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 					</div>
 				</header>
 
-				{entry.data.description && (
-					<p class="entity-description">{entry.data.description}</p>
-				)}
 
 				<!-- Badges -->
 				<div class="entity-badges">
@@ -109,9 +105,10 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 				<div class="entity-content">
 					<Content />
 				</div>
+	</article>
 
-				<!-- Relationships -->
-				<aside class="entity-relationships">
+	<!-- Relationships -->
+	<aside slot="right-sidebar" class="entity-relationships">
 					{memberOf.length > 0 && (
 						<section class="relationship-section">
 							<h2>Member Of</h2>
@@ -235,8 +232,7 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 							</ul>
 						</section>
 					)}
-				</aside>
-	</article>
+	</aside>
 </StarlightPage>
 
 <style>

@@ -3,6 +3,7 @@
  * Marketplace Directory
  * Displays all marketplace offers with category filtering
  */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { getCollection } from 'astro:content';
 import OfferCard from '@/components/entities/OfferCard.astro';
 
@@ -29,24 +30,13 @@ const pageTitle = 'Marketplace';
 const pageDescription = 'Goods, services, and offerings from the Breadchain solidarity economy network';
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content={pageDescription} />
-		<title>{pageTitle} | Breadchain</title>
-	</head>
-	<body>
-		<header class="page-header">
-			<nav>
-				<a href="/">← Back to Home</a>
-			</nav>
-			<h1>Marketplace</h1>
-			<p class="page-description">{pageDescription}</p>
-		</header>
-
-		<main class="directory-page">
+<StarlightPage
+	frontmatter={{
+		title: pageTitle,
+		description: pageDescription,
+	}}
+>
+	<div class="directory-page">
 			<div class="directory-stats">
 				<div class="stat">
 					<span class="stat-value">{allOffers.length}</span>
@@ -113,17 +103,8 @@ const pageDescription = 'Goods, services, and offerings from the Breadchain soli
 					to participate in the marketplace.
 				</p>
 			</aside>
-		</main>
-
-		<footer class="page-footer">
-			<nav>
-				<a href="/angel-minters">Angel Minters</a> |
-				<a href="/contributors">Contributors</a> |
-				<a href="/member-projects">Member Projects</a>
-			</nav>
-		</footer>
-	</body>
-</html>
+	</div>
+</StarlightPage>
 
 <style>
 	.page-header {

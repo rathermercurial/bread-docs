@@ -3,6 +3,7 @@
  * Angel Minters Directory
  * Displays both people and organizations who are angel minters
  */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { getAngelMinters, sortEntitiesByName, groupEntitiesByType } from '@/lib/entity-utils';
 import EntityCard from '@/components/entities/EntityCard.astro';
 
@@ -14,24 +15,13 @@ const pageTitle = 'Angel Minters';
 const pageDescription = 'Community members and organizations participating in Breadchain crowdstaking and solidarity funding';
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content={pageDescription} />
-		<title>{pageTitle} | Breadchain</title>
-	</head>
-	<body>
-		<header class="page-header">
-			<nav>
-				<a href="/">← Back to Home</a>
-			</nav>
-			<h1>Angel Minters</h1>
-			<p class="page-description">{pageDescription}</p>
-		</header>
-
-		<main class="directory-page">
+<StarlightPage
+	frontmatter={{
+		title: pageTitle,
+		description: pageDescription,
+	}}
+>
+	<div class="directory-page">
 			<div class="directory-stats">
 				<div class="stat">
 					<span class="stat-value">{angelMinters.length}</span>
@@ -99,17 +89,8 @@ const pageDescription = 'Community members and organizations participating in Br
 					<a href="/solidarity-primitives/crowdstaking">Learn more about crowdstaking →</a>
 				</p>
 			</aside>
-		</main>
-
-		<footer class="page-footer">
-			<nav>
-				<a href="/contributors">Contributors</a> |
-				<a href="/member-projects">Member Projects</a> |
-				<a href="/marketplace">Marketplace</a>
-			</nav>
-		</footer>
-	</body>
-</html>
+	</div>
+</StarlightPage>
 
 <style>
 	.page-header {

@@ -47,16 +47,19 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 							class="offer-image"
 						/>
 					)}
-					<div class="offer-title">
-						<h1>{offer.data.name}</h1>
-						{offer.data.description && (
-							<p class="offer-description">{offer.data.description}</p>
-						)}
-					</div>
 				</header>
 
-				<!-- Offer Details -->
-				<aside class="offer-meta">
+				<!-- Main Content -->
+				<div class="offer-content">
+					<h2>What's Offered</h2>
+					<p class="item-offered">{offer.data.itemOffered}</p>
+
+					<Content />
+				</div>
+	</article>
+
+	<!-- Offer Details -->
+	<aside slot="right-sidebar" class="offer-meta">
 					{provider && (
 						<section class="meta-section">
 							<h2>Offered By</h2>
@@ -123,16 +126,7 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 							</a>
 						</section>
 					)}
-				</aside>
-
-				<!-- Main Content -->
-				<div class="offer-content">
-					<h2>What's Offered</h2>
-					<p class="item-offered">{offer.data.itemOffered}</p>
-
-					<Content />
-				</div>
-	</article>
+	</aside>
 </StarlightPage>
 
 <style>
