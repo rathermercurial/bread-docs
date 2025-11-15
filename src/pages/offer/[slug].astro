@@ -19,7 +19,9 @@ interface Props {
 }
 
 const { offer } = Astro.props;
-const { Content } = await offer.render();
+
+// Get content - glob loader entries use body property directly
+const bodyContent = offer.body;
 
 // Resolve provider
 const provider = await resolveOfferProvider(offer);
@@ -136,7 +138,7 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 					<h2>What's Offered</h2>
 					<p class="item-offered">{offer.data.itemOffered}</p>
 
-					<Content />
+					{bodyContent && <div set:html={bodyContent} />}
 				</div>
 			</article>
 		</main>

@@ -28,7 +28,9 @@ interface Props {
 }
 
 const { entry, entityType } = Astro.props;
-const { Content } = await entry.render();
+
+// Get content - glob loader entries use body property directly
+const bodyContent = entry.body;
 
 // Resolve relationships
 const memberOf =
@@ -114,7 +116,7 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 
 				<!-- Main Content -->
 				<div class="entity-content">
-					<Content />
+					{bodyContent && <div set:html={bodyContent} />}
 				</div>
 
 				<!-- Relationships -->

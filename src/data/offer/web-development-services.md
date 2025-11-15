@@ -1,7 +1,7 @@
 ---
 name: "Cooperative Web Development Services"
 description: "Custom web application development for cooperatives, mutual aid organizations, and solidarity economy projects"
-offeredBy: example-alice-chen
+offeredBy: "Alice Chen"
 itemOffered: "Full-stack web development, including frontend (React, Astro, Vue), backend (Node.js, Python), and smart contract development"
 price: "Contact for pricing - sliding scale available"
 priceCurrency: "USD"

@@ -192,15 +192,16 @@ export async function getEntityBySlug(
 	collection: 'person' | 'organization',
 	slug: string
 ): Promise<Entity | undefined> {
-	const entry = await getEntry(collection, slug);
-	if (!entry) return undefined;
-
 	if (collection === 'person') {
+		const entry = await getEntry('person', slug);
+		if (!entry) return undefined;
 		return {
 			...entry,
 			entityType: 'person' as const,
 		};
 	} else {
+		const entry = await getEntry('organization', slug);
+		if (!entry) return undefined;
 		return {
 			...entry,
 			entityType: 'organization' as const,

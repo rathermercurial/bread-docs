@@ -14,9 +14,9 @@ givenName: "Alice"
 familyName: "Chen"
 jobTitle: "Cooperative Technology Developer"
 memberOf:
-  - breadchain-cooperative
+  - "Breadchain Cooperative"
 worksFor:
-  - breadchain-cooperative
+  - "Breadchain Cooperative"
 email: "alice@breadchain.coop"
 
 # Web3 identity
@@ -28,9 +28,7 @@ isContributor: true
 isAngelMinter: true
 
 # Relationships
-makesOffer:
-  - web-development-services
-  - cooperative-consulting
+makesOffer: []
 ---
 
 # Alice Chen

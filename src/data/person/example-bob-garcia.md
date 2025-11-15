@@ -14,7 +14,7 @@ givenName: "Bob"
 familyName: "Garcia"
 jobTitle: "Cooperative Design Lead"
 memberOf:
-  - local-harvest-coop
+  - "Local Harvest Food Cooperative"
 email: "bob@localharvestcoop.org"
 
 # Web3 identity
@@ -25,8 +25,7 @@ isContributor: true
 isAngelMinter: false
 
 # Relationships
-makesOffer:
-  - cooperative-branding-services
+makesOffer: []
 ---
 
 # Bob Garcia

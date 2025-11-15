@@ -51,7 +51,7 @@ const pageDescription = 'People who build, organize, and support the Breadchain 
 				<section class="directory-section">
 					<div class="entity-grid">
 						{sortedContributors.map((contributor) => (
-							<EntityCard entity={contributor} />
+							<EntityCard entity={{...contributor, entityType: 'person' as const}} />
 						))}
 					</div>
 				</section>

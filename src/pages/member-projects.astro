@@ -51,7 +51,7 @@ const pageDescription = 'Cooperatives, mutual aid organizations, and solidarity 
 				<section class="directory-section">
 					<div class="entity-grid">
 						{sortedProjects.map((project) => (
-							<EntityCard entity={project} />
+							<EntityCard entity={{...project, entityType: 'organization' as const}} />
 						))}
 					</div>
 				</section>
