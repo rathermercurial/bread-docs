@@ -1,0 +1,310 @@
+---
+/**
+ * Marketplace Directory
+ * Displays all marketplace offers with category filtering
+ */
+import { getCollection } from 'astro:content';
+import OfferCard from '@/components/entities/OfferCard.astro';
+
+const allOffers = await getCollection('offer');
+const sortedOffers = allOffers.sort((a, b) =>
+	a.data.name.localeCompare(b.data.name)
+);
+
+// Extract all unique categories
+const allCategories = new Set<string>();
+allOffers.forEach(offer => {
+	offer.data.category?.forEach(cat => allCategories.add(cat));
+});
+const categories = Array.from(allCategories).sort();
+
+// Group offers by category
+const offersByCategory = new Map<string, typeof allOffers>();
+categories.forEach(cat => {
+	const offers = allOffers.filter(o => o.data.category?.includes(cat));
+	offersByCategory.set(cat, offers);
+});
+
+const pageTitle = 'Marketplace';
+const pageDescription = 'Goods, services, and offerings from the Breadchain solidarity economy network';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content={pageDescription} />
+		<title>{pageTitle} | Breadchain</title>
+	</head>
+	<body>
+		<header class="page-header">
+			<nav>
+				<a href="/">← Back to Home</a>
+			</nav>
+			<h1>Marketplace</h1>
+			<p class="page-description">{pageDescription}</p>
+		</header>
+
+		<main class="directory-page">
+			<div class="directory-stats">
+				<div class="stat">
+					<span class="stat-value">{allOffers.length}</span>
+					<span class="stat-label">Total Offerings</span>
+				</div>
+				<div class="stat">
+					<span class="stat-value">{categories.length}</span>
+					<span class="stat-label">Categories</span>
+				</div>
+			</div>
+
+			{sortedOffers.length === 0 && (
+				<div class="empty-state">
+					<p>No marketplace offers yet. Check back soon!</p>
+				</div>
+			)}
+
+			{sortedOffers.length > 0 && (
+				<>
+					<section class="directory-section">
+						<h2>All Offerings ({allOffers.length})</h2>
+						<div class="offer-grid">
+							{sortedOffers.map((offer) => (
+								<OfferCard offer={offer} />
+							))}
+						</div>
+					</section>
+
+					{categories.length > 0 && (
+						<section class="categories-section">
+							<h2>Browse by Category</h2>
+							<div class="categories-grid">
+								{categories.map(category => {
+									const categoryOffers = offersByCategory.get(category) || [];
+									return (
+										<details class="category-group">
+											<summary class="category-header">
+												<span class="category-name">{category}</span>
+												<span class="category-count">({categoryOffers.length})</span>
+											</summary>
+											<div class="category-offers">
+												{categoryOffers.map((offer) => (
+													<OfferCard offer={offer} />
+												))}
+											</div>
+										</details>
+									);
+								})}
+							</div>
+						</section>
+					)}
+				</>
+			)}
+
+			<aside class="info-box">
+				<h3>About the Marketplace</h3>
+				<p>
+					The Breadchain marketplace connects solidarity economy practitioners offering
+					goods and services. All providers are part of the Breadchain network—cooperatives,
+					mutual aid organizations, and community members working towards economic justice.
+				</p>
+				<p>
+					<strong>Want to list an offering?</strong> Become a contributor or member project
+					to participate in the marketplace.
+				</p>
+			</aside>
+		</main>
+
+		<footer class="page-footer">
+			<nav>
+				<a href="/angel-minters">Angel Minters</a> |
+				<a href="/contributors">Contributors</a> |
+				<a href="/member-projects">Member Projects</a>
+			</nav>
+		</footer>
+	</body>
+</html>
+
+<style>
+	.page-header {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 2rem;
+		border-bottom: 2px solid #ea6023;
+	}
+
+	.page-header nav {
+		margin-bottom: 1rem;
+	}
+
+	.page-header nav a {
+		color: #ea6023;
+		text-decoration: none;
+	}
+
+	.page-header h1 {
+		margin: 0 0 0.5rem 0;
+		font-size: 3rem;
+		color: #1c5bb9;
+	}
+
+	.page-description {
+		font-size: 1.2rem;
+		color: #666;
+		margin: 0;
+	}
+
+	.directory-page {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 2rem;
+	}
+
+	.directory-stats {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 1.5rem;
+		margin-bottom: 3rem;
+	}
+
+	.stat {
+		background: #f6f3eb;
+		padding: 1.5rem;
+		border-radius: 8px;
+		text-align: center;
+		border-left: 4px solid #ea6023;
+	}
+
+	.stat-value {
+		display: block;
+		font-size: 2.5rem;
+		font-weight: bold;
+		color: #ea6023;
+		margin-bottom: 0.5rem;
+	}
+
+	.stat-label {
+		display: block;
+		color: #666;
+		font-size: 0.9rem;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.directory-section,
+	.categories-section {
+		margin-bottom: 3rem;
+	}
+
+	.directory-section h2,
+	.categories-section h2 {
+		font-size: 1.8rem;
+		margin-bottom: 1.5rem;
+		color: #286b63;
+	}
+
+	.offer-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		gap: 1.5rem;
+	}
+
+	.categories-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.category-group {
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		overflow: hidden;
+	}
+
+	.category-header {
+		padding: 1rem 1.5rem;
+		background: #f6f3eb;
+		cursor: pointer;
+		list-style: none;
+		user-select: none;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-weight: 600;
+		color: #1c5bb9;
+	}
+
+	.category-header:hover {
+		background: #ede9dc;
+	}
+
+	.category-header::marker,
+	.category-header::-webkit-details-marker {
+		display: none;
+	}
+
+	.category-name {
+		font-size: 1.1rem;
+	}
+
+	.category-count {
+		color: #666;
+		font-weight: normal;
+	}
+
+	.category-offers {
+		padding: 1.5rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 1.5rem;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 4rem 2rem;
+		color: #666;
+	}
+
+	.info-box {
+		margin-top: 3rem;
+		padding: 2rem;
+		background: #fff3e0;
+		border-left: 4px solid #ea6023;
+		border-radius: 8px;
+	}
+
+	.info-box h3 {
+		margin-top: 0;
+		color: #ea6023;
+	}
+
+	.info-box p {
+		margin: 0.5rem 0;
+		line-height: 1.6;
+	}
+
+	.page-footer {
+		max-width: 1200px;
+		margin: 4rem auto 0;
+		padding: 2rem;
+		text-align: center;
+		border-top: 1px solid #ddd;
+	}
+
+	.page-footer a {
+		color: #ea6023;
+		text-decoration: none;
+		margin: 0 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.page-header h1 {
+			font-size: 2rem;
+		}
+
+		.offer-grid,
+		.category-offers {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

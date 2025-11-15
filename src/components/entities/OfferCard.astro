@@ -1,0 +1,198 @@
+---
+/**
+ * Offer Card Component
+ * Displays a marketplace offer in a card format
+ */
+import type { CollectionEntry } from 'astro:content';
+import { resolveOfferProvider } from '@/lib/entity-utils';
+
+interface Props {
+	offer: CollectionEntry<'offer'>;
+}
+
+const { offer } = Astro.props;
+const provider = await resolveOfferProvider(offer);
+const link = `/offer/${offer.id}`;
+---
+
+<article class="offer-card">
+	<a href={link} class="card-link">
+		{offer.data.image && (
+			<img
+				src={offer.data.image}
+				alt={offer.data.name}
+				class="offer-image"
+			/>
+		)}
+
+		<div class="offer-info">
+			<h3 class="offer-name">{offer.data.name}</h3>
+
+			{provider && (
+				<p class="offer-provider">
+					by {typeof provider === 'string' ? provider : provider.data.name}
+				</p>
+			)}
+
+			{offer.data.description && (
+				<p class="offer-description">{offer.data.description}</p>
+			)}
+
+			<div class="offer-meta">
+				{offer.data.price && (
+					<span class="price">
+						{offer.data.price}
+						{offer.data.priceCurrency && offer.data.priceCurrency !== 'USD' && (
+							<span class="currency"> {offer.data.priceCurrency}</span>
+						)}
+					</span>
+				)}
+
+				{offer.data.availability && (
+					<span class={`availability ${offer.data.availability.toLowerCase().replace(/\s+/g, '-')}`}>
+						{offer.data.availability.replace(/([A-Z])/g, ' $1').trim()}
+					</span>
+				)}
+			</div>
+
+			{offer.data.category && offer.data.category.length > 0 && (
+				<div class="offer-categories">
+					{offer.data.category.slice(0, 3).map((cat) => (
+						<span class="category-tag">{cat}</span>
+					))}
+					{offer.data.category.length > 3 && (
+						<span class="category-tag more">+{offer.data.category.length - 3}</span>
+					)}
+				</div>
+			)}
+		</div>
+	</a>
+</article>
+
+<style>
+	.offer-card {
+		background: white;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		transition: all 0.2s;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.offer-card:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		transform: translateY(-2px);
+		border-color: #ea6023;
+	}
+
+	.card-link {
+		display: flex;
+		flex-direction: column;
+		text-decoration: none;
+		color: inherit;
+		height: 100%;
+	}
+
+	.offer-image {
+		width: 100%;
+		height: 180px;
+		object-fit: cover;
+	}
+
+	.offer-info {
+		padding: 1.5rem;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.offer-name {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.25rem;
+		color: #1c5bb9;
+	}
+
+	.offer-provider {
+		margin: 0 0 0.75rem 0;
+		color: #666;
+		font-size: 0.9rem;
+	}
+
+	.offer-description {
+		margin: 0 0 1rem 0;
+		color: #444;
+		font-size: 0.9rem;
+		line-height: 1.4;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		flex: 1;
+	}
+
+	.offer-meta {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+		margin-bottom: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.price {
+		font-size: 1.25rem;
+		font-weight: bold;
+		color: #ea6023;
+	}
+
+	.currency {
+		font-size: 0.9rem;
+		font-weight: normal;
+	}
+
+	.availability {
+		padding: 0.25rem 0.75rem;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+
+	.availability.in-stock {
+		background: #286b63;
+		color: white;
+	}
+
+	.availability.out-of-stock {
+		background: #999;
+		color: white;
+	}
+
+	.availability.limited-availability {
+		background: #ea6023;
+		color: white;
+	}
+
+	.availability.pre-order {
+		background: #1c5bb9;
+		color: white;
+	}
+
+	.offer-categories {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.category-tag {
+		display: inline-block;
+		padding: 0.25rem 0.6rem;
+		background: #f6f3eb;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		color: #666;
+	}
+
+	.category-tag.more {
+		background: #ddd;
+		font-weight: 600;
+	}
+</style>

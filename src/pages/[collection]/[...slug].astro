@@ -1,0 +1,406 @@
+---
+/**
+ * Dynamic entity page template
+ * Handles both person and organization detail pages
+ */
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { resolveEntityReferences, getOffersByEntity, type Entity } from '@/lib/entity-utils';
+
+export async function getStaticPaths() {
+	const people = await getCollection('person');
+	const orgs = await getCollection('organization');
+
+	return [
+		...people.map((p) => ({
+			params: { collection: 'person', slug: p.id },
+			props: { entry: p, entityType: 'person' as const },
+		})),
+		...orgs.map((o) => ({
+			params: { collection: 'organization', slug: o.id },
+			props: { entry: o, entityType: 'organization' as const },
+		})),
+	];
+}
+
+interface Props {
+	entry: CollectionEntry<'person'> | CollectionEntry<'organization'>;
+	entityType: 'person' | 'organization';
+}
+
+const { entry, entityType } = Astro.props;
+const { Content } = await entry.render();
+
+// Resolve relationships
+const memberOf =
+	entityType === 'person' && 'memberOf' in entry.data
+		? await resolveEntityReferences(entry.data.memberOf || [])
+		: [];
+
+const worksFor =
+	entityType === 'person' && 'worksFor' in entry.data
+		? await resolveEntityReferences(entry.data.worksFor || [])
+		: [];
+
+const members =
+	entityType === 'organization' && 'member' in entry.data
+		? await resolveEntityReferences(entry.data.member || [])
+		: [];
+
+const parentOrg =
+	entityType === 'organization' && 'parentOrganization' in entry.data && entry.data.parentOrganization
+		? await resolveEntityReferences([entry.data.parentOrganization])
+		: [];
+
+// Get offers made by this entity
+const offers = await getOffersByEntity(entry);
+
+const pageTitle = entry.data.name;
+const pageDescription = entry.data.description || `Profile for ${entry.data.name}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content={pageDescription} />
+		<title>{pageTitle} | Breadchain</title>
+		<link rel="stylesheet" href="/src/styles/entity-pages.css" />
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a href="/">← Back to Home</a>
+			</nav>
+		</header>
+
+		<main class="entity-page">
+			<article class="entity-profile">
+				<header class="entity-header">
+					{entry.data.image && (
+						<img
+							src={entry.data.image}
+							alt={entry.data.name}
+							class="entity-image"
+						/>
+					)}
+					<div class="entity-title">
+						<h1>{entry.data.name}</h1>
+						{entityType === 'person' && 'jobTitle' in entry.data && entry.data.jobTitle && (
+							<p class="job-title">{entry.data.jobTitle}</p>
+						)}
+						{entityType === 'organization' && 'legalName' in entry.data && entry.data.legalName && (
+							<p class="legal-name">{entry.data.legalName}</p>
+						)}
+					</div>
+				</header>
+
+				{entry.data.description && (
+					<p class="entity-description">{entry.data.description}</p>
+				)}
+
+				<!-- Badges -->
+				<div class="entity-badges">
+					{entry.data.isAngelMinter && (
+						<span class="badge angel-minter">Angel Minter</span>
+					)}
+					{entityType === 'person' && 'isContributor' in entry.data && entry.data.isContributor && (
+						<span class="badge contributor">Contributor</span>
+					)}
+					{entityType === 'organization' && 'isMemberProject' in entry.data && entry.data.isMemberProject && (
+						<span class="badge member-project">Member Project</span>
+					)}
+				</div>
+
+				<!-- Main Content -->
+				<div class="entity-content">
+					<Content />
+				</div>
+
+				<!-- Relationships -->
+				<aside class="entity-relationships">
+					{memberOf.length > 0 && (
+						<section class="relationship-section">
+							<h2>Member Of</h2>
+							<ul class="entity-list">
+								{memberOf.map((org) => (
+									<li>
+										{typeof org === 'string' ? (
+											<span>{org}</span>
+										) : (
+											<a href={`/organization/${org.id}`}>{org.data.name}</a>
+										)}
+									</li>
+								))}
+							</ul>
+						</section>
+					)}
+
+					{worksFor.length > 0 && (
+						<section class="relationship-section">
+							<h2>Works For</h2>
+							<ul class="entity-list">
+								{worksFor.map((org) => (
+									<li>
+										{typeof org === 'string' ? (
+											<span>{org}</span>
+										) : (
+											<a href={`/organization/${org.id}`}>{org.data.name}</a>
+										)}
+									</li>
+								))}
+							</ul>
+						</section>
+					)}
+
+					{members.length > 0 && (
+						<section class="relationship-section">
+							<h2>Members</h2>
+							<ul class="entity-list">
+								{members.map((member) => (
+									<li>
+										{typeof member === 'string' ? (
+											<span>{member}</span>
+										) : (
+											<a href={`/${member.collection}/${member.id}`}>
+												{member.data.name}
+											</a>
+										)}
+									</li>
+								))}
+							</ul>
+						</section>
+					)}
+
+					{parentOrg.length > 0 && (
+						<section class="relationship-section">
+							<h2>Parent Organization</h2>
+							{parentOrg.map((org) => (
+								typeof org === 'string' ? (
+									<p>{org}</p>
+								) : (
+									<p><a href={`/organization/${org.id}`}>{org.data.name}</a></p>
+								)
+							))}
+						</section>
+					)}
+
+					{offers.length > 0 && (
+						<section class="relationship-section">
+							<h2>Offers</h2>
+							<ul class="entity-list">
+								{offers.map((offer) => (
+									<li>
+										<a href={`/offer/${offer.id}`}>{offer.data.name}</a>
+									</li>
+								))}
+							</ul>
+						</section>
+					)}
+
+					<!-- Contact & Links -->
+					{(entry.data.email || entry.data.url || (entry.data.sameAs && entry.data.sameAs.length > 0)) && (
+						<section class="relationship-section">
+							<h2>Contact & Links</h2>
+							<ul class="contact-list">
+								{entry.data.email && (
+									<li>
+										<a href={`mailto:${entry.data.email}`}>{entry.data.email}</a>
+									</li>
+								)}
+								{entry.data.url && (
+									<li>
+										<a href={entry.data.url} target="_blank" rel="noopener noreferrer">
+											Website ↗
+										</a>
+									</li>
+								)}
+								{entry.data.sameAs?.map((link) => (
+									<li>
+										<a href={link} target="_blank" rel="noopener noreferrer">
+											{new URL(link).hostname} ↗
+										</a>
+									</li>
+								))}
+							</ul>
+						</section>
+					)}
+
+					<!-- Web3 Identity -->
+					{entityType === 'person' && 'ensName' in entry.data && (entry.data.ensName || entry.data.identifier) && (
+						<section class="relationship-section">
+							<h2>Web3 Identity</h2>
+							<ul class="contact-list">
+								{entry.data.ensName && (
+									<li>ENS: {entry.data.ensName}</li>
+								)}
+								{entry.data.identifier && (
+									<li class="identifier">
+										<code>{entry.data.identifier}</code>
+									</li>
+								)}
+							</ul>
+						</section>
+					)}
+				</aside>
+			</article>
+		</main>
+
+		<footer>
+			<p>
+				<a href="/angel-minters">Angel Minters</a> |
+				<a href="/contributors">Contributors</a> |
+				<a href="/member-projects">Member Projects</a> |
+				<a href="/marketplace">Marketplace</a>
+			</p>
+		</footer>
+	</body>
+</html>
+
+<style>
+	.entity-page {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 2rem;
+	}
+
+	.entity-profile {
+		display: grid;
+		grid-template-columns: 1fr 300px;
+		gap: 2rem;
+	}
+
+	.entity-header {
+		grid-column: 1 / -1;
+		display: flex;
+		gap: 2rem;
+		align-items: flex-start;
+		margin-bottom: 1rem;
+	}
+
+	.entity-image {
+		width: 150px;
+		height: 150px;
+		object-fit: cover;
+		border-radius: 8px;
+	}
+
+	.entity-title h1 {
+		margin: 0;
+		font-size: 2.5rem;
+	}
+
+	.job-title,
+	.legal-name {
+		color: #666;
+		font-size: 1.2rem;
+		margin: 0.5rem 0 0;
+	}
+
+	.entity-description {
+		grid-column: 1 / -1;
+		font-size: 1.2rem;
+		color: #444;
+	}
+
+	.entity-badges {
+		grid-column: 1 / -1;
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.badge {
+		display: inline-block;
+		padding: 0.25rem 0.75rem;
+		border-radius: 4px;
+		font-size: 0.875rem;
+		font-weight: 600;
+	}
+
+	.badge.angel-minter {
+		background: #ea6023;
+		color: white;
+	}
+
+	.badge.contributor {
+		background: #286b63;
+		color: white;
+	}
+
+	.badge.member-project {
+		background: #1c5bb9;
+		color: white;
+	}
+
+	.entity-content {
+		grid-column: 1 / 2;
+	}
+
+	.entity-relationships {
+		grid-column: 2 / 3;
+	}
+
+	.relationship-section {
+		margin-bottom: 2rem;
+		padding: 1rem;
+		background: #f6f3eb;
+		border-radius: 8px;
+	}
+
+	.relationship-section h2 {
+		font-size: 1.2rem;
+		margin-top: 0;
+		margin-bottom: 0.75rem;
+	}
+
+	.entity-list,
+	.contact-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.entity-list li,
+	.contact-list li {
+		margin-bottom: 0.5rem;
+	}
+
+	.identifier code {
+		font-size: 0.75rem;
+		word-break: break-all;
+	}
+
+	nav a {
+		text-decoration: none;
+		color: #ea6023;
+	}
+
+	footer {
+		margin-top: 4rem;
+		padding: 2rem;
+		text-align: center;
+		border-top: 1px solid #ddd;
+	}
+
+	footer a {
+		color: #ea6023;
+		text-decoration: none;
+		margin: 0 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.entity-profile {
+			grid-template-columns: 1fr;
+		}
+
+		.entity-content,
+		.entity-relationships {
+			grid-column: 1 / -1;
+		}
+
+		.entity-header {
+			flex-direction: column;
+		}
+	}
+</style>

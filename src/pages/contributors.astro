@@ -1,0 +1,222 @@
+---
+/**
+ * Contributors Directory
+ * Displays people who contribute to Breadchain
+ */
+import { getContributors } from '@/lib/entity-utils';
+import EntityCard from '@/components/entities/EntityCard.astro';
+
+const contributors = await getContributors();
+const sortedContributors = contributors.sort((a, b) =>
+	a.data.name.localeCompare(b.data.name)
+);
+
+const pageTitle = 'Contributors';
+const pageDescription = 'People who build, organize, and support the Breadchain solidarity economy network';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content={pageDescription} />
+		<title>{pageTitle} | Breadchain</title>
+	</head>
+	<body>
+		<header class="page-header">
+			<nav>
+				<a href="/">← Back to Home</a>
+			</nav>
+			<h1>Contributors</h1>
+			<p class="page-description">{pageDescription}</p>
+		</header>
+
+		<main class="directory-page">
+			<div class="directory-stats">
+				<div class="stat">
+					<span class="stat-value">{contributors.length}</span>
+					<span class="stat-label">Active Contributors</span>
+				</div>
+			</div>
+
+			{sortedContributors.length === 0 && (
+				<div class="empty-state">
+					<p>No contributors found. Want to get involved?</p>
+					<p><a href="/about/get-involved">Learn how to contribute →</a></p>
+				</div>
+			)}
+
+			{sortedContributors.length > 0 && (
+				<section class="directory-section">
+					<div class="entity-grid">
+						{sortedContributors.map((contributor) => (
+							<EntityCard entity={contributor} />
+						))}
+					</div>
+				</section>
+			)}
+
+			<aside class="info-box">
+				<h3>Get Involved</h3>
+				<p>
+					Breadchain is built by a community of developers, designers, organizers,
+					and solidarity economy practitioners. Contributions come in many forms:
+				</p>
+				<ul>
+					<li>Code and technical development</li>
+					<li>Documentation and content creation</li>
+					<li>Community organizing and outreach</li>
+					<li>Design and user experience</li>
+					<li>Governance and coordination</li>
+				</ul>
+				<p>
+					<strong>Want to contribute?</strong> Join our Discord or check out open issues on GitHub.
+				</p>
+			</aside>
+		</main>
+
+		<footer class="page-footer">
+			<nav>
+				<a href="/angel-minters">Angel Minters</a> |
+				<a href="/member-projects">Member Projects</a> |
+				<a href="/marketplace">Marketplace</a>
+			</nav>
+		</footer>
+	</body>
+</html>
+
+<style>
+	.page-header {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 2rem;
+		border-bottom: 2px solid #286b63;
+	}
+
+	.page-header nav {
+		margin-bottom: 1rem;
+	}
+
+	.page-header nav a {
+		color: #286b63;
+		text-decoration: none;
+	}
+
+	.page-header h1 {
+		margin: 0 0 0.5rem 0;
+		font-size: 3rem;
+		color: #1c5bb9;
+	}
+
+	.page-description {
+		font-size: 1.2rem;
+		color: #666;
+		margin: 0;
+	}
+
+	.directory-page {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 2rem;
+	}
+
+	.directory-stats {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 1.5rem;
+		margin-bottom: 3rem;
+	}
+
+	.stat {
+		background: #f6f3eb;
+		padding: 1.5rem;
+		border-radius: 8px;
+		text-align: center;
+		border-left: 4px solid #286b63;
+	}
+
+	.stat-value {
+		display: block;
+		font-size: 2.5rem;
+		font-weight: bold;
+		color: #286b63;
+		margin-bottom: 0.5rem;
+	}
+
+	.stat-label {
+		display: block;
+		color: #666;
+		font-size: 0.9rem;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.directory-section {
+		margin-bottom: 3rem;
+	}
+
+	.entity-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+		gap: 1.5rem;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 4rem 2rem;
+		color: #666;
+	}
+
+	.empty-state a {
+		color: #286b63;
+		font-weight: 600;
+	}
+
+	.info-box {
+		margin-top: 3rem;
+		padding: 2rem;
+		background: #f0f9f4;
+		border-left: 4px solid #286b63;
+		border-radius: 8px;
+	}
+
+	.info-box h3 {
+		margin-top: 0;
+		color: #286b63;
+	}
+
+	.info-box p,
+	.info-box ul {
+		margin: 0.5rem 0;
+		line-height: 1.6;
+	}
+
+	.info-box ul {
+		padding-left: 1.5rem;
+	}
+
+	.page-footer {
+		max-width: 1200px;
+		margin: 4rem auto 0;
+		padding: 2rem;
+		text-align: center;
+		border-top: 1px solid #ddd;
+	}
+
+	.page-footer a {
+		color: #286b63;
+		text-decoration: none;
+		margin: 0 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.page-header h1 {
+			font-size: 2rem;
+		}
+
+		.entity-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

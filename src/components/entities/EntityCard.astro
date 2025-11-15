@@ -1,0 +1,183 @@
+---
+/**
+ * Entity Card Component
+ * Displays a person or organization in a card format
+ */
+import type { Entity } from '@/lib/entity-utils';
+import { getEntityDisplayName } from '@/lib/entity-utils';
+
+interface Props {
+	entity: Entity;
+	showType?: boolean;
+}
+
+const { entity, showType = false } = Astro.props;
+const displayName = getEntityDisplayName(entity);
+const link = `/${entity.collection}/${entity.id}`;
+---
+
+<article class="entity-card">
+	<a href={link} class="card-link">
+		{entity.data.image && (
+			<img
+				src={entity.data.image}
+				alt={displayName}
+				class="entity-avatar"
+			/>
+		)}
+		{!entity.data.image && (
+			<div class="entity-avatar-placeholder">
+				{entity.entityType === 'person' ? '👤' : '🏢'}
+			</div>
+		)}
+
+		<div class="entity-info">
+			<h3 class="entity-name">{displayName}</h3>
+
+			{entity.entityType === 'person' && entity.data.jobTitle && (
+				<p class="entity-subtitle">{entity.data.jobTitle}</p>
+			)}
+			{entity.entityType === 'organization' && entity.data.alternateName && (
+				<p class="entity-subtitle">{entity.data.alternateName}</p>
+			)}
+
+			{entity.data.description && (
+				<p class="entity-description">{entity.data.description}</p>
+			)}
+
+			<div class="entity-badges">
+				{showType && (
+					<span class={`badge type-badge ${entity.entityType}`}>
+						{entity.entityType === 'person' ? 'Person' : 'Organization'}
+					</span>
+				)}
+				{entity.data.isAngelMinter && (
+					<span class="badge angel-minter">Angel Minter</span>
+				)}
+				{entity.entityType === 'person' && entity.data.isContributor && (
+					<span class="badge contributor">Contributor</span>
+				)}
+				{entity.entityType === 'organization' && entity.data.isMemberProject && (
+					<span class="badge member-project">Member Project</span>
+				)}
+			</div>
+		</div>
+	</a>
+</article>
+
+<style>
+	.entity-card {
+		background: white;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		transition: all 0.2s;
+		height: 100%;
+	}
+
+	.entity-card:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		transform: translateY(-2px);
+		border-color: #ea6023;
+	}
+
+	.card-link {
+		display: flex;
+		gap: 1rem;
+		padding: 1.5rem;
+		text-decoration: none;
+		color: inherit;
+		height: 100%;
+	}
+
+	.entity-avatar {
+		width: 80px;
+		height: 80px;
+		object-fit: cover;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.entity-avatar-placeholder {
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		background: #f6f3eb;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 2.5rem;
+		flex-shrink: 0;
+	}
+
+	.entity-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.entity-name {
+		margin: 0 0 0.25rem 0;
+		font-size: 1.25rem;
+		color: #1c5bb9;
+	}
+
+	.entity-subtitle {
+		margin: 0 0 0.5rem 0;
+		color: #666;
+		font-size: 0.95rem;
+	}
+
+	.entity-description {
+		margin: 0 0 0.75rem 0;
+		color: #444;
+		font-size: 0.9rem;
+		line-height: 1.4;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.entity-badges {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.badge {
+		display: inline-block;
+		padding: 0.25rem 0.6rem;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+
+	.badge.type-badge {
+		background: #eee;
+		color: #666;
+	}
+
+	.badge.type-badge.person {
+		background: #e3f2fd;
+		color: #1976d2;
+	}
+
+	.badge.type-badge.organization {
+		background: #f3e5f5;
+		color: #7b1fa2;
+	}
+
+	.badge.angel-minter {
+		background: #ea6023;
+		color: white;
+	}
+
+	.badge.contributor {
+		background: #286b63;
+		color: white;
+	}
+
+	.badge.member-project {
+		background: #1c5bb9;
+		color: white;
+	}
+</style>
