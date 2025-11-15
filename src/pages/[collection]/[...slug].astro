@@ -3,8 +3,9 @@
  * Dynamic entity page template
  * Handles both person and organization detail pages
  */
-import { getCollection, type CollectionEntry } from 'astro:content';
-import { resolveEntityReferences, getOffersByEntity, type Entity } from '@/lib/entity-utils';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { resolveEntityReferences, getOffersByEntity } from '@/lib/entity-utils';
 
 export async function getStaticPaths() {
 	const people = await getCollection('person');
@@ -29,8 +30,8 @@ interface Props {
 
 const { entry, entityType } = Astro.props;
 
-// Get content - glob loader entries use body property directly
-const bodyContent = entry.body;
+// Render markdown content
+const { Content, headings } = await render(entry);
 
 // Resolve relationships
 const memberOf =
@@ -60,24 +61,14 @@ const pageTitle = entry.data.name;
 const pageDescription = entry.data.description || `Profile for ${entry.data.name}`;
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content={pageDescription} />
-		<title>{pageTitle} | Breadchain</title>
-		<link rel="stylesheet" href="/src/styles/entity-pages.css" />
-	</head>
-	<body>
-		<header>
-			<nav>
-				<a href="/">← Back to Home</a>
-			</nav>
-		</header>
-
-		<main class="entity-page">
-			<article class="entity-profile">
+<StarlightPage
+	frontmatter={{
+		title: pageTitle,
+		description: pageDescription,
+	}}
+	headings={headings}
+>
+	<article class="entity-profile">
 				<header class="entity-header">
 					{entry.data.image && (
 						<img
@@ -116,7 +107,7 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 
 				<!-- Main Content -->
 				<div class="entity-content">
-					{bodyContent && <div set:html={bodyContent} />}
+					<Content />
 				</div>
 
 				<!-- Relationships -->
@@ -245,19 +236,8 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 						</section>
 					)}
 				</aside>
-			</article>
-		</main>
-
-		<footer>
-			<p>
-				<a href="/angel-minters">Angel Minters</a> |
-				<a href="/contributors">Contributors</a> |
-				<a href="/member-projects">Member Projects</a> |
-				<a href="/marketplace">Marketplace</a>
-			</p>
-		</footer>
-	</body>
-</html>
+	</article>
+</StarlightPage>
 
 <style>
 	.entity-page {

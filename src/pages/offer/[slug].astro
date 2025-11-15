@@ -2,7 +2,8 @@
 /**
  * Marketplace offer detail page
  */
-import { getCollection, type CollectionEntry } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { resolveOfferProvider } from '@/lib/entity-utils';
 
 export async function getStaticPaths() {
@@ -20,8 +21,8 @@ interface Props {
 
 const { offer } = Astro.props;
 
-// Get content - glob loader entries use body property directly
-const bodyContent = offer.body;
+// Render markdown content
+const { Content, headings } = await render(offer);
 
 // Resolve provider
 const provider = await resolveOfferProvider(offer);
@@ -30,23 +31,14 @@ const pageTitle = offer.data.name;
 const pageDescription = offer.data.description || `Marketplace offer: ${offer.data.name}`;
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content={pageDescription} />
-		<title>{pageTitle} | Breadchain Marketplace</title>
-	</head>
-	<body>
-		<header>
-			<nav>
-				<a href="/marketplace">← Back to Marketplace</a>
-			</nav>
-		</header>
-
-		<main class="offer-page">
-			<article class="offer-detail">
+<StarlightPage
+	frontmatter={{
+		title: pageTitle,
+		description: pageDescription,
+	}}
+	headings={headings}
+>
+	<article class="offer-detail">
 				<header class="offer-header">
 					{offer.data.image && (
 						<img
@@ -138,20 +130,10 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 					<h2>What's Offered</h2>
 					<p class="item-offered">{offer.data.itemOffered}</p>
 
-					{bodyContent && <div set:html={bodyContent} />}
+					<Content />
 				</div>
-			</article>
-		</main>
-
-		<footer>
-			<p>
-				<a href="/marketplace">Marketplace</a> |
-				<a href="/angel-minters">Angel Minters</a> |
-				<a href="/member-projects">Member Projects</a>
-			</p>
-		</footer>
-	</body>
-</html>
+	</article>
+</StarlightPage>
 
 <style>
 	.offer-page {
