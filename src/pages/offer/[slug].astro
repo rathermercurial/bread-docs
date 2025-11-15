@@ -130,20 +130,14 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 </StarlightPage>
 
 <style>
-	.offer-page {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 2rem;
-	}
-
 	.offer-detail {
 		display: grid;
 		grid-template-columns: 1fr 300px;
 		gap: 2rem;
+		max-width: 1400px;
 	}
 
 	.offer-header {
-		grid-column: 1 / -1;
 		display: flex;
 		gap: 2rem;
 		align-items: flex-start;
@@ -157,37 +151,33 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 		border-radius: 8px;
 	}
 
-	.offer-title h1 {
-		margin: 0;
-		font-size: 2.5rem;
-	}
-
-	.offer-description {
-		font-size: 1.2rem;
-		color: #444;
-		margin-top: 1rem;
-	}
-
 	.offer-content {
-		grid-column: 1 / 2;
+		min-width: 0;
+	}
+
+	.offer-content h2 {
+		color: var(--sl-color-text-accent);
 	}
 
 	.item-offered {
 		font-size: 1.1rem;
 		padding: 1rem;
-		background: #f6f3eb;
-		border-left: 4px solid #ea6023;
+		background: var(--sl-color-bg-sidebar);
+		border-left: 4px solid var(--sl-color-text-accent);
+		border-radius: 4px;
 		margin-bottom: 2rem;
+		color: var(--sl-color-gray-3);
 	}
 
 	.offer-meta {
-		grid-column: 2 / 3;
+		min-width: 0;
 	}
 
 	.meta-section {
 		margin-bottom: 1.5rem;
 		padding: 1rem;
-		background: #f6f3eb;
+		background: var(--sl-color-bg-sidebar);
+		border: 1px solid var(--sl-color-gray-5);
 		border-radius: 8px;
 	}
 
@@ -196,14 +186,27 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 		margin-top: 0;
 		margin-bottom: 0.75rem;
 		text-transform: uppercase;
-		color: #666;
+		color: var(--sl-color-text-accent);
+	}
+
+	.meta-section p {
+		color: var(--sl-color-gray-3);
+		margin: 0;
+	}
+
+	.meta-section a {
+		color: var(--sl-color-text-accent);
+		text-decoration: none;
+	}
+
+	.meta-section a:hover {
+		text-decoration: underline;
 	}
 
 	.price {
 		font-size: 1.5rem;
 		font-weight: bold;
-		color: #ea6023;
-		margin: 0;
+		color: var(--sl-color-text-accent);
 	}
 
 	.availability {
@@ -219,7 +222,7 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 	}
 
 	.availability.out-of-stock {
-		background: #999;
+		background: #666;
 		color: white;
 	}
 
@@ -237,55 +240,33 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 	.category-tag {
 		display: inline-block;
 		padding: 0.25rem 0.75rem;
-		background: white;
-		border: 1px solid #ddd;
+		background: var(--sl-color-gray-6);
+		border: 1px solid var(--sl-color-gray-5);
 		border-radius: 4px;
 		font-size: 0.875rem;
+		color: var(--sl-color-gray-3);
 	}
 
 	.cta-button {
 		display: block;
 		width: 100%;
 		padding: 1rem;
-		background: #ea6023;
-		color: white;
+		background: var(--sl-color-text-accent);
+		color: var(--sl-color-white);
 		text-align: center;
 		text-decoration: none;
 		border-radius: 8px;
 		font-weight: 600;
-		transition: background 0.2s;
+		transition: opacity 0.2s;
 	}
 
 	.cta-button:hover {
-		background: #d35520;
+		opacity: 0.9;
 	}
 
-	nav a {
-		text-decoration: none;
-		color: #ea6023;
-	}
-
-	footer {
-		margin-top: 4rem;
-		padding: 2rem;
-		text-align: center;
-		border-top: 1px solid #ddd;
-	}
-
-	footer a {
-		color: #ea6023;
-		text-decoration: none;
-		margin: 0 1rem;
-	}
-
-	@media (max-width: 768px) {
+	@media (max-width: 1024px) {
 		.offer-detail {
 			grid-template-columns: 1fr;
-		}
-
-		.offer-content,
-		.offer-meta {
-			grid-column: 1 / -1;
 		}
 
 		.offer-header {
