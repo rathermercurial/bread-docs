@@ -68,16 +68,20 @@ const link = `/${entity.collection}/${entity.id}`;
 <style>
 	.entity-card {
 		background: var(--sl-color-bg-nav);
-		border: 1px solid var(--sl-color-hairline-light);
+		border: 1px solid var(--sl-color-gray-5);
 		border-radius: 8px;
 		transition: all 0.2s;
 		height: 100%;
 	}
 
 	.entity-card:hover {
-		box-shadow: 0 4px 12px var(--sl-color-shadow);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		transform: translateY(-2px);
-		border-color: var(--sl-color-accent);
+		border-color: var(--sl-color-text-accent);
+	}
+
+	:global([data-theme='dark']) .entity-card:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 	}
 
 	.card-link {
@@ -101,7 +105,7 @@ const link = `/${entity.collection}/${entity.id}`;
 		width: 80px;
 		height: 80px;
 		border-radius: 50%;
-		background: var(--sl-color-bg-sidebar);
+		background: var(--sl-color-gray-6);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -122,7 +126,7 @@ const link = `/${entity.collection}/${entity.id}`;
 
 	.entity-subtitle {
 		margin: 0 0 0.5rem 0;
-		color: var(--sl-color-gray-3);
+		color: var(--sl-color-gray-2);
 		font-size: 0.95rem;
 	}
 
@@ -152,32 +156,42 @@ const link = `/${entity.collection}/${entity.id}`;
 	}
 
 	.badge.type-badge {
-		background: var(--sl-color-bg-sidebar);
-		color: var(--sl-color-gray-3);
+		background: var(--sl-color-gray-5);
+		color: var(--sl-color-gray-2);
 	}
 
 	.badge.type-badge.person {
-		background: var(--sl-color-blue-low);
-		color: var(--sl-color-blue-high);
+		background: #e3f2fd;
+		color: #1976d2;
+	}
+
+	:global([data-theme='dark']) .badge.type-badge.person {
+		background: #1e3a5f;
+		color: #90caf9;
 	}
 
 	.badge.type-badge.organization {
-		background: var(--sl-color-purple-low);
-		color: var(--sl-color-purple-high);
+		background: #f3e5f5;
+		color: #7b1fa2;
+	}
+
+	:global([data-theme='dark']) .badge.type-badge.organization {
+		background: #38284c;
+		color: #ce93d8;
 	}
 
 	.badge.angel-minter {
-		background: var(--sl-color-orange);
+		background: #ea6023;
 		color: white;
 	}
 
 	.badge.contributor {
-		background: var(--sl-color-green);
+		background: #286b63;
 		color: white;
 	}
 
 	.badge.member-project {
-		background: var(--sl-color-blue);
+		background: #1c5bb9;
 		color: white;
 	}
 </style>

@@ -54,17 +54,6 @@ const link = `/offer/${offer.id}`;
 					</span>
 				)}
 			</div>
-
-			{offer.data.category && offer.data.category.length > 0 && (
-				<div class="offer-categories">
-					{offer.data.category.slice(0, 3).map((cat) => (
-						<span class="category-tag">{cat}</span>
-					))}
-					{offer.data.category.length > 3 && (
-						<span class="category-tag more">+{offer.data.category.length - 3}</span>
-					)}
-				</div>
-			)}
 		</div>
 	</a>
 </article>
@@ -72,7 +61,7 @@ const link = `/offer/${offer.id}`;
 <style>
 	.offer-card {
 		background: var(--sl-color-bg-nav);
-		border: 1px solid var(--sl-color-hairline-light);
+		border: 1px solid var(--sl-color-gray-5);
 		border-radius: 8px;
 		transition: all 0.2s;
 		height: 100%;
@@ -80,9 +69,13 @@ const link = `/offer/${offer.id}`;
 	}
 
 	.offer-card:hover {
-		box-shadow: 0 4px 12px var(--sl-color-shadow);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		transform: translateY(-2px);
-		border-color: var(--sl-color-accent);
+		border-color: var(--sl-color-text-accent);
+	}
+
+	:global([data-theme='dark']) .offer-card:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 	}
 
 	.card-link {
@@ -114,7 +107,7 @@ const link = `/offer/${offer.id}`;
 
 	.offer-provider {
 		margin: 0 0 0.75rem 0;
-		color: var(--sl-color-gray-3);
+		color: var(--sl-color-gray-2);
 		font-size: 0.9rem;
 	}
 
@@ -134,14 +127,13 @@ const link = `/offer/${offer.id}`;
 		display: flex;
 		gap: 1rem;
 		align-items: center;
-		margin-bottom: 0.75rem;
 		flex-wrap: wrap;
 	}
 
 	.price {
 		font-size: 1.25rem;
 		font-weight: bold;
-		color: var(--sl-color-accent);
+		color: var(--sl-color-text-accent);
 	}
 
 	.currency {
@@ -157,42 +149,22 @@ const link = `/offer/${offer.id}`;
 	}
 
 	.availability.in-stock {
-		background: var(--sl-color-green);
+		background: #286b63;
 		color: white;
 	}
 
 	.availability.out-of-stock {
-		background: var(--sl-color-gray-4);
+		background: #666;
 		color: white;
 	}
 
 	.availability.limited-availability {
-		background: var(--sl-color-orange);
+		background: #ea6023;
 		color: white;
 	}
 
 	.availability.pre-order {
-		background: var(--sl-color-blue);
+		background: #1c5bb9;
 		color: white;
-	}
-
-	.offer-categories {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	.category-tag {
-		display: inline-block;
-		padding: 0.25rem 0.6rem;
-		background: var(--sl-color-bg-sidebar);
-		border-radius: 4px;
-		font-size: 0.75rem;
-		color: var(--sl-color-gray-3);
-	}
-
-	.category-tag.more {
-		background: var(--sl-color-gray-5);
-		font-weight: 600;
 	}
 </style>
