@@ -4,12 +4,11 @@
  * Displays both people and organizations who are angel minters
  */
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
-import { getAngelMinters, sortEntitiesByName, groupEntitiesByType } from '@/lib/entity-utils';
+import { getAngelMinters, sortEntitiesByName } from '@/lib/entity-utils';
 import EntityCard from '@/components/entities/EntityCard.astro';
 
 const angelMinters = await getAngelMinters();
 const sortedMinters = sortEntitiesByName(angelMinters);
-const { people, organizations } = groupEntitiesByType(sortedMinters);
 
 const pageTitle = 'Angel Minters';
 const pageDescription = 'Community members and organizations participating in Breadchain crowdstaking and solidarity funding';
@@ -21,153 +20,20 @@ const pageDescription = 'Community members and organizations participating in Br
 		description: pageDescription,
 	}}
 >
-	<div class="directory-page">
-			<div class="directory-stats">
-				<div class="stat">
-					<span class="stat-value">{angelMinters.length}</span>
-					<span class="stat-label">Total Angel Minters</span>
-				</div>
-				<div class="stat">
-					<span class="stat-value">{people.length}</span>
-					<span class="stat-label">People</span>
-				</div>
-				<div class="stat">
-					<span class="stat-value">{organizations.length}</span>
-					<span class="stat-label">Organizations</span>
-				</div>
-			</div>
-
-			{sortedMinters.length === 0 && (
-				<div class="empty-state">
-					<p>No angel minters found. Check back soon!</p>
-				</div>
-			)}
-
-			{sortedMinters.length > 0 && (
-				<>
-					<section class="directory-section">
-						<h2>All Angel Minters</h2>
-						<div class="entity-grid">
-							{sortedMinters.map((entity) => (
-								<EntityCard entity={entity} showType={true} />
-							))}
-						</div>
-					</section>
-
-					{people.length > 0 && (
-						<section class="directory-section">
-							<h2>People ({people.length})</h2>
-							<div class="entity-grid">
-								{people.map((entity) => (
-									<EntityCard entity={entity} />
-								))}
-							</div>
-						</section>
-					)}
-
-					{organizations.length > 0 && (
-						<section class="directory-section">
-							<h2>Organizations ({organizations.length})</h2>
-							<div class="entity-grid">
-								{organizations.map((entity) => (
-									<EntityCard entity={entity} />
-								))}
-							</div>
-						</section>
-					)}
-				</>
-			)}
-
-			<aside class="info-box">
-				<h3>What is an Angel Minter?</h3>
-				<p>
-					Angel Minters participate in Breadchain's crowdstaking mechanism, where
-					yield from staked assets is used to mint BREAD tokens. These tokens support
-					solidarity economy projects, mutual aid networks, and cooperative development.
-				</p>
-				<p>
-					<a href="/solidarity-primitives/crowdstaking">Learn more about crowdstaking →</a>
-				</p>
-			</aside>
-	</div>
+	{sortedMinters.length === 0 ? (
+		<div class="empty-state">
+			<p>No angel minters found. Check back soon!</p>
+		</div>
+	) : (
+		<div class="entity-grid">
+			{sortedMinters.map((entity) => (
+				<EntityCard entity={entity} showType={true} />
+			))}
+		</div>
+	)}
 </StarlightPage>
 
 <style>
-	.page-header {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 2rem;
-		border-bottom: 2px solid #ea6023;
-	}
-
-	.page-header nav {
-		margin-bottom: 1rem;
-	}
-
-	.page-header nav a {
-		color: #ea6023;
-		text-decoration: none;
-	}
-
-	.page-header h1 {
-		margin: 0 0 0.5rem 0;
-		font-size: 3rem;
-		color: #1c5bb9;
-	}
-
-	.page-description {
-		font-size: 1.2rem;
-		color: #666;
-		margin: 0;
-	}
-
-	.directory-page {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 2rem;
-	}
-
-	.directory-stats {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: 1.5rem;
-		margin-bottom: 3rem;
-	}
-
-	.stat {
-		background: #f6f3eb;
-		padding: 1.5rem;
-		border-radius: 8px;
-		text-align: center;
-		border-left: 4px solid #ea6023;
-	}
-
-	.stat-value {
-		display: block;
-		font-size: 2.5rem;
-		font-weight: bold;
-		color: #ea6023;
-		margin-bottom: 0.5rem;
-	}
-
-	.stat-label {
-		display: block;
-		color: #666;
-		font-size: 0.9rem;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
-
-	.directory-section {
-		margin-bottom: 3rem;
-	}
-
-	.directory-section h2 {
-		font-size: 1.8rem;
-		margin-bottom: 1.5rem;
-		color: #286b63;
-	}
-
 	.entity-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -177,51 +43,10 @@ const pageDescription = 'Community members and organizations participating in Br
 	.empty-state {
 		text-align: center;
 		padding: 4rem 2rem;
-		color: #666;
-	}
-
-	.info-box {
-		margin-top: 3rem;
-		padding: 2rem;
-		background: #e3f2fd;
-		border-left: 4px solid #1c5bb9;
-		border-radius: 8px;
-	}
-
-	.info-box h3 {
-		margin-top: 0;
-		color: #1c5bb9;
-	}
-
-	.info-box p {
-		margin: 0.5rem 0;
-		line-height: 1.6;
-	}
-
-	.info-box a {
-		color: #1c5bb9;
-		font-weight: 600;
-	}
-
-	.page-footer {
-		max-width: 1200px;
-		margin: 4rem auto 0;
-		padding: 2rem;
-		text-align: center;
-		border-top: 1px solid #ddd;
-	}
-
-	.page-footer a {
-		color: #ea6023;
-		text-decoration: none;
-		margin: 0 1rem;
+		color: var(--sl-color-text-accent);
 	}
 
 	@media (max-width: 768px) {
-		.page-header h1 {
-			font-size: 2rem;
-		}
-
 		.entity-grid {
 			grid-template-columns: 1fr;
 		}

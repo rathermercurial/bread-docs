@@ -22,123 +22,20 @@ const pageDescription = 'Cooperatives, mutual aid organizations, and solidarity 
 		description: pageDescription,
 	}}
 >
-	<div class="directory-page">
-			<div class="directory-stats">
-				<div class="stat">
-					<span class="stat-value">{memberProjects.length}</span>
-					<span class="stat-label">Member Projects</span>
-				</div>
-			</div>
-
-			{sortedProjects.length === 0 && (
-				<div class="empty-state">
-					<p>No member projects found yet.</p>
-					<p><a href="/about/membership">Learn about becoming a member project →</a></p>
-				</div>
-			)}
-
-			{sortedProjects.length > 0 && (
-				<section class="directory-section">
-					<div class="entity-grid">
-						{sortedProjects.map((project) => (
-							<EntityCard entity={{...project, entityType: 'organization' as const}} />
-						))}
-					</div>
-				</section>
-			)}
-
-			<aside class="info-box">
-				<h3>About Member Projects</h3>
-				<p>
-					Breadchain member projects are cooperatives, mutual aid organizations,
-					and solidarity economy initiatives that participate in the BREAD token
-					economic system. Member projects receive:
-				</p>
-				<ul>
-					<li>BREAD token allocations for community support</li>
-					<li>Technical infrastructure and development resources</li>
-					<li>Access to the solidarity economy network</li>
-					<li>Governance participation in protocol decisions</li>
-					<li>Collaborative opportunities with other projects</li>
-				</ul>
-				<p>
-					<strong>Interested in joining?</strong> Member projects are selected through
-					community governance processes.
-				</p>
-			</aside>
-	</div>
+	{sortedProjects.length === 0 ? (
+		<div class="empty-state">
+			<p>No member projects found. Check back soon!</p>
+		</div>
+	) : (
+		<div class="entity-grid">
+			{sortedProjects.map((project) => (
+				<EntityCard entity={{...project, entityType: 'organization' as const}} />
+			))}
+		</div>
+	)}
 </StarlightPage>
 
 <style>
-	.page-header {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 2rem;
-		border-bottom: 2px solid #1c5bb9;
-	}
-
-	.page-header nav {
-		margin-bottom: 1rem;
-	}
-
-	.page-header nav a {
-		color: #1c5bb9;
-		text-decoration: none;
-	}
-
-	.page-header h1 {
-		margin: 0 0 0.5rem 0;
-		font-size: 3rem;
-		color: #1c5bb9;
-	}
-
-	.page-description {
-		font-size: 1.2rem;
-		color: #666;
-		margin: 0;
-	}
-
-	.directory-page {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 2rem;
-	}
-
-	.directory-stats {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: 1.5rem;
-		margin-bottom: 3rem;
-	}
-
-	.stat {
-		background: #f6f3eb;
-		padding: 1.5rem;
-		border-radius: 8px;
-		text-align: center;
-		border-left: 4px solid #1c5bb9;
-	}
-
-	.stat-value {
-		display: block;
-		font-size: 2.5rem;
-		font-weight: bold;
-		color: #1c5bb9;
-		margin-bottom: 0.5rem;
-	}
-
-	.stat-label {
-		display: block;
-		color: #666;
-		font-size: 0.9rem;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
-
-	.directory-section {
-		margin-bottom: 3rem;
-	}
-
 	.entity-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -148,56 +45,10 @@ const pageDescription = 'Cooperatives, mutual aid organizations, and solidarity 
 	.empty-state {
 		text-align: center;
 		padding: 4rem 2rem;
-		color: #666;
-	}
-
-	.empty-state a {
-		color: #1c5bb9;
-		font-weight: 600;
-	}
-
-	.info-box {
-		margin-top: 3rem;
-		padding: 2rem;
-		background: #e8f4f8;
-		border-left: 4px solid #1c5bb9;
-		border-radius: 8px;
-	}
-
-	.info-box h3 {
-		margin-top: 0;
-		color: #1c5bb9;
-	}
-
-	.info-box p,
-	.info-box ul {
-		margin: 0.5rem 0;
-		line-height: 1.6;
-	}
-
-	.info-box ul {
-		padding-left: 1.5rem;
-	}
-
-	.page-footer {
-		max-width: 1200px;
-		margin: 4rem auto 0;
-		padding: 2rem;
-		text-align: center;
-		border-top: 1px solid #ddd;
-	}
-
-	.page-footer a {
-		color: #1c5bb9;
-		text-decoration: none;
-		margin: 0 1rem;
+		color: var(--sl-color-text-accent);
 	}
 
 	@media (max-width: 768px) {
-		.page-header h1 {
-			font-size: 2rem;
-		}
-
 		.entity-grid {
 			grid-template-columns: 1fr;
 		}
