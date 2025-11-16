@@ -38,66 +38,60 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 	}}
 	headings={headings}
 >
-	<article class="offer-detail">
-				<header class="offer-header">
-					{offer.data.image && (
-						<img
-							src={offer.data.image}
-							alt={offer.data.name}
-							class="offer-image"
-						/>
-					)}
-				</header>
+	<article class="offer-page">
+		<header class="offer-header">
+			{offer.data.image && (
+				<img
+					src={offer.data.image}
+					alt={offer.data.name}
+					class="offer-image"
+				/>
+			)}
+		</header>
 
-				<!-- Main Content -->
-				<div class="offer-content">
-					<h2>What's Offered</h2>
-					<p class="item-offered">{offer.data.itemOffered}</p>
+		<!-- Main Content -->
+		<div class="offer-content">
+			<h2>What's Offered</h2>
+			<p class="item-offered">{offer.data.itemOffered}</p>
 
-					<Content />
-				</div>
+			<Content />
+		</div>
+
+		<!-- Offer Details -->
+		{provider && (
+			<section class="provider-section">
+				<h2>Offered By</h2>
+				{typeof provider === 'string' ? (
+					<p>{provider}</p>
+				) : (
+					<p>
+						<a href={`/${provider.collection}/${provider.id}`}>
+							{provider.data.name}
+						</a>
+					</p>
+				)}
+			</section>
+		)}
+
+		{offer.data.url && (
+			<div class="cta-section">
+				<a href={offer.data.url} target="_blank" rel="noopener noreferrer" class="cta-button">
+					Learn More ↗
+				</a>
+			</div>
+		)}
 	</article>
-
-	<!-- Offer Details -->
-	<aside slot="right-sidebar" class="offer-meta">
-					{provider && (
-						<section class="meta-section">
-							<h2>Offered By</h2>
-							{typeof provider === 'string' ? (
-								<p>{provider}</p>
-							) : (
-								<p>
-									<a href={`/${provider.collection}/${provider.id}`}>
-										{provider.data.name}
-									</a>
-								</p>
-							)}
-						</section>
-					)}
-
-					{offer.data.url && (
-						<section class="meta-section">
-							<a href={offer.data.url} target="_blank" rel="noopener noreferrer" class="cta-button">
-								Learn More ↗
-							</a>
-						</section>
-					)}
-	</aside>
 </StarlightPage>
 
 <style>
-	.offer-detail {
-		display: grid;
-		grid-template-columns: 1fr 300px;
-		gap: 2rem;
-		max-width: 1400px;
+	.offer-page {
+		max-width: 800px;
+		margin: 0 auto;
 	}
 
 	.offer-header {
-		display: flex;
-		gap: 2rem;
-		align-items: flex-start;
 		margin-bottom: 2rem;
+		text-align: center;
 	}
 
 	.offer-image {
@@ -108,7 +102,7 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 	}
 
 	.offer-content {
-		min-width: 0;
+		margin-bottom: 3rem;
 	}
 
 	.offer-content h2 {
@@ -125,44 +119,44 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 		color: var(--sl-color-gray-3);
 	}
 
-	.offer-meta {
-		min-width: 0;
-	}
-
-	.meta-section {
-		margin-bottom: 1.5rem;
-		padding: 1rem;
+	.provider-section {
+		margin-bottom: 2rem;
+		padding: 1.5rem;
 		background: var(--sl-color-bg-sidebar);
 		border: 1px solid var(--sl-color-gray-5);
 		border-radius: 8px;
 	}
 
-	.meta-section h2 {
-		font-size: 1rem;
+	.provider-section h2 {
+		font-size: 1.25rem;
 		margin-top: 0;
-		margin-bottom: 0.75rem;
-		text-transform: uppercase;
+		margin-bottom: 1rem;
 		color: var(--sl-color-text-accent);
 	}
 
-	.meta-section p {
+	.provider-section p {
 		color: var(--sl-color-gray-3);
 		margin: 0;
 	}
 
-	.meta-section a {
+	.provider-section a {
 		color: var(--sl-color-text-accent);
 		text-decoration: none;
+		font-weight: 500;
 	}
 
-	.meta-section a:hover {
+	.provider-section a:hover {
 		text-decoration: underline;
 	}
 
+	.cta-section {
+		text-align: center;
+		margin-top: 3rem;
+	}
+
 	.cta-button {
-		display: block;
-		width: 100%;
-		padding: 1rem;
+		display: inline-block;
+		padding: 1rem 2rem;
 		background: var(--sl-color-text-accent);
 		color: var(--sl-color-white);
 		text-align: center;
@@ -174,15 +168,5 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 
 	.cta-button:hover {
 		opacity: 0.9;
-	}
-
-	@media (max-width: 1024px) {
-		.offer-detail {
-			grid-template-columns: 1fr;
-		}
-
-		.offer-header {
-			flex-direction: column;
-		}
 	}
 </style>

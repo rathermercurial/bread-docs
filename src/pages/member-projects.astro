@@ -4,6 +4,7 @@
  * Displays organizations that are Breadchain member projects
  */
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getEntry, render } from 'astro:content';
 import { getMemberProjects } from '@/lib/entity-utils';
 import EntityCard from '@/components/entities/EntityCard.astro';
 
@@ -14,6 +15,18 @@ const sortedProjects = memberProjects.sort((a, b) =>
 
 const pageTitle = 'Member Projects';
 const pageDescription = 'Cooperatives, mutual aid organizations, and solidarity economy projects in the Breadchain network';
+
+// Try to load markdown content from docs
+let pageContent = null;
+try {
+	const docEntry = await getEntry('docs', 'solidarity-primitives/crowdstaking/member-projects');
+	if (docEntry) {
+		const { Content } = await render(docEntry);
+		pageContent = Content;
+	}
+} catch (e) {
+	// Doc doesn't exist yet, that's okay
+}
 ---
 
 <StarlightPage
@@ -22,6 +35,12 @@ const pageDescription = 'Cooperatives, mutual aid organizations, and solidarity 
 		description: pageDescription,
 	}}
 >
+	{pageContent && (
+		<div class="page-content">
+			<pageContent />
+		</div>
+	)}
+
 	{sortedProjects.length === 0 ? (
 		<div class="empty-state">
 			<p>No member projects found. Check back soon!</p>
@@ -36,6 +55,10 @@ const pageDescription = 'Cooperatives, mutual aid organizations, and solidarity 
 </StarlightPage>
 
 <style>
+	.page-content {
+		margin-bottom: 3rem;
+	}
+
 	.entity-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));

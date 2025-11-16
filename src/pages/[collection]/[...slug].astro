@@ -69,170 +69,164 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 	headings={headings}
 	hasSidebar={false}
 >
-	<div class="entity-layout">
-		<article class="entity-main">
-				<header class="entity-header">
-					{entry.data.image && (
-						<img
-							src={entry.data.image}
-							alt={entry.data.name}
-							class="entity-image"
-						/>
-					)}
-				</header>
+	<article class="entity-page">
+		<header class="entity-header">
+			{entry.data.image && (
+				<img
+					src={entry.data.image}
+					alt={entry.data.name}
+					class="entity-image"
+				/>
+			)}
+		</header>
 
-				<!-- Main Content -->
-				<div class="entity-content">
-					<Content />
-				</div>
-		</article>
+		<!-- Main Content -->
+		<div class="entity-content">
+			<Content />
+		</div>
 
-		<!-- Relationships Sidebar -->
-		<aside class="entity-sidebar">
-					{memberOf.length > 0 && (
-						<section class="relationship-section">
-							<h2>Member Of</h2>
-							<ul class="entity-list">
-								{memberOf.map((org) => (
-									<li>
-										{typeof org === 'string' ? (
-											<span>{org}</span>
-										) : (
-											<a href={`/organization/${org.id}`}>{org.data.name}</a>
-										)}
-									</li>
-								))}
-							</ul>
-						</section>
-					)}
+		<!-- Relationships -->
+		{(memberOf.length > 0 || worksFor.length > 0 || members.length > 0 || parentOrg.length > 0 || offers.length > 0) && (
+			<section class="relationships">
+				<h2>Relationships</h2>
 
-					{worksFor.length > 0 && (
-						<section class="relationship-section">
-							<h2>Works For</h2>
-							<ul class="entity-list">
-								{worksFor.map((org) => (
-									<li>
-										{typeof org === 'string' ? (
-											<span>{org}</span>
-										) : (
-											<a href={`/organization/${org.id}`}>{org.data.name}</a>
-										)}
-									</li>
-								))}
-							</ul>
-						</section>
-					)}
-
-					{members.length > 0 && (
-						<section class="relationship-section">
-							<h2>Members</h2>
-							<ul class="entity-list">
-								{members.map((member) => (
-									<li>
-										{typeof member === 'string' ? (
-											<span>{member}</span>
-										) : (
-											<a href={`/${member.collection}/${member.id}`}>
-												{member.data.name}
-											</a>
-										)}
-									</li>
-								))}
-							</ul>
-						</section>
-					)}
-
-					{parentOrg.length > 0 && (
-						<section class="relationship-section">
-							<h2>Parent Organization</h2>
-							{parentOrg.map((org) => (
-								typeof org === 'string' ? (
-									<p>{org}</p>
-								) : (
-									<p><a href={`/organization/${org.id}`}>{org.data.name}</a></p>
-								)
+				{memberOf.length > 0 && (
+					<div class="relationship-section">
+						<h3>Member Of</h3>
+						<ul class="entity-list">
+							{memberOf.map((org) => (
+								<li>
+									{typeof org === 'string' ? (
+										<span>{org}</span>
+									) : (
+										<a href={`/organization/${org.id}`}>{org.data.name}</a>
+									)}
+								</li>
 							))}
-						</section>
-					)}
+						</ul>
+					</div>
+				)}
 
-					{offers.length > 0 && (
-						<section class="relationship-section">
-							<h2>Offers</h2>
-							<ul class="entity-list">
-								{offers.map((offer) => (
-									<li>
-										<a href={`/offer/${offer.id}`}>{offer.data.name}</a>
-									</li>
-								))}
-							</ul>
-						</section>
-					)}
+				{worksFor.length > 0 && (
+					<div class="relationship-section">
+						<h3>Works For</h3>
+						<ul class="entity-list">
+							{worksFor.map((org) => (
+								<li>
+									{typeof org === 'string' ? (
+										<span>{org}</span>
+									) : (
+										<a href={`/organization/${org.id}`}>{org.data.name}</a>
+									)}
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
 
-					<!-- Contact & Links -->
-					{(entry.data.email || entry.data.url || (entry.data.sameAs && entry.data.sameAs.length > 0)) && (
-						<section class="relationship-section">
-							<h2>Contact & Links</h2>
-							<ul class="contact-list">
-								{entry.data.email && (
-									<li>
-										<a href={`mailto:${entry.data.email}`}>{entry.data.email}</a>
-									</li>
-								)}
-								{entry.data.url && (
-									<li>
-										<a href={entry.data.url} target="_blank" rel="noopener noreferrer">
-											Website ↗
+				{members.length > 0 && (
+					<div class="relationship-section">
+						<h3>Members</h3>
+						<ul class="entity-list">
+							{members.map((member) => (
+								<li>
+									{typeof member === 'string' ? (
+										<span>{member}</span>
+									) : (
+										<a href={`/${member.collection}/${member.id}`}>
+											{member.data.name}
 										</a>
-									</li>
-								)}
-								{entry.data.sameAs?.map((link) => (
-									<li>
-										<a href={link} target="_blank" rel="noopener noreferrer">
-											{new URL(link).hostname} ↗
-										</a>
-									</li>
-								))}
-							</ul>
-						</section>
-					)}
+									)}
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
 
-					<!-- Web3 Identity -->
-					{entityType === 'person' && 'ensName' in entry.data && (entry.data.ensName || entry.data.identifier) && (
-						<section class="relationship-section">
-							<h2>Web3 Identity</h2>
-							<ul class="contact-list">
-								{entry.data.ensName && (
-									<li>ENS: {entry.data.ensName}</li>
-								)}
-								{entry.data.identifier && (
-									<li class="identifier">
-										<code>{entry.data.identifier}</code>
-									</li>
-								)}
-							</ul>
-						</section>
+				{parentOrg.length > 0 && (
+					<div class="relationship-section">
+						<h3>Parent Organization</h3>
+						{parentOrg.map((org) => (
+							typeof org === 'string' ? (
+								<p>{org}</p>
+							) : (
+								<p><a href={`/organization/${org.id}`}>{org.data.name}</a></p>
+							)
+						))}
+					</div>
+				)}
+
+				{offers.length > 0 && (
+					<div class="relationship-section">
+						<h3>Offers</h3>
+						<ul class="entity-list">
+							{offers.map((offer) => (
+								<li>
+									<a href={`/offer/${offer.id}`}>{offer.data.name}</a>
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
+			</section>
+		)}
+
+		<!-- Contact & Links -->
+		{(entry.data.email || entry.data.url || (entry.data.sameAs && entry.data.sameAs.length > 0)) && (
+			<section class="contact-section">
+				<h2>Contact & Links</h2>
+				<ul class="contact-list">
+					{entry.data.email && (
+						<li>
+							<a href={`mailto:${entry.data.email}`}>{entry.data.email}</a>
+						</li>
 					)}
-		</aside>
-	</div>
+					{entry.data.url && (
+						<li>
+							<a href={entry.data.url} target="_blank" rel="noopener noreferrer">
+								Website ↗
+							</a>
+						</li>
+					)}
+					{entry.data.sameAs?.map((link) => (
+						<li>
+							<a href={link} target="_blank" rel="noopener noreferrer">
+								{new URL(link).hostname} ↗
+							</a>
+						</li>
+					))}
+				</ul>
+			</section>
+		)}
+
+		<!-- Web3 Identity -->
+		{entityType === 'person' && 'ensName' in entry.data && (entry.data.ensName || entry.data.identifier) && (
+			<section class="web3-section">
+				<h2>Web3 Identity</h2>
+				<ul class="web3-list">
+					{entry.data.ensName && (
+						<li>ENS: {entry.data.ensName}</li>
+					)}
+					{entry.data.identifier && (
+						<li class="identifier">
+							<code>{entry.data.identifier}</code>
+						</li>
+					)}
+				</ul>
+			</section>
+		)}
+	</article>
 </StarlightPage>
 
 <style>
-	.entity-layout {
-		display: grid;
-		grid-template-columns: 1fr 300px;
-		gap: 2rem;
-		max-width: 1400px;
-	}
-
-	.entity-main {
-		min-width: 0;
+	.entity-page {
+		max-width: 800px;
+		margin: 0 auto;
 	}
 
 	.entity-header {
-		display: flex;
-		gap: 2rem;
-		align-items: flex-start;
-		margin-bottom: 1.5rem;
+		margin-bottom: 2rem;
+		text-align: center;
 	}
 
 	.entity-image {
@@ -242,40 +236,68 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 		border-radius: 8px;
 	}
 
-	.entity-sidebar {
-		min-width: 0;
+	.entity-content {
+		margin-bottom: 3rem;
 	}
 
-	.relationship-section {
-		margin-bottom: 1.5rem;
-		padding: 1rem;
+	.relationships,
+	.contact-section,
+	.web3-section {
+		margin-bottom: 2rem;
+		padding: 1.5rem;
 		background: var(--sl-color-bg-sidebar);
 		border: 1px solid var(--sl-color-gray-5);
 		border-radius: 8px;
 	}
 
-	.relationship-section h2 {
-		font-size: 1.1rem;
+	.relationships h2,
+	.contact-section h2,
+	.web3-section h2 {
+		font-size: 1.25rem;
 		margin-top: 0;
-		margin-bottom: 0.75rem;
+		margin-bottom: 1rem;
 		color: var(--sl-color-text-accent);
+	}
+
+	.relationship-section {
+		margin-bottom: 1.5rem;
+	}
+
+	.relationship-section:last-child {
+		margin-bottom: 0;
+	}
+
+	.relationship-section h3 {
+		font-size: 1rem;
+		margin-top: 0;
+		margin-bottom: 0.5rem;
+		color: var(--sl-color-text);
 	}
 
 	.relationship-section p {
 		color: var(--sl-color-gray-3);
+		margin: 0;
 	}
 
 	.entity-list,
-	.contact-list {
+	.contact-list,
+	.web3-list {
 		list-style: none;
 		padding: 0;
 		margin: 0;
 	}
 
 	.entity-list li,
-	.contact-list li {
+	.contact-list li,
+	.web3-list li {
 		margin-bottom: 0.5rem;
 		color: var(--sl-color-gray-3);
+	}
+
+	.entity-list li:last-child,
+	.contact-list li:last-child,
+	.web3-list li:last-child {
+		margin-bottom: 0;
 	}
 
 	.entity-list a,
@@ -289,27 +311,16 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 		text-decoration: underline;
 	}
 
-	.entity-list span,
-	.contact-list span {
+	.entity-list span {
 		color: var(--sl-color-gray-3);
 	}
 
 	.identifier code {
-		font-size: 0.75rem;
+		font-size: 0.85rem;
 		word-break: break-all;
 		background: var(--sl-color-gray-6);
 		color: var(--sl-color-text);
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
-	}
-
-	@media (max-width: 1024px) {
-		.entity-layout {
-			grid-template-columns: 1fr;
-		}
-
-		.entity-header {
-			flex-direction: column;
-		}
 	}
 </style>

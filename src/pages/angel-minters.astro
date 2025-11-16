@@ -4,6 +4,7 @@
  * Displays both people and organizations who are angel minters
  */
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, getEntry, render } from 'astro:content';
 import { getAngelMinters, sortEntitiesByName } from '@/lib/entity-utils';
 import EntityCard from '@/components/entities/EntityCard.astro';
 
@@ -12,6 +13,18 @@ const sortedMinters = sortEntitiesByName(angelMinters);
 
 const pageTitle = 'Angel Minters';
 const pageDescription = 'Community members and organizations participating in Breadchain crowdstaking and solidarity funding';
+
+// Try to load markdown content from docs
+let pageContent = null;
+try {
+	const docEntry = await getEntry('docs', 'solidarity-primitives/crowdstaking/angel-minters');
+	if (docEntry) {
+		const { Content } = await render(docEntry);
+		pageContent = Content;
+	}
+} catch (e) {
+	// Doc doesn't exist yet, that's okay
+}
 ---
 
 <StarlightPage
@@ -20,6 +33,12 @@ const pageDescription = 'Community members and organizations participating in Br
 		description: pageDescription,
 	}}
 >
+	{pageContent && (
+		<div class="page-content">
+			<pageContent />
+		</div>
+	)}
+
 	{sortedMinters.length === 0 ? (
 		<div class="empty-state">
 			<p>No angel minters found. Check back soon!</p>
@@ -34,6 +53,10 @@ const pageDescription = 'Community members and organizations participating in Br
 </StarlightPage>
 
 <style>
+	.page-content {
+		margin-bottom: 3rem;
+	}
+
 	.entity-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
