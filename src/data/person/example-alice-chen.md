@@ -1,5 +1,5 @@
 ---
-# Entity (Thing) properties
+# Entity properties
 name: "Alice Chen"
 description: "Web developer and community organizer focused on cooperative technology and solidarity economics"
 url: "https://alice-chen.example.com"
@@ -8,26 +8,17 @@ identifier: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1"
 sameAs:
   - "https://github.com/alicechen"
   - "https://twitter.com/alicechen_coop"
+email: "alice@breadchain.coop"
+ensName: "alicechen.eth"
+isAngelMinter: true
 
 # Person properties
-givenName: "Alice"
-familyName: "Chen"
 jobTitle: "Cooperative Technology Developer"
 memberOf:
   - "Breadchain Cooperative"
 worksFor:
   - "Breadchain Cooperative"
-email: "alice@breadchain.coop"
-
-# Web3 identity
-ensName: "alicechen.eth"
-ensAvatar: "https://ens.example.com/avatar/alicechen.eth"
-
-# Flags
 isContributor: true
-isAngelMinter: true
-
-# Relationships
 makesOffer: []
 ---
 

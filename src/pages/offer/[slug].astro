@@ -75,50 +75,6 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 						</section>
 					)}
 
-					{offer.data.price && (
-						<section class="meta-section">
-							<h2>Pricing</h2>
-							<p class="price">
-								{offer.data.price}
-								{offer.data.priceCurrency && offer.data.priceCurrency !== 'USD' && (
-									<span class="currency"> {offer.data.priceCurrency}</span>
-								)}
-							</p>
-						</section>
-					)}
-
-					{offer.data.availability && (
-						<section class="meta-section">
-							<h2>Availability</h2>
-							<p class={`availability ${offer.data.availability.toLowerCase().replace(/\s+/g, '-')}`}>
-								{offer.data.availability.replace(/([A-Z])/g, ' $1').trim()}
-							</p>
-						</section>
-					)}
-
-					{(offer.data.validFrom || offer.data.validThrough) && (
-						<section class="meta-section">
-							<h2>Validity</h2>
-							{offer.data.validFrom && (
-								<p>From: {new Date(offer.data.validFrom).toLocaleDateString()}</p>
-							)}
-							{offer.data.validThrough && (
-								<p>Until: {new Date(offer.data.validThrough).toLocaleDateString()}</p>
-							)}
-						</section>
-					)}
-
-					{offer.data.category && offer.data.category.length > 0 && (
-						<section class="meta-section">
-							<h2>Categories</h2>
-							<div class="categories">
-								{offer.data.category.map((cat) => (
-									<span class="category-tag">{cat}</span>
-								))}
-							</div>
-						</section>
-					)}
-
 					{offer.data.url && (
 						<section class="meta-section">
 							<a href={offer.data.url} target="_blank" rel="noopener noreferrer" class="cta-button">
@@ -201,50 +157,6 @@ const pageDescription = offer.data.description || `Marketplace offer: ${offer.da
 
 	.meta-section a:hover {
 		text-decoration: underline;
-	}
-
-	.price {
-		font-size: 1.5rem;
-		font-weight: bold;
-		color: var(--sl-color-text-accent);
-	}
-
-	.availability {
-		padding: 0.5rem 1rem;
-		border-radius: 4px;
-		font-weight: 600;
-		display: inline-block;
-	}
-
-	.availability.in-stock {
-		background: #286b63;
-		color: white;
-	}
-
-	.availability.out-of-stock {
-		background: #666;
-		color: white;
-	}
-
-	.availability.limited-availability {
-		background: #ea6023;
-		color: white;
-	}
-
-	.categories {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	.category-tag {
-		display: inline-block;
-		padding: 0.25rem 0.75rem;
-		background: var(--sl-color-gray-6);
-		border: 1px solid var(--sl-color-gray-5);
-		border-radius: 4px;
-		font-size: 0.875rem;
-		color: var(--sl-color-gray-3);
 	}
 
 	.cta-button {

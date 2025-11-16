@@ -79,14 +79,6 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 							class="entity-image"
 						/>
 					)}
-					<div class="entity-title">
-								{entityType === 'person' && 'jobTitle' in entry.data && entry.data.jobTitle && (
-							<p class="job-title">{entry.data.jobTitle}</p>
-						)}
-						{entityType === 'organization' && 'legalName' in entry.data && entry.data.legalName && (
-							<p class="legal-name">{entry.data.legalName}</p>
-						)}
-					</div>
 				</header>
 
 				<!-- Main Content -->
@@ -248,17 +240,6 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 		height: 150px;
 		object-fit: cover;
 		border-radius: 8px;
-	}
-
-	.entity-title {
-		flex: 1;
-	}
-
-	.job-title,
-	.legal-name {
-		color: var(--sl-color-gray-3);
-		font-size: 1.1rem;
-		margin: 0.5rem 0 0;
 	}
 
 	.entity-sidebar {

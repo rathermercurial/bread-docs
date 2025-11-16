@@ -1,5 +1,5 @@
 ---
-# Entity (Thing) properties
+# Entity properties
 name: "Bob Garcia"
 description: "Designer and educator working on cooperative branding and visual communication"
 url: "https://bobgarcia.design"
@@ -8,23 +8,15 @@ identifier: "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
 sameAs:
   - "https://dribbble.com/bobgarcia"
   - "https://linkedin.com/in/bobgarcia"
+email: "bob@localharvestcoop.org"
+ensName: "bobgarcia.eth"
+isAngelMinter: false
 
 # Person properties
-givenName: "Bob"
-familyName: "Garcia"
 jobTitle: "Cooperative Design Lead"
 memberOf:
   - "Local Harvest Food Cooperative"
-email: "bob@localharvestcoop.org"
-
-# Web3 identity
-ensName: "bobgarcia.eth"
-
-# Flags
 isContributor: true
-isAngelMinter: false
-
-# Relationships
 makesOffer: []
 ---
 

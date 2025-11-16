@@ -36,9 +36,6 @@ const link = `/${entity.collection}/${entity.id}`;
 			{entity.entityType === 'person' && entity.data.jobTitle && (
 				<p class="entity-subtitle">{entity.data.jobTitle}</p>
 			)}
-			{entity.entityType === 'organization' && entity.data.alternateName && (
-				<p class="entity-subtitle">{entity.data.alternateName}</p>
-			)}
 
 			{entity.data.description && (
 				<p class="entity-description">{entity.data.description}</p>

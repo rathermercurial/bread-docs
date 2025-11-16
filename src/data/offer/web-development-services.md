@@ -3,15 +3,8 @@ name: "Cooperative Web Development Services"
 description: "Custom web application development for cooperatives, mutual aid organizations, and solidarity economy projects"
 offeredBy: "Alice Chen"
 itemOffered: "Full-stack web development, including frontend (React, Astro, Vue), backend (Node.js, Python), and smart contract development"
-price: "Contact for pricing - sliding scale available"
-priceCurrency: "USD"
-availability: "InStock"
 url: "https://alice-chen.example.com/services"
 image: "/attachments/web-dev-services.jpg"
-category:
-  - web-services
-  - development
-  - cooperative-tech
 ---
 
 # Cooperative Web Development Services

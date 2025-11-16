@@ -1,4 +1,5 @@
 ---
+# Entity properties
 name: "Breadchain Cooperative"
 description: "A solidarity economy platform connecting cooperative projects, mutual aid networks, and regenerative finance"
 url: "https://breadchain.coop"
@@ -7,13 +8,14 @@ identifier: "0x1234567890123456789012345678901234567890"
 sameAs:
   - "https://github.com/BreadchainCoop"
   - "https://twitter.com/breadchain_"
+email: "hello@breadchain.coop"
+isAngelMinter: true
+
+# Organization properties
 member:
   - "Alice Chen"
   - "Bob Garcia"
-legalName: "Breadchain Cooperative LLC"
-email: "hello@breadchain.coop"
 isMemberProject: true
-isAngelMinter: true
 makesOffer: []
 ---
 

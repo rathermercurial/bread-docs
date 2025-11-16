@@ -297,20 +297,12 @@ export function groupEntitiesByType(entities: Entity[]) {
 // ============================================================================
 
 /**
- * Get display name for entity (handles different name structures)
+ * Get display name for entity
  *
  * @param entity - Entity to get name for
- * @returns Display-friendly name
- * @example
- * const name = getEntityDisplayName(entity); // "Alice Chen" or "Breadchain Cooperative"
+ * @returns Display name
  */
 export function getEntityDisplayName(entity: Entity): string {
-	if (entity.entityType === 'person') {
-		const { givenName, familyName } = entity.data;
-		if (givenName && familyName) {
-			return `${givenName} ${familyName}`;
-		}
-	}
 	return entity.data.name;
 }
 
