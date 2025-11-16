@@ -69,10 +69,6 @@ const person = defineCollection({
 			description: 'Last/family name'
 		}).optional(),
 
-		additionalName: z.string({
-			description: 'Middle name or other names'
-		}).optional(),
-
 		// Professional context
 		jobTitle: z.string({
 			description: 'Current job title or role'
@@ -106,10 +102,6 @@ const person = defineCollection({
 		// Web3 identity
 		ensName: z.string().optional().describe(
 			'ENS name (can be auto-resolved from identifier)'
-		),
-
-		ensAvatar: z.string().optional().describe(
-			'ENS avatar URL'
 		),
 
 		// Custom flags
@@ -147,10 +139,6 @@ const organization = defineCollection({
 			description: 'Alternate or short name'
 		}).optional(),
 
-		logo: z.string({
-			description: 'Logo image path/URL'
-		}).optional(),
-
 		// Organizational relationships
 		member: z.array(
 			z.union([
@@ -166,15 +154,6 @@ const organization = defineCollection({
 			z.string()
 		]).optional().describe(
 			'Parent organization (if this is a suborganization)'
-		),
-
-		subOrganization: z.array(
-			z.union([
-				reference('organization'),
-				z.string()
-			])
-		).optional().default([]).describe(
-			'Child/sub-organizations'
 		),
 
 		// Contact

@@ -8,10 +8,9 @@ import { getEntityDisplayName } from '@/lib/entity-utils';
 
 interface Props {
 	entity: Entity;
-	showType?: boolean;
 }
 
-const { entity, showType = false } = Astro.props;
+const { entity } = Astro.props;
 const displayName = getEntityDisplayName(entity);
 const link = `/${entity.collection}/${entity.id}`;
 ---
@@ -45,22 +44,6 @@ const link = `/${entity.collection}/${entity.id}`;
 				<p class="entity-description">{entity.data.description}</p>
 			)}
 
-			<div class="entity-badges">
-				{showType && (
-					<span class={`badge type-badge ${entity.entityType}`}>
-						{entity.entityType === 'person' ? 'Person' : 'Organization'}
-					</span>
-				)}
-				{entity.data.isAngelMinter && (
-					<span class="badge angel-minter">Angel Minter</span>
-				)}
-				{entity.entityType === 'person' && entity.data.isContributor && (
-					<span class="badge contributor">Contributor</span>
-				)}
-				{entity.entityType === 'organization' && entity.data.isMemberProject && (
-					<span class="badge member-project">Member Project</span>
-				)}
-			</div>
 		</div>
 	</a>
 </article>
@@ -126,13 +109,17 @@ const link = `/${entity.collection}/${entity.id}`;
 
 	.entity-subtitle {
 		margin: 0 0 0.5rem 0;
-		color: var(--sl-color-gray-3);
+		color: var(--sl-color-gray-2);
 		font-size: 0.95rem;
+	}
+
+	:global([data-theme='dark']) .entity-subtitle {
+		color: var(--sl-color-gray-4);
 	}
 
 	.entity-description {
 		margin: 0 0 0.75rem 0;
-		color: var(--sl-color-gray-3);
+		color: var(--sl-color-gray-2);
 		font-size: 0.9rem;
 		line-height: 1.4;
 		display: -webkit-box;
@@ -141,57 +128,7 @@ const link = `/${entity.collection}/${entity.id}`;
 		overflow: hidden;
 	}
 
-	.entity-badges {
-		display: flex;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-	}
-
-	.badge {
-		display: inline-block;
-		padding: 0.25rem 0.6rem;
-		border-radius: 4px;
-		font-size: 0.75rem;
-		font-weight: 600;
-	}
-
-	.badge.type-badge {
-		background: var(--sl-color-gray-5);
-		color: var(--sl-color-gray-2);
-	}
-
-	.badge.type-badge.person {
-		background: #e3f2fd;
-		color: #1976d2;
-	}
-
-	:global([data-theme='dark']) .badge.type-badge.person {
-		background: #1e3a5f;
-		color: #90caf9;
-	}
-
-	.badge.type-badge.organization {
-		background: #f3e5f5;
-		color: #7b1fa2;
-	}
-
-	:global([data-theme='dark']) .badge.type-badge.organization {
-		background: #38284c;
-		color: #ce93d8;
-	}
-
-	.badge.angel-minter {
-		background: #ea6023;
-		color: white;
-	}
-
-	.badge.contributor {
-		background: #286b63;
-		color: white;
-	}
-
-	.badge.member-project {
-		background: #1c5bb9;
-		color: white;
+	:global([data-theme='dark']) .entity-description {
+		color: var(--sl-color-gray-4);
 	}
 </style>

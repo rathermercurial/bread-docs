@@ -89,20 +89,6 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 					</div>
 				</header>
 
-
-				<!-- Badges -->
-				<div class="entity-badges">
-					{entry.data.isAngelMinter && (
-						<span class="badge angel-minter">Angel Minter</span>
-					)}
-					{entityType === 'person' && 'isContributor' in entry.data && entry.data.isContributor && (
-						<span class="badge contributor">Contributor</span>
-					)}
-					{entityType === 'organization' && 'isMemberProject' in entry.data && entry.data.isMemberProject && (
-						<span class="badge member-project">Member Project</span>
-					)}
-				</div>
-
 				<!-- Main Content -->
 				<div class="entity-content">
 					<Content />
@@ -273,36 +259,6 @@ const pageDescription = entry.data.description || `Profile for ${entry.data.name
 		color: var(--sl-color-gray-3);
 		font-size: 1.1rem;
 		margin: 0.5rem 0 0;
-	}
-
-	.entity-badges {
-		display: flex;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-		margin-bottom: 1.5rem;
-	}
-
-	.badge {
-		display: inline-block;
-		padding: 0.25rem 0.75rem;
-		border-radius: 4px;
-		font-size: 0.875rem;
-		font-weight: 600;
-	}
-
-	.badge.angel-minter {
-		background: var(--sl-color-orange);
-		color: white;
-	}
-
-	.badge.contributor {
-		background: var(--sl-color-green);
-		color: white;
-	}
-
-	.badge.member-project {
-		background: var(--sl-color-blue);
-		color: white;
 	}
 
 	.entity-sidebar {

@@ -107,13 +107,17 @@ const link = `/offer/${offer.id}`;
 
 	.offer-provider {
 		margin: 0 0 0.75rem 0;
-		color: var(--sl-color-gray-3);
+		color: var(--sl-color-gray-2);
 		font-size: 0.9rem;
+	}
+
+	:global([data-theme='dark']) .offer-provider {
+		color: var(--sl-color-gray-4);
 	}
 
 	.offer-description {
 		margin: 0 0 1rem 0;
-		color: var(--sl-color-gray-3);
+		color: var(--sl-color-gray-2);
 		font-size: 0.9rem;
 		line-height: 1.4;
 		display: -webkit-box;
@@ -121,6 +125,10 @@ const link = `/offer/${offer.id}`;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		flex: 1;
+	}
+
+	:global([data-theme='dark']) .offer-description {
+		color: var(--sl-color-gray-4);
 	}
 
 	.offer-meta {
