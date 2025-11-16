@@ -20,8 +20,6 @@ isContributor: true
 makesOffer: []
 ---
 
-# Bob Garcia
-
 ## About
 
 Bob is a graphic designer and visual communicator who helps cooperatives develop their brand identity and communication materials. He believes in making design accessible to grassroots organizations.

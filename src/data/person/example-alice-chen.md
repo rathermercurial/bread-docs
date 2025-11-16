@@ -22,8 +22,6 @@ isContributor: true
 makesOffer: []
 ---
 
-# Alice Chen
-
 ## About
 
 Alice is a full-stack developer and community organizer who has been working in the cooperative movement for over 5 years. She specializes in building web applications that support solidarity economics and mutual aid networks.

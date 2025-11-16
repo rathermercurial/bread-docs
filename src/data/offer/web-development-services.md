@@ -7,8 +7,6 @@ url: "https://alice-chen.example.com/services"
 image: "/attachments/web-dev-services.jpg"
 ---
 
-# Cooperative Web Development Services
-
 ## Overview
 
 Professional web development services tailored for cooperatives, mutual aid organizations, and solidarity economy projects. All work follows cooperative principles with transparent pricing and democratic decision-making.

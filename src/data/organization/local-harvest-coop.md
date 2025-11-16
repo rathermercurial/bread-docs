@@ -15,6 +15,4 @@ isMemberProject: true
 makesOffer: []
 ---
 
-# Local Harvest Food Cooperative
-
 Local Harvest is a member-owned food cooperative.

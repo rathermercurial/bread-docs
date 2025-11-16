@@ -19,6 +19,4 @@ isMemberProject: true
 makesOffer: []
 ---
 
-# Breadchain Cooperative
-
 Breadchain is a solidarity economy platform connecting cooperative projects and mutual aid networks.

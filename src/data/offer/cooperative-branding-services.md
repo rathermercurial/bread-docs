@@ -5,6 +5,4 @@ offeredBy: "Bob Garcia"
 itemOffered: "Brand identity development, logo design, design systems"
 ---
 
-# Cooperative Branding Services
-
 Professional design services for cooperatives and mutual aid organizations.
