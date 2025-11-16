@@ -37,23 +37,6 @@ const link = `/offer/${offer.id}`;
 			{offer.data.description && (
 				<p class="offer-description">{offer.data.description}</p>
 			)}
-
-			<div class="offer-meta">
-				{offer.data.price && (
-					<span class="price">
-						{offer.data.price}
-						{offer.data.priceCurrency && offer.data.priceCurrency !== 'USD' && (
-							<span class="currency"> {offer.data.priceCurrency}</span>
-						)}
-					</span>
-				)}
-
-				{offer.data.availability && (
-					<span class={`availability ${offer.data.availability.toLowerCase().replace(/\s+/g, '-')}`}>
-						{offer.data.availability.replace(/([A-Z])/g, ' $1').trim()}
-					</span>
-				)}
-			</div>
 		</div>
 	</a>
 </article>
@@ -129,50 +112,5 @@ const link = `/offer/${offer.id}`;
 
 	:global([data-theme='dark']) .offer-description {
 		color: var(--sl-color-gray-4);
-	}
-
-	.offer-meta {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
-		flex-wrap: wrap;
-	}
-
-	.price {
-		font-size: 1.25rem;
-		font-weight: bold;
-		color: var(--sl-color-text-accent);
-	}
-
-	.currency {
-		font-size: 0.9rem;
-		font-weight: normal;
-	}
-
-	.availability {
-		padding: 0.25rem 0.75rem;
-		border-radius: 4px;
-		font-size: 0.75rem;
-		font-weight: 600;
-	}
-
-	.availability.in-stock {
-		background: #286b63;
-		color: white;
-	}
-
-	.availability.out-of-stock {
-		background: #666;
-		color: white;
-	}
-
-	.availability.limited-availability {
-		background: #ea6023;
-		color: white;
-	}
-
-	.availability.pre-order {
-		background: #1c5bb9;
-		color: white;
 	}
 </style>
