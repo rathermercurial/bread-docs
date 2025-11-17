@@ -1,135 +1,264 @@
-# Obsidian Vault Updates - Entity Collection Integration
+# Obsidian Vault Updates - Entity Data Migration
 
 ## Context
 
-The bread-docs site now has entity collection pages (marketplace, angel-minters, member-projects) that:
-1. Display dynamically generated card grids from data collections
-2. Attempt to load and display markdown content from wiki docs ABOVE the card grids
-3. Use Starlight's native page title rendering
+The bread-docs site loads entity data from Astro content collections. We need to copy the individual entity markdown files from the wiki directory structure into a `data/` folder that will be synced to the bread-docs repo.
 
-## Required Changes
+## Critical Requirements
 
-You need to update three index pages in the shared-obsidian wiki to ensure they work correctly with the entity collection integration.
+- ✅ **COPY files, DO NOT MOVE** - Source files must remain in their current wiki locations
+- ✅ Create new `data/` folder at root level (OUTSIDE wiki folder)
+- ✅ Organize copied files by entity type (person, organization, offer)
+- ✅ Clean up index pages to remove duplicate H1 titles
 
-## File Locations
+## Directory Structure
 
-The pages are expected at these paths in the wiki:
+### Source Locations (in wiki/)
 
-1. **Marketplace Index**: `wiki/about/bread-token/marketplace.md`
-2. **Angel Minters Directory**: `wiki/solidarity-primitives/crowdstaking/angel-minters.md`
-3. **Member Projects Directory**: `wiki/solidarity-primitives/crowdstaking/member-projects.md`
+Entity markdown files are currently located in:
 
-## Changes Required
+1. **Marketplace Offers**: `wiki/about/bread-token/marketplace/`
+   - Individual offer files (NOT the index)
 
-### 1. Remove Duplicate H1 Titles
+2. **Angel Minters**: `wiki/solidarity-primitives/crowdstaking/angel-minters/`
+   - Person and organization files (NOT the index)
 
-**CRITICAL**: Starlight already displays page titles from frontmatter. Any H1 (`# Title`) in the markdown will create a duplicate title.
+3. **Member Projects**: `wiki/solidarity-primitives/crowdstaking/member-projects/`
+   - Organization files (NOT the index)
 
-**Action**: If any of these files exist and have H1 titles, remove them completely.
+### Target Structure (new data/ folder)
 
-**Example**:
-```markdown
-<!-- BEFORE -->
-# Marketplace
-
-Welcome to the Breadchain marketplace...
-
-<!-- AFTER -->
-Welcome to the Breadchain marketplace...
+```
+shared-obsidian/
+├── data/                    <- CREATE THIS FOLDER
+│   ├── person/             <- All person entities
+│   │   └── *.md            <- Copied from angel-minters/
+│   ├── organization/       <- All organization entities
+│   │   └── *.md            <- Copied from member-projects/ and angel-minters/
+│   └── offer/              <- All marketplace offers
+│       └── *.md            <- Copied from marketplace/
+└── wiki/                   <- LEAVE UNCHANGED (except index cleanup)
+    └── ...
 ```
 
-### 2. Ensure Files Exist
+## Step-by-Step Instructions
 
-If any of these three files don't exist yet, they should be created with appropriate introductory content (no H1 title).
+### 1. Create Data Directory Structure
 
-### 3. Content Guidelines
-
-Each page should contain:
-- **Introduction paragraph**: Explain what this section is about
-- **Context**: Why this exists in the Breadchain ecosystem
-- **How to participate** (if applicable): Instructions for getting listed
-- **NO H1 heading**: Let Starlight handle the title
-
-## Example Content Templates
-
-### Marketplace (`wiki/about/bread-token/marketplace.md`)
-
-```markdown
-The Breadchain Marketplace connects cooperative projects, mutual aid organizations, and solidarity economy participants through a decentralized exchange of goods, services, and offerings.
-
-## How It Works
-
-Members of the Breadchain network can list their offerings in the marketplace, making them discoverable to other cooperatives and community members. The marketplace operates on principles of transparency, mutual aid, and solidarity economics.
-
-## Getting Listed
-
-To add your offering to the marketplace, create a markdown file in the appropriate data collection with your offer details including description, what you're offering, and how to connect.
+```bash
+# At root of shared-obsidian repo
+mkdir -p data/person
+mkdir -p data/organization
+mkdir -p data/offer
 ```
 
-### Angel Minters (`wiki/solidarity-primitives/crowdstaking/angel-minters.md`)
+### 2. Copy Marketplace Offers
 
-```markdown
-Angel Minters are community members and organizations who participate in Breadchain's crowdstaking mechanism, providing solidarity funding to support cooperative projects and mutual aid networks.
+**Source**: `wiki/about/bread-token/marketplace/*.md` (EXCEPT index file)
+**Destination**: `data/offer/`
 
-## What is Angel Minting?
-
-Angel Minting is Breadchain's approach to community-driven funding, where participants stake BREAD tokens to support projects aligned with cooperative and solidarity economy principles.
-
-## Becoming an Angel Minter
-
-Community members can become Angel Minters by participating in the crowdstaking protocol and supporting member projects through token staking.
+```bash
+# Copy all offer files to data/offer/
+# Skip index.md or marketplace.md (the directory index)
+# COPY ONLY - do not delete originals
 ```
 
-### Member Projects (`wiki/solidarity-primitives/crowdstaking/member-projects.md`)
+**What to copy**: Individual offer markdown files
+**What to skip**: The index/directory page
 
-```markdown
-Member Projects are cooperatives, mutual aid organizations, and solidarity economy initiatives that are part of the Breadchain network and participate in the crowdstaking ecosystem.
+### 3. Copy Angel Minters
 
-## What are Member Projects?
+**Source**: `wiki/solidarity-primitives/crowdstaking/angel-minters/*.md` (EXCEPT index)
+**Destinations**:
+- Person files → `data/person/`
+- Organization files → `data/organization/`
 
-Member Projects represent the core of Breadchain's cooperative network - organizations building solidarity economy infrastructure, providing mutual aid, and advancing cooperative principles.
-
-## Joining as a Member Project
-
-Cooperatives and solidarity economy projects can apply to become Member Projects, gaining access to crowdstaking support, marketplace visibility, and network resources.
+```bash
+# Identify which files are people vs organizations
+# Copy person files to data/person/
+# Copy organization files to data/organization/
+# Skip the index file
 ```
 
-## Execution Instructions for Claude Code
+**How to identify**:
+- Check frontmatter for entity type indicators
+- People usually have names like "alice-chen.md", "bob-garcia.md"
+- Organizations have names like "breadchain-cooperative.md"
 
-When you run this in the shared-obsidian repo (`F:\projects\shared-obsidian`):
+### 4. Copy Member Projects
 
-1. **Search for existing files**:
-   - Look for `wiki/about/bread-token/marketplace.md`
-   - Look for `wiki/solidarity-primitives/crowdstaking/angel-minters.md`
-   - Look for `wiki/solidarity-primitives/crowdstaking/member-projects.md`
+**Source**: `wiki/solidarity-primitives/crowdstaking/member-projects/*.md` (EXCEPT index)
+**Destination**: `data/organization/`
 
-2. **For each existing file**:
-   - Read the file
-   - Check if it starts with an H1 (`# Title`)
-   - If yes, remove the H1 line (and any blank lines immediately after it)
-   - Preserve all other content
+```bash
+# Copy all organization files to data/organization/
+# Skip the index file
+# Check for duplicates from angel-minters (orgs can be both)
+```
 
-3. **For each missing file**:
-   - Create the directory structure if needed
-   - Create the file with appropriate template content (see examples above)
-   - Ensure NO H1 heading is present
+### 5. Ensure Proper Frontmatter
 
-4. **Commit changes**:
-   - Review all changes
-   - Commit with message: "Remove duplicate H1 titles from entity index pages for Starlight compatibility"
-   - Push to the shared-obsidian repo
+All copied files must have frontmatter matching the Astro schema. Check that each file has:
 
-## Validation
+**Person files** require:
+```yaml
+---
+name: "Full Name"
+description: "Brief description"
+# ... other fields
+---
+```
 
-After making changes, verify:
-- ✅ No files contain H1 headings (`# Title`)
-- ✅ All three required files exist
-- ✅ Content is meaningful and provides context
-- ✅ Files are in correct wiki directory structure
+**Organization files** require:
+```yaml
+---
+name: "Organization Name"
+description: "Brief description"
+# ... other fields
+---
+```
+
+**Offer files** require:
+```yaml
+---
+name: "Offer Name"
+description: "Brief description"
+offeredBy: "Provider Name"
+itemOffered: "What's being offered"
+---
+```
+
+### 6. Remove H1 Titles from Copied Files
+
+**CRITICAL**: All files in the `data/` folder must NOT have H1 headings.
+
+For each copied file:
+```markdown
+# BEFORE (in wiki)
+---
+name: "Alice Chen"
+---
+
+# Alice Chen    <- REMOVE THIS LINE
+
+## About
+...
+
+# AFTER (in data/)
+---
+name: "Alice Chen"
+---
+
+## About        <- Start with H2
+...
+```
+
+**Reason**: Starlight displays the title from frontmatter. H1 in markdown creates duplicates.
+
+### 7. Clean Up Wiki Index Pages
+
+Update the three index pages in the wiki (leave the individual entity files unchanged):
+
+**Files to update**:
+1. `wiki/about/bread-token/marketplace.md` (or index.md in that folder)
+2. `wiki/solidarity-primitives/crowdstaking/angel-minters.md` (or index.md)
+3. `wiki/solidarity-primitives/crowdstaking/member-projects.md` (or index.md)
+
+**Changes**:
+- Remove H1 title if present
+- Keep all other content
+- These should provide context/introduction text
+
+## Validation Checklist
+
+Before committing:
+
+- [ ] `data/` folder exists at repo root
+- [ ] `data/person/` contains person markdown files
+- [ ] `data/organization/` contains organization markdown files
+- [ ] `data/offer/` contains offer markdown files
+- [ ] ALL original files still in wiki/ (nothing deleted)
+- [ ] NO H1 headings in any data/ files
+- [ ] All data/ files have proper frontmatter
+- [ ] Wiki index pages cleaned (no H1 titles)
+
+## Example File Counts
+
+If you have:
+- 15 marketplace offers → 15 files in `data/offer/`
+- 8 angel minters (5 people, 3 orgs) → 5 in `data/person/`, 3 in `data/organization/`
+- 10 member projects → 10 in `data/organization/` (may overlap with angel minters)
+
+**Note**: Organizations can be both angel minters AND member projects, so you may have duplicates to dedupe.
 
 ## Technical Notes
 
-- The bread-docs site loads these files via `getEntry('docs', 'path/to/file')`
-- The path is relative to the wiki sync location
-- Content is rendered ABOVE the dynamically generated card grids
-- Starlight's page title comes from the route/page name, not markdown H1
+### GitHub Wiki Sync
+
+The `data/` folder will be synced by the github-wiki-sync integration in bread-docs:
+
+```typescript
+githubWikiSync({
+  wikiPath: 'wiki',           // Syncs wiki/ to src/content/docs
+  // Also syncs data/ to src/data/
+})
+```
+
+The integration should pick up the `data/` folder and copy it to `bread-docs/src/data/`.
+
+### Content Collections
+
+Astro will load files from `src/data/` using glob loaders:
+
+```typescript
+const person = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/data/person' }),
+  schema: entity.extend({ /* ... */ }),
+});
+```
+
+## Common Issues
+
+**Issue**: "Which files are people vs organizations?"
+**Solution**: Look at frontmatter or content. People have names, job titles. Organizations have "cooperative", "project", organizational structure.
+
+**Issue**: "An organization is both an angel minter and member project"
+**Solution**: Only copy it once to `data/organization/`. It can have both `isAngelMinter: true` and `isMemberProject: true` in frontmatter.
+
+**Issue**: "There's no index file, files are directly in the folder"
+**Solution**: Good! Copy all the entity files to the appropriate data/ subfolder.
+
+## Example Commands
+
+```bash
+# Create structure
+mkdir -p data/{person,organization,offer}
+
+# Copy offers (example)
+cp wiki/about/bread-token/marketplace/web-dev-services.md data/offer/
+cp wiki/about/bread-token/marketplace/branding-services.md data/offer/
+
+# Copy people (example)
+cp wiki/solidarity-primitives/crowdstaking/angel-minters/alice-chen.md data/person/
+
+# Copy organizations (example)
+cp wiki/solidarity-primitives/crowdstaking/member-projects/breadchain-coop.md data/organization/
+
+# Then remove H1 titles from copied files
+# Then clean up wiki index pages
+# Then commit
+```
+
+## Commit Message
+
+```
+Copy entity data to data/ folder for Astro collections
+
+- Create data/ folder structure (person, organization, offer)
+- Copy marketplace offers to data/offer/
+- Copy angel minter entities to data/person/ and data/organization/
+- Copy member project entities to data/organization/
+- Remove H1 titles from all copied data files
+- Clean up wiki index pages (remove duplicate H1s)
+- Original wiki files remain unchanged
+```

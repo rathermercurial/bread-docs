@@ -4,32 +4,76 @@ Copy this prompt and paste it to Claude Code when working in `F:\projects\shared
 
 ---
 
-I need you to update three wiki pages for Starlight compatibility. The bread-docs site now loads these pages as content above dynamically generated entity card grids, and Starlight displays page titles automatically, so we need to remove any H1 headings.
+I need you to copy entity markdown files from the wiki directory structure into a new `data/` folder for Astro content collections.
 
-**Tasks**:
+**CRITICAL RULES**:
+1. **COPY ONLY** - DO NOT delete or move files from their wiki locations
+2. Create `data/` folder at repo root (NOT inside wiki/)
+3. Organize by entity type: person/, organization/, offer/
+4. Remove H1 titles from copied files (Starlight displays titles automatically)
+5. Clean up wiki index pages (remove H1 titles)
 
-1. **Check and update these three files** (remove H1 titles if present, create if missing):
-   - `wiki/about/bread-token/marketplace.md`
-   - `wiki/solidarity-primitives/crowdstaking/angel-minters.md`
-   - `wiki/solidarity-primitives/crowdstaking/member-projects.md`
+**STEP 1: Create directory structure**
+```bash
+mkdir -p data/person
+mkdir -p data/organization
+mkdir -p data/offer
+```
 
-2. **For existing files**: Remove any H1 heading (`# Title`) at the start of the file. Keep all other content.
+**STEP 2: Copy marketplace offers**
+- **Source**: `wiki/about/bread-token/marketplace/*.md` (individual offers, NOT index)
+- **Destination**: `data/offer/`
+- **Action**: Copy all offer files, skip index/directory page
 
-3. **For missing files**: Create them with introductory content (NO H1 heading). The content should explain what the section is about and how to participate.
+**STEP 3: Copy angel minters**
+- **Source**: `wiki/solidarity-primitives/crowdstaking/angel-minters/*.md` (NOT index)
+- **Destinations**:
+  - Person files → `data/person/`
+  - Organization files → `data/organization/`
+- **Action**: Identify file type from frontmatter/content, copy to appropriate folder
 
-**Content guidelines**:
-- Marketplace: Explain the cooperative marketplace, how it works, how to list offerings
-- Angel Minters: Explain crowdstaking, what angel minting is, how to participate
-- Member Projects: Explain what member projects are, benefits, how to join
+**STEP 4: Copy member projects**
+- **Source**: `wiki/solidarity-primitives/crowdstaking/member-projects/*.md` (NOT index)
+- **Destination**: `data/organization/`
+- **Action**: Copy org files (may overlap with angel minters - dedupe)
 
-**Important**:
-- NO H1 headings (`# Title`) - Starlight handles page titles
-- H2 and below are fine for section headings
-- Create directory structure if needed
-- Commit with message: "Remove duplicate H1 titles from entity index pages for Starlight compatibility"
+**STEP 5: Remove H1 titles from ALL copied data/ files**
+```markdown
+# BEFORE
+---
+name: "Alice Chen"
+---
 
-Refer to `temp/obsidian-vault-updates.md` in the bread-docs repo for detailed examples and templates.
+# Alice Chen    <- REMOVE THIS
+
+## About
+
+# AFTER
+---
+name: "Alice Chen"
+---
+
+## About
+```
+
+**STEP 6: Clean up wiki index pages**
+- `wiki/about/bread-token/marketplace.md` (or index.md in that folder)
+- `wiki/solidarity-primitives/crowdstaking/angel-minters.md` (or index.md)
+- `wiki/solidarity-primitives/crowdstaking/member-projects.md` (or index.md)
+
+Remove H1 titles, keep all other content.
+
+**Validation**:
+- [ ] data/ folder exists with person/, organization/, offer/ subdirectories
+- [ ] All entity files copied (counts should match source directories minus indices)
+- [ ] NO H1 headings in data/ files
+- [ ] Original wiki files UNCHANGED (still exist in their locations)
+- [ ] Wiki index pages cleaned (no H1)
+
+**Commit message**: "Copy entity data to data/ folder for Astro collections"
+
+Refer to `temp/obsidian-vault-updates.md` in bread-docs repo for detailed instructions and examples.
 
 ---
 
-After pasting this prompt, Claude Code will handle the file updates in the shared-obsidian repo.
+After pasting this prompt, Claude Code will handle the file copying and cleanup.
