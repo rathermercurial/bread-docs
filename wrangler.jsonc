@@ -1,0 +1,10 @@
+{
+  "name": "bread-docs",
+  "compatibility_date": "2025-11-19",
+  "routes": [
+    "bread-docs.test.rathermercurial.xyz/*"
+  ],
+  "assets": {
+    "directory": "./dist"
+  }
+}
