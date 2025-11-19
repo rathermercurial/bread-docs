@@ -1,0 +1,172 @@
+---
+/**
+ * Marketplace offer detail page
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { resolveOfferProvider } from '@/lib/entity-utils';
+
+export async function getStaticPaths() {
+	const offers = await getCollection('offer');
+
+	return offers.map((offer) => ({
+		params: { slug: offer.id },
+		props: { offer },
+	}));
+}
+
+interface Props {
+	offer: CollectionEntry<'offer'>;
+}
+
+const { offer } = Astro.props;
+
+// Render markdown content
+const { Content, headings } = await render(offer);
+
+// Resolve provider
+const provider = await resolveOfferProvider(offer);
+
+const pageTitle = offer.data.name || 'Marketplace Offer';
+const pageDescription = offer.data.description || `Marketplace offer: ${offer.data.name || 'unknown'}`;
+---
+
+<StarlightPage
+	frontmatter={{
+		title: pageTitle,
+		description: pageDescription,
+	}}
+	headings={headings}
+>
+	<article class="offer-page">
+		<header class="offer-header">
+			{offer.data.image && (
+				<img
+					src={offer.data.image}
+					alt={offer.data.name}
+					class="offer-image"
+				/>
+			)}
+		</header>
+
+		<!-- Main Content -->
+		<div class="offer-content">
+			<h2>What's Offered</h2>
+			<p class="item-offered">{offer.data.itemOffered}</p>
+
+			<Content />
+		</div>
+
+		<!-- Offer Details -->
+		{provider && (
+			<section class="provider-section">
+				<h2>Offered By</h2>
+				{typeof provider === 'string' ? (
+					<p>{provider}</p>
+				) : (
+					<p>
+						<a href={`/${provider.collection}/${provider.id}`}>
+							{provider.data.name}
+						</a>
+					</p>
+				)}
+			</section>
+		)}
+
+		{offer.data.url && (
+			<div class="cta-section">
+				<a href={offer.data.url} target="_blank" rel="noopener noreferrer" class="cta-button">
+					Learn More ↗
+				</a>
+			</div>
+		)}
+	</article>
+</StarlightPage>
+
+<style>
+	.offer-page {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.offer-header {
+		margin-bottom: 2rem;
+		text-align: center;
+	}
+
+	.offer-image {
+		width: 200px;
+		height: 200px;
+		object-fit: cover;
+		border-radius: 8px;
+	}
+
+	.offer-content {
+		margin-bottom: 3rem;
+	}
+
+	.offer-content h2 {
+		color: var(--sl-color-text-accent);
+	}
+
+	.item-offered {
+		font-size: 1.1rem;
+		padding: 1rem;
+		background: var(--sl-color-bg-sidebar);
+		border-left: 4px solid var(--sl-color-text-accent);
+		border-radius: 4px;
+		margin-bottom: 2rem;
+		color: var(--sl-color-text);
+	}
+
+	.provider-section {
+		margin-bottom: 2rem;
+		padding: 1.5rem;
+		background: var(--sl-color-bg-sidebar);
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 8px;
+	}
+
+	.provider-section h2 {
+		font-size: 1.25rem;
+		margin-top: 0;
+		margin-bottom: 1rem;
+		color: var(--sl-color-text-accent);
+	}
+
+	.provider-section p {
+		color: var(--sl-color-text);
+		margin: 0;
+	}
+
+	.provider-section a {
+		color: var(--sl-color-text-accent);
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	.provider-section a:hover {
+		text-decoration: underline;
+	}
+
+	.cta-section {
+		text-align: center;
+		margin-top: 3rem;
+	}
+
+	.cta-button {
+		display: inline-block;
+		padding: 1rem 2rem;
+		background: var(--sl-color-text-accent);
+		color: var(--sl-color-white);
+		text-align: center;
+		text-decoration: none;
+		border-radius: 8px;
+		font-weight: 600;
+		transition: opacity 0.2s;
+	}
+
+	.cta-button:hover {
+		opacity: 0.9;
+	}
+</style>

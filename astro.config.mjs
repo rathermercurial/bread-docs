@@ -27,13 +27,15 @@ export default defineConfig({
 		],
 	},
 	integrations: [
-		// Sync wiki content from GitHub before build
+		// Sync content from GitHub before build (wiki docs, entity data, attachments)
 		githubWikiSync({
 			token: env.GITHUB_TOKEN || '',
 			owner: env.GITHUB_REPO_OWNER || 'BreadchainCoop',
 			repo: env.GITHUB_REPO_NAME || 'shared-obsidian',
-			wikiPath: env.GITHUB_WIKI_PATH || 'wiki',
-			contentDir: 'src/content/docs',
+			syncPaths: [
+				{ sourcePath: env.GITHUB_WIKI_PATH || 'wiki', targetDir: 'src/content/docs' },
+				{ sourcePath: 'data', targetDir: 'src/content/data' },
+			],
 			attachmentsDir: 'public/attachments',
 		}),
 		starlight({

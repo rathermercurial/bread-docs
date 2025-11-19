@@ -1,0 +1,116 @@
+---
+/**
+ * Offer Card Component
+ * Displays a marketplace offer in a card format
+ */
+import type { CollectionEntry } from 'astro:content';
+import { resolveOfferProvider, getOfferSemanticPath } from '@/lib/entity-utils';
+
+interface Props {
+	offer: CollectionEntry<'offer'>;
+}
+
+const { offer } = Astro.props;
+const provider = await resolveOfferProvider(offer);
+const link = getOfferSemanticPath(offer);
+---
+
+<article class="offer-card">
+	<a href={link} class="card-link">
+		{offer.data.image && (
+			<img
+				src={offer.data.image}
+				alt={offer.data.name}
+				class="offer-image"
+			/>
+		)}
+
+		<div class="offer-info">
+			<h3 class="offer-name">{offer.data.name}</h3>
+
+			{provider && (
+				<p class="offer-provider">
+					by {typeof provider === 'string' ? provider : provider.data.name}
+				</p>
+			)}
+
+			{offer.data.description && (
+				<p class="offer-description">{offer.data.description}</p>
+			)}
+		</div>
+	</a>
+</article>
+
+<style>
+	.offer-card {
+		background: var(--sl-color-bg-nav);
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 8px;
+		transition: all 0.2s;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.offer-card:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		transform: translateY(-2px);
+		border-color: var(--sl-color-text-accent);
+	}
+
+	:global([data-theme='dark']) .offer-card:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+	}
+
+	.card-link {
+		display: flex;
+		flex-direction: column;
+		text-decoration: none;
+		color: var(--sl-color-text);
+		height: 100%;
+	}
+
+	.offer-image {
+		width: 100%;
+		height: 180px;
+		object-fit: cover;
+	}
+
+	.offer-info {
+		padding: 1.5rem;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.offer-name {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.25rem;
+		color: var(--sl-color-text-accent);
+	}
+
+	.offer-provider {
+		margin: 0 0 0.75rem 0;
+		color: var(--sl-color-gray-2);
+		font-size: 0.9rem;
+	}
+
+	:global([data-theme='dark']) .offer-provider {
+		color: var(--sl-color-gray-4);
+	}
+
+	.offer-description {
+		margin: 0 0 1rem 0;
+		color: var(--sl-color-gray-2);
+		font-size: 0.9rem;
+		line-height: 1.4;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		flex: 1;
+	}
+
+	:global([data-theme='dark']) .offer-description {
+		color: var(--sl-color-gray-4);
+	}
+</style>

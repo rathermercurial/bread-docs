@@ -1,0 +1,104 @@
+---
+/**
+ * Data collections index
+ * Lists all available data collections
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection } from 'astro:content';
+
+const people = await getCollection('person');
+const organizations = await getCollection('organization');
+const offers = await getCollection('offer');
+---
+
+<StarlightPage
+	frontmatter={{
+		title: 'Data Collections',
+		description: 'Browse all data collections in the Breadchain documentation',
+	}}
+>
+	<div class="data-index">
+		<p>This section contains all structured data entries organized by collection type.</p>
+
+		<div class="collections-grid">
+			<a href="/data/person" class="collection-card">
+				<h2>👤 People</h2>
+				<p class="count">{people.length} entries</p>
+				<p class="description">Contributors, community members, and individuals</p>
+			</a>
+
+			<a href="/data/organization" class="collection-card">
+				<h2>🏢 Organizations</h2>
+				<p class="count">{organizations.length} entries</p>
+				<p class="description">Member projects, cooperatives, and partner organizations</p>
+			</a>
+
+			<a href="/data/offer" class="collection-card">
+				<h2>🛍️ Marketplace Offers</h2>
+				<p class="count">{offers.length} entries</p>
+				<p class="description">Goods, services, and offerings accepting BREAD</p>
+			</a>
+		</div>
+	</div>
+</StarlightPage>
+
+<style>
+	.data-index {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.data-index > p {
+		margin-bottom: 2rem;
+		font-size: 1.1rem;
+		color: var(--sl-color-text);
+	}
+
+	.collections-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 1.5rem;
+		margin-top: 2rem;
+	}
+
+	.collection-card {
+		display: block;
+		padding: 2rem;
+		background: var(--sl-color-bg-nav);
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 8px;
+		text-decoration: none;
+		transition: all 0.2s;
+	}
+
+	.collection-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		border-color: var(--sl-color-text-accent);
+	}
+
+	.collection-card h2 {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.5rem;
+		color: var(--sl-color-text-accent);
+	}
+
+	.count {
+		margin: 0 0 0.75rem 0;
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--sl-color-text);
+	}
+
+	.description {
+		margin: 0;
+		color: var(--sl-color-text);
+		opacity: 0.8;
+	}
+
+	@media (max-width: 768px) {
+		.collections-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

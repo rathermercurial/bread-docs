@@ -5,18 +5,22 @@ import path from 'path';
 import { loadCache, saveCache, fileExists } from '../lib/github-cache.js';
 import { isImageFile } from '../lib/markdown-utils.js';
 
+interface SyncPath {
+  sourcePath: string;
+  targetDir: string;
+}
+
 interface GitHubWikiSyncOptions {
   token: string;
   owner: string;
   repo: string;
-  wikiPath: string;
-  contentDir: string;
+  syncPaths: SyncPath[];
   attachmentsDir: string;
 }
 
 /**
- * Astro integration that syncs wiki content from a GitHub repository
- * to the local filesystem for Starlight to process.
+ * Astro integration that syncs content from multiple paths in a GitHub repository
+ * to the local filesystem (wiki docs, entity data, etc.).
  */
 export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroIntegration {
   return {
@@ -40,9 +44,9 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
           throw new Error('GITHUB_TOKEN environment variable is required');
         }
 
-        logger.info('Starting GitHub wiki sync...');
+        logger.info('Starting GitHub sync...');
         logger.info(`Repository: ${options.owner}/${options.repo}`);
-        logger.info(`Wiki path: ${options.wikiPath}`);
+        logger.info(`Sync paths: ${options.syncPaths.map(p => `${p.sourcePath} → ${p.targetDir}`).join(', ')}`);
         logger.info(`Token configured: ${options.token.substring(0, 8)}...`);
 
         const octokit = new Octokit({ auth: options.token });
@@ -82,14 +86,32 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
               Object.values(cache.attachments).map((a) => fileExists(a.localPath))
             );
 
-            if (fileChecks.every(Boolean) && attachmentChecks.every(Boolean)) {
+            // Also check if any target directories are empty (indicating new sync paths)
+            const dirChecks = await Promise.all(
+              options.syncPaths.map(async (syncPath) => {
+                const targetDir = path.join(process.cwd(), syncPath.targetDir);
+                try {
+                  const files = await fs.readdir(targetDir);
+                  const mdFiles = files.filter(f => f.endsWith('.md'));
+                  return mdFiles.length > 0;
+                } catch {
+                  return false; // Directory doesn't exist or can't be read
+                }
+              })
+            );
+
+            if (fileChecks.every(Boolean) && attachmentChecks.every(Boolean) && dirChecks.every(Boolean)) {
               logger.info(
                 `All ${fileChecks.length} files and ${attachmentChecks.length} attachments present - skipping sync`
               );
               return; // EXIT - No sync needed!
             }
 
-            logger.warn('Some cached files missing, performing sync');
+            if (!dirChecks.every(Boolean)) {
+              logger.warn('Some sync path directories are empty, performing sync');
+            } else {
+              logger.warn('Some cached files missing, performing sync');
+            }
           }
 
           // Get the repository tree
@@ -133,95 +155,132 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
 
           logger.info(`Indexed ${attachmentIndex.size} attachments in repository`);
 
-          // Filter for markdown files in the wiki path, excluding readme files
-          const wikiFiles = tree.tree.filter((item) => {
-            if (item.type !== 'blob' || !item.path) return false;
-            if (!item.path.startsWith(options.wikiPath + '/')) return false;
-            if (!item.path.endsWith('.md')) return false;
-
-            // Exclude readme files (case-insensitive)
-            const filename = item.path.split('/').pop()?.toLowerCase();
-            if (filename === 'readme.md') {
-              logger.info(`Skipping readme file: ${item.path}`);
-              return false;
-            }
-
-            return true;
-          });
-
-          logger.info(`Found ${wikiFiles.length} wiki files`);
-
-          // Create content directory
-          const contentDir = path.join(process.cwd(), options.contentDir);
-          await fs.mkdir(contentDir, { recursive: true });
-
-          // Track all image references across all files
+          // Track all image references and file counts across all paths
           const allImageReferences = new Set<string>();
+          let totalSyncedCount = 0;
+          let totalCachedCount = 0;
 
-          // Download each markdown file with file-level caching
-          let syncedCount = 0;
-          let cachedCount = 0;
+          // Collection index folders to exclude (except index.md)
+          const collectionIndexFolders = [
+            'about/bread-token/marketplace',
+            'solidarity-primitives/crowdstaking/angel-minters',
+            'solidarity-primitives/crowdstaking/member-projects',
+          ];
 
-          for (const file of wikiFiles) {
-            if (!file.path || !file.sha) continue;
+          // Process each sync path
+          for (const syncPath of options.syncPaths) {
+            logger.info(`Processing: ${syncPath.sourcePath} → ${syncPath.targetDir}`);
 
-            const relativePath = file.path.substring(options.wikiPath.length + 1);
-            const outputPath = path.join(contentDir, relativePath);
+            // Filter for markdown files in this source path, excluding readme files
+            const pathFiles = tree.tree.filter((item) => {
+              if (item.type !== 'blob' || !item.path) return false;
+              if (!item.path.startsWith(syncPath.sourcePath + '/')) return false;
+              if (!item.path.endsWith('.md')) return false;
 
-            // Check cache
-            const cached = cache.files[relativePath];
-
-            if (cached && cached.sha === file.sha) {
-              // File unchanged
-              if (await fileExists(cached.localPath)) {
-                logger.info(`Cached: ${relativePath}`);
-                cachedCount++;
-
-                // Still need to extract image references for later
-                const markdown = await fs.readFile(cached.localPath, 'utf-8');
-                const images = extractImageReferences(markdown);
-                images.forEach((img) => allImageReferences.add(img));
-
-                continue; // Skip download
+              // Exclude readme files (case-insensitive)
+              const filename = item.path.split('/').pop()?.toLowerCase();
+              if (filename === 'readme.md') {
+                logger.info(`Skipping readme file: ${item.path}`);
+                return false;
               }
-            }
 
-            // File is new or changed - download it
-            logger.info(`Syncing: ${relativePath}`);
+              // For wiki path, exclude collection folder contents (except index.md)
+              if (syncPath.sourcePath === 'wiki') {
+                const relativePath = item.path.substring(syncPath.sourcePath.length + 1);
+                for (const collectionFolder of collectionIndexFolders) {
+                  if (relativePath.startsWith(collectionFolder + '/')) {
+                    // Only allow index.md in collection folders
+                    if (filename !== 'index.md') {
+                      logger.info(`Skipping collection item (now from data/): ${item.path}`);
+                      return false;
+                    }
+                  }
+                }
+              }
 
-            const { data: content } = await octokit.rest.git.getBlob({
-              owner: options.owner,
-              repo: options.repo,
-              file_sha: file.sha,
+              return true;
             });
 
-            const markdown = Buffer.from(content.content, 'base64').toString('utf-8');
+            logger.info(`Found ${pathFiles.length} files in ${syncPath.sourcePath}`);
 
-            // Create subdirectories if needed
-            await fs.mkdir(path.dirname(outputPath), { recursive: true });
+            // Create target directory
+            const targetDir = path.join(process.cwd(), syncPath.targetDir);
+            await fs.mkdir(targetDir, { recursive: true });
 
-            // Write the markdown file
-            await fs.writeFile(outputPath, markdown, 'utf-8');
-            syncedCount++;
+            // Download each markdown file with file-level caching
+            let syncedCount = 0;
+            let cachedCount = 0;
 
-            // Update cache entry
-            cache.files[relativePath] = {
-              sha: file.sha,
-              syncedAt: new Date().toISOString(),
-              localPath: outputPath,
-            };
+            for (const file of pathFiles) {
+              if (!file.path || !file.sha) continue;
 
-            // Extract image references from this file
-            const images = extractImageReferences(markdown);
-            images.forEach((img) => allImageReferences.add(img));
+              const relativePath = file.path.substring(syncPath.sourcePath.length + 1);
+              const outputPath = path.join(targetDir, relativePath);
+
+              // Check cache
+              const cached = cache.files[file.path];
+
+              if (cached && cached.sha === file.sha) {
+                // File unchanged
+                if (await fileExists(cached.localPath)) {
+                  logger.info(`Cached: ${file.path}`);
+                  cachedCount++;
+
+                  // Still need to extract image references for later
+                  const markdown = await fs.readFile(cached.localPath, 'utf-8');
+                  const images = extractImageReferences(markdown);
+                  images.forEach((img) => allImageReferences.add(img));
+
+                  continue; // Skip download
+                }
+              }
+
+              // File is new or changed - download it
+              logger.info(`Syncing: ${file.path}`);
+
+              const { data: content } = await octokit.rest.git.getBlob({
+                owner: options.owner,
+                repo: options.repo,
+                file_sha: file.sha,
+              });
+
+              const markdown = Buffer.from(content.content, 'base64').toString('utf-8');
+
+              // Create subdirectories if needed
+              await fs.mkdir(path.dirname(outputPath), { recursive: true });
+
+              // Write the markdown file
+              await fs.writeFile(outputPath, markdown, 'utf-8');
+              syncedCount++;
+
+              // Update cache entry (use full path as key)
+              cache.files[file.path] = {
+                sha: file.sha,
+                syncedAt: new Date().toISOString(),
+                localPath: outputPath,
+              };
+
+              // Extract image references from this file
+              const images = extractImageReferences(markdown);
+              images.forEach((img) => allImageReferences.add(img));
+            }
+
+            logger.info(`${syncPath.sourcePath}: ${syncedCount} synced, ${cachedCount} cached`);
+            totalSyncedCount += syncedCount;
+            totalCachedCount += cachedCount;
           }
 
-          logger.info(`Files: ${syncedCount} synced, ${cachedCount} cached`);
+          logger.info(`Total files: ${totalSyncedCount} synced, ${totalCachedCount} cached`);
 
-          // Clean up deleted files
-          const currentPaths = new Set(
-            wikiFiles.map((f) => f.path!.substring(options.wikiPath.length + 1))
-          );
+          // Clean up deleted files - build set of all current paths from all sync paths
+          const currentPaths = new Set<string>();
+          for (const syncPath of options.syncPaths) {
+            tree.tree.forEach((item) => {
+              if (item.type === 'blob' && item.path && item.path.startsWith(syncPath.sourcePath + '/') && item.path.endsWith('.md')) {
+                currentPaths.add(item.path);
+              }
+            });
+          }
 
           for (const [cachedPath, cachedFile] of Object.entries(cache.files)) {
             if (!currentPaths.has(cachedPath)) {
@@ -307,22 +366,32 @@ export default function githubWikiSync(options: GitHubWikiSyncOptions): AstroInt
             `Cache updated: ${Object.keys(cache.files).length} files, ${Object.keys(cache.attachments).length} attachments tracked`
           );
 
-          // Generate manifest of synced files for wikilink resolution
-          const manifest = {
-            files: wikiFiles.map((file) => ({
-              path: file.path!.substring(options.wikiPath.length + 1),
-              fullPath: file.path!,
-            })),
-            generatedAt: new Date().toISOString(),
-          };
+          // Generate manifest of synced files for wikilink resolution (for each sync path)
+          for (const syncPath of options.syncPaths) {
+            const syncPathFiles = tree.tree.filter((item) => {
+              if (item.type !== 'blob' || !item.path) return false;
+              if (!item.path.startsWith(syncPath.sourcePath + '/')) return false;
+              if (!item.path.endsWith('.md')) return false;
+              return true;
+            });
 
-          const manifestPath = path.join(contentDir, '.synced-files.json');
-          await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
-          logger.info(`Generated file manifest: ${manifest.files.length} files`);
+            const manifest = {
+              files: syncPathFiles.map((file) => ({
+                path: file.path!.substring(syncPath.sourcePath.length + 1),
+                fullPath: file.path!,
+              })),
+              generatedAt: new Date().toISOString(),
+            };
 
-          logger.info('GitHub wiki sync completed successfully');
+            const targetDir = path.join(process.cwd(), syncPath.targetDir);
+            const manifestPath = path.join(targetDir, '.synced-files.json');
+            await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+            logger.info(`Generated manifest for ${syncPath.sourcePath}: ${manifest.files.length} files`);
+          }
+
+          logger.info('GitHub sync completed successfully');
         } catch (error) {
-          logger.error('Failed to sync wiki from GitHub:');
+          logger.error('Failed to sync content from GitHub:');
           if (error instanceof Error) {
             logger.error(error.message);
 

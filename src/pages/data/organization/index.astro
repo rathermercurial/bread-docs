@@ -1,0 +1,147 @@
+---
+/**
+ * Organization collection index
+ * Lists all organizations in the data collection
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection } from 'astro:content';
+
+const organizations = await getCollection('organization');
+const sortedOrgs = organizations.sort((a, b) =>
+	(a.data.name || '').localeCompare(b.data.name || '')
+);
+---
+
+<StarlightPage
+	frontmatter={{
+		title: 'Organizations',
+		description: 'All organizations in the Breadchain data collection',
+	}}
+>
+	<div class="collection-index">
+		<p class="count-badge">{organizations.length} {organizations.length === 1 ? 'organization' : 'organizations'}</p>
+
+		<ul class="entry-list">
+			{sortedOrgs.map((org) => (
+				<li>
+					<a href={`/data/organization/${org.id}`}>
+						<span class="icon">🏢</span>
+						<div class="entry-info">
+							<strong>{org.data.name}</strong>
+							<div class="badges">
+								{org.data.isMemberProject && (
+									<span class="badge member">Member Project</span>
+								)}
+								{org.data.isAngelMinter && (
+									<span class="badge angel">Angel Minter</span>
+								)}
+							</div>
+							{org.data.description && (
+								<p class="description">{org.data.description}</p>
+							)}
+						</div>
+					</a>
+				</li>
+			))}
+		</ul>
+	</div>
+</StarlightPage>
+
+<style>
+	.collection-index {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.count-badge {
+		display: inline-block;
+		padding: 0.5rem 1rem;
+		background: var(--sl-color-bg-sidebar);
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 4px;
+		font-weight: 600;
+		margin-bottom: 2rem;
+		color: var(--sl-color-text);
+	}
+
+	.entry-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.entry-list li {
+		margin-bottom: 0.5rem;
+	}
+
+	.entry-list a {
+		display: flex;
+		align-items: start;
+		gap: 1rem;
+		padding: 1rem;
+		background: var(--sl-color-bg-nav);
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 6px;
+		text-decoration: none;
+		color: var(--sl-color-text);
+		transition: all 0.2s;
+	}
+
+	.entry-list a:hover {
+		border-color: var(--sl-color-text-accent);
+		transform: translateX(4px);
+	}
+
+	.icon {
+		font-size: 1.5rem;
+		flex-shrink: 0;
+	}
+
+	.entry-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.entry-info strong {
+		display: block;
+		color: var(--sl-color-text-accent);
+		margin-bottom: 0.25rem;
+	}
+
+	.badges {
+		display: flex;
+		gap: 0.5rem;
+		margin-bottom: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.badge {
+		display: inline-block;
+		padding: 0.15rem 0.5rem;
+		font-size: 0.75rem;
+		border-radius: 3px;
+		font-weight: 500;
+	}
+
+	.badge.member {
+		background: var(--sl-color-blue);
+		color: white;
+	}
+
+	.badge.angel {
+		background: var(--sl-color-orange);
+		color: white;
+	}
+
+	.description {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--sl-color-text);
+		opacity: 0.7;
+		line-height: 1.4;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+</style>
