@@ -21,6 +21,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.5",
     "@types/js-yaml": "^4.0.9",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.49.0"
   }
 }
