@@ -1,0 +1,20 @@
+---
+/**
+ * Member Project detail page (semantic route)
+ * Rewrites to /data/organization/[slug] to display content at semantic URL
+ */
+import { getMemberProjects } from '@/lib/entity-utils';
+
+export async function getStaticPaths() {
+	const memberProjects = await getMemberProjects();
+
+	return memberProjects.map((org) => ({
+		params: { slug: org.id },
+	}));
+}
+
+const { slug } = Astro.params;
+
+// Rewrite to the data route while keeping the semantic URL
+return Astro.rewrite(`/data/organization/${slug}`);
+---

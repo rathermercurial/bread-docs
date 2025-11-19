@@ -12,12 +12,13 @@ import { docsSchema } from '@astrojs/starlight/schema';
  * Common properties for both Person and Organization
  */
 const entity = z.object({
-	// Core identity
-	name: z.string().describe('Entity name'),
+	// Core identity - accept both 'name' and 'title'
+	name: z.string().optional().describe('Entity name'),
+	title: z.string().optional().describe('Entity title (alias for name)'),
 
 	description: z.string().optional().describe('Entity description'),
 
-	url: z.string().url().optional().describe('Primary URL'),
+	url: z.string().optional().describe('Primary URL or web identifier'),
 
 	image: z.string().optional().describe('Profile image or logo'),
 
@@ -26,6 +27,9 @@ const entity = z.object({
 	sameAs: z.array(z.string().url()).optional().default([]).describe(
 		'URLs for other profiles (Twitter, GitHub, etc.)'
 	),
+
+	// Social media
+	twitter: z.string().optional().describe('Twitter handle'),
 
 	// Contact
 	email: z.string().email().optional().describe('Contact email'),
@@ -45,18 +49,21 @@ const entity = z.object({
  * Person collection for contributors, angel minters, and individuals
  */
 const person = defineCollection({
-	loader: glob({ pattern: '**/*.md', base: './src/data/person' }),
+	loader: glob({ pattern: '**/*.md', base: './src/content/data/person' }),
 	schema: entity.extend({
 		// Professional context
 		jobTitle: z.string().optional().describe('Job title or role'),
 
-		// Organizational relationships
-		memberOf: z.array(
-			z.union([
-				reference('organization'),
-				z.string()
-			])
-		).optional().default([]).describe('Organizations this person is a member of'),
+		// Organizational relationships - accept both string and array
+		memberOf: z.union([
+			z.array(z.union([reference('organization'), z.string()])),
+			reference('organization'),
+			z.string()
+		]).optional().transform((val) => {
+			if (!val) return [];
+			if (Array.isArray(val)) return val;
+			return [val];
+		}).describe('Organizations this person is a member of'),
 
 		worksFor: z.array(
 			z.union([
@@ -72,6 +79,15 @@ const person = defineCollection({
 		makesOffer: z.array(reference('offer')).optional().default([]).describe(
 			'Offers made by this person'
 		),
+	}).transform((data) => {
+		// Use title as name if name is not provided, with fallback
+		if (!data.name && data.title) {
+			data.name = data.title;
+		}
+		if (!data.name) {
+			data.name = 'Unnamed Person';
+		}
+		return data;
 	}),
 });
 
@@ -83,7 +99,7 @@ const person = defineCollection({
  * Organization collection for member projects, cooperatives, and groups
  */
 const organization = defineCollection({
-	loader: glob({ pattern: '**/*.md', base: './src/data/organization' }),
+	loader: glob({ pattern: '**/*.md', base: './src/content/data/organization' }),
 	schema: entity.extend({
 		// Organizational relationships
 		member: z.array(
@@ -105,6 +121,16 @@ const organization = defineCollection({
 		makesOffer: z.array(reference('offer')).optional().default([]).describe(
 			'Offers made by this organization'
 		),
+	}).transform((data) => {
+		// Use title as name if name is not provided, with fallback
+		if (!data.name && data.title) {
+			data.name = data.title;
+		}
+		if (!data.name) {
+			data.name = 'Unnamed Organization';
+		}
+
+		return data;
 	}),
 });
 
@@ -116,10 +142,11 @@ const organization = defineCollection({
  * Offer collection for marketplace listings
  */
 const offer = defineCollection({
-	loader: glob({ pattern: '**/*.md', base: './src/data/offer' }),
+	loader: glob({ pattern: '**/*.md', base: './src/content/data/offer' }),
 	schema: z.object({
-		// Basic info
-		name: z.string().describe('Offer name'),
+		// Basic info - accept both 'name' and 'title'
+		name: z.string().optional().describe('Offer name'),
+		title: z.string().optional().describe('Offer title (alias for name)'),
 
 		description: z.string().optional().describe('Offer description'),
 
@@ -134,9 +161,18 @@ const offer = defineCollection({
 		itemOffered: z.string().describe('Product, service, or item being offered'),
 
 		// Links
-		url: z.string().url().optional().describe('URL for more information'),
+		url: z.string().optional().describe('URL or link for more information'),
 
 		image: z.string().optional().describe('Offer image'),
+	}).transform((data) => {
+		// Use title as name if name is not provided, with fallback
+		if (!data.name && data.title) {
+			data.name = data.title;
+		}
+		if (!data.name) {
+			data.name = 'Unnamed Offer';
+		}
+		return data;
 	}),
 });
 

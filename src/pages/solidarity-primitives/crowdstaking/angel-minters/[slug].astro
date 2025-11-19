@@ -1,0 +1,22 @@
+---
+/**
+ * Angel Minter detail page (semantic route)
+ * Rewrites to /data/person/[slug] or /data/organization/[slug] to display content at semantic URL
+ */
+import { getAngelMinters } from '@/lib/entity-utils';
+
+export async function getStaticPaths() {
+	const angelMinters = await getAngelMinters();
+
+	return angelMinters.map((entity) => ({
+		params: { slug: entity.id },
+		props: { collection: entity.collection },
+	}));
+}
+
+const { slug } = Astro.params;
+const { collection } = Astro.props;
+
+// Rewrite to the appropriate data route while keeping the semantic URL
+return Astro.rewrite(`/data/${collection}/${slug}`);
+---

@@ -4,7 +4,7 @@
  * Displays a marketplace offer in a card format
  */
 import type { CollectionEntry } from 'astro:content';
-import { resolveOfferProvider } from '@/lib/entity-utils';
+import { resolveOfferProvider, getOfferSemanticPath } from '@/lib/entity-utils';
 
 interface Props {
 	offer: CollectionEntry<'offer'>;
@@ -12,7 +12,7 @@ interface Props {
 
 const { offer } = Astro.props;
 const provider = await resolveOfferProvider(offer);
-const link = `/offer/${offer.id}`;
+const link = getOfferSemanticPath(offer);
 ---
 
 <article class="offer-card">

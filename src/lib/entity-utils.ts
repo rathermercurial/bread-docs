@@ -257,12 +257,8 @@ export async function resolveOfferProvider(
  * @example
  * const webServices = await getOffers('web-services');
  */
-export async function getOffers(category?: string): Promise<CollectionEntry<'offer'>[]> {
-	if (!category) {
-		return getCollection('offer');
-	}
-
-	return getCollection('offer', ({ data }) => data.category?.includes(category) ?? false);
+export async function getOffers(): Promise<CollectionEntry<'offer'>[]> {
+	return getCollection('offer');
 }
 
 // ============================================================================
@@ -276,7 +272,7 @@ export async function getOffers(category?: string): Promise<CollectionEntry<'off
  * @returns Sorted array
  */
 export function sortEntitiesByName(entities: Entity[]): Entity[] {
-	return entities.sort((a, b) => a.data.name.localeCompare(b.data.name));
+	return entities.sort((a, b) => (a.data.name || '').localeCompare(b.data.name || ''));
 }
 
 /**
@@ -303,7 +299,7 @@ export function groupEntitiesByType(entities: Entity[]) {
  * @returns Display name
  */
 export function getEntityDisplayName(entity: Entity): string {
-	return entity.data.name;
+	return entity.data.name || (entity.entityType === 'person' ? 'Unnamed Person' : 'Unnamed Organization');
 }
 
 /**
@@ -324,4 +320,44 @@ export function getEntityTypeLabel(entity: Entity): string {
  */
 export function getEntityIcon(entity: Entity): string {
 	return entity.entityType === 'person' ? '👤' : '🏢';
+}
+
+// ============================================================================
+// URL/PATH UTILITIES
+// ============================================================================
+
+/**
+ * Context for determining entity semantic path
+ */
+export type EntityContext = 'member-project' | 'angel-minter';
+
+/**
+ * Get semantic URL path for an entity based on its context
+ *
+ * @param entity - Entity to get path for
+ * @param context - Context determining which semantic path to use
+ * @returns Semantic URL path
+ * @example
+ * getEntitySemanticPath(org, 'member-project')
+ * // => '/solidarity-primitives/crowdstaking/member-projects/citizen-wallet'
+ */
+export function getEntitySemanticPath(entity: Entity, context: EntityContext): string {
+	if (context === 'member-project') {
+		return `/solidarity-primitives/crowdstaking/member-projects/${entity.id}`;
+	} else {
+		return `/solidarity-primitives/crowdstaking/angel-minters/${entity.id}`;
+	}
+}
+
+/**
+ * Get semantic URL path for a marketplace offer
+ *
+ * @param offer - Offer to get path for
+ * @returns Semantic URL path
+ * @example
+ * getOfferSemanticPath(offer)
+ * // => '/about/bread-token/marketplace/cca-events'
+ */
+export function getOfferSemanticPath(offer: CollectionEntry<'offer'>): string {
+	return `/about/bread-token/marketplace/${offer.id}`;
 }

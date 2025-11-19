@@ -3,16 +3,17 @@
  * Entity Card Component
  * Displays a person or organization in a card format
  */
-import type { Entity } from '@/lib/entity-utils';
-import { getEntityDisplayName } from '@/lib/entity-utils';
+import type { Entity, EntityContext } from '@/lib/entity-utils';
+import { getEntityDisplayName, getEntitySemanticPath } from '@/lib/entity-utils';
 
 interface Props {
 	entity: Entity;
+	context: EntityContext;
 }
 
-const { entity } = Astro.props;
+const { entity, context } = Astro.props;
 const displayName = getEntityDisplayName(entity);
-const link = `/${entity.collection}/${entity.id}`;
+const link = getEntitySemanticPath(entity, context);
 ---
 
 <article class="entity-card">

@@ -1,0 +1,76 @@
+---
+/**
+ * Member Projects Directory
+ * Displays organizations that are Breadchain member projects
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getEntry, render } from 'astro:content';
+import { getMemberProjects } from '@/lib/entity-utils';
+import EntityCard from '@/components/entities/EntityCard.astro';
+
+const memberProjects = await getMemberProjects();
+const sortedProjects = memberProjects.sort((a, b) =>
+	(a.data.name || '').localeCompare(b.data.name || '')
+);
+
+const pageTitle = 'Member Projects';
+const pageDescription = 'Cooperatives, mutual aid organizations, and solidarity economy projects in the Breadchain network';
+
+// Try to load markdown content from docs
+// Try both with and without /index suffix
+let docEntry = await getEntry('docs', 'solidarity-primitives/crowdstaking/member-projects/index');
+if (!docEntry) {
+	docEntry = await getEntry('docs', 'solidarity-primitives/crowdstaking/member-projects');
+}
+const { Content: PageContent } = docEntry ? await render(docEntry) : { Content: null };
+---
+
+<StarlightPage
+	frontmatter={{
+		title: pageTitle,
+		description: pageDescription,
+	}}
+>
+	{PageContent && (
+		<div class="page-content">
+			<PageContent />
+		</div>
+	)}
+
+	{sortedProjects.length === 0 ? (
+		<div class="empty-state">
+			<p>No member projects found. Check back soon!</p>
+		</div>
+	) : (
+		<div class="entity-grid">
+			{sortedProjects.map((project) => (
+				<EntityCard entity={{...project, entityType: 'organization' as const}} context="member-project" />
+			))}
+		</div>
+	)}
+</StarlightPage>
+
+<style>
+	.page-content {
+		margin-bottom: 3rem;
+	}
+
+	.entity-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+		gap: 1.5rem;
+		align-items: start;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 4rem 2rem;
+		color: var(--sl-color-text-accent);
+	}
+
+	@media (max-width: 768px) {
+		.entity-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -1,0 +1,20 @@
+---
+/**
+ * Marketplace offer detail page (semantic route)
+ * Rewrites to /data/offer/[slug] to display content at semantic URL
+ */
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+	const offers = await getCollection('offer');
+
+	return offers.map((offer) => ({
+		params: { slug: offer.id },
+	}));
+}
+
+const { slug } = Astro.params;
+
+// Rewrite to the data route while keeping the semantic URL
+return Astro.rewrite(`/data/offer/${slug}`);
+---
