@@ -1,1 +1,499 @@
+@layer base, starlight, theme, components, utilities;
+
+/* Import Tailwind (existing setup) */
 @import "tailwindcss";
+
+/* Import Starlight's Tailwind compatibility layer */
+@import "@astrojs/starlight-tailwind";
+
+/* Tailwind theme/utilities with proper layers */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* ============================================================================
+   BREAD COOPERATIVE DESIGN SYSTEM
+   ============================================================================ */
+
+/* Font Face Declarations - Bread Display & Bread Body */
+@font-face {
+  font-family: "Bread Display";
+  src: url("/fonts/PogacaDisplayBlack.woff2") format("woff2");
+  font-weight: 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bread Display";
+  src: url("/fonts/PogacaDisplayBold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bread Display";
+  src: url("/fonts/PogacaDisplayRegular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bread Body";
+  src: url("/fonts/PogacaBodyRegular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bread Body";
+  src: url("/fonts/PogacaBodyBold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bread Body";
+  src: url("/fonts/PogacaBodyLight.woff2") format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+
+/* CSS Variables */
+:root {
+  --font-breadDisplay: "Bread Display", ui-sans-serif, system-ui, sans-serif;
+  --font-breadBody: "Bread Body", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ============================================================================
+   TAILWIND THEME - Bread Cooperative Colors
+   ============================================================================ */
+
+@theme {
+  /* -------------------------------------------------------------------------
+     Bread Brand Colors
+     ------------------------------------------------------------------------- */
+  
+  /* Orange (Primary Brand) */
+  --color-primary-orange: #ea6023;
+  --color-orange-0: #ffc080;
+  --color-orange-1: #d14a0f;
+  --color-orange-2: #b83c08;
+  
+  /* Jade (Safety Net Product) */
+  --color-primary-jade: #286b63;
+  --color-jade-0: #9cacc6;
+  --color-jade-1: #72849d;
+  --color-jade-2: #134a44;
+  
+  /* Blue (Stacks Product) */
+  --color-primary-blue: #1c5bb9;
+  --color-blue-0: #a8c3ea;
+  --color-blue-1: #588ddb;
+  --color-blue-2: #1b4a90;
+  
+  /* Paper (Warm Off-White Backgrounds) */
+  --color-paper-main: #f6f3eb;
+  --color-paper-0: #fdfcf9;
+  --color-paper-1: #f0ebe0;
+  --color-paper-2: #eae2d6;
+  
+  /* Ink / Surface */
+  --color-surface-ink: #1b201a;
+  --color-surface-grey: #808080;
+  --color-surface-grey-2: #595959;
+  --color-surface-brown: #513c35;
+  --color-surface-brown-1: #301f18;
+  
+  /* Semantic */
+  --color-system-green: #32a800;
+  --color-system-red: #df0b00;
+  --color-system-warning: #ce7f00;
+  --color-red-0: #f7cac2;
+  --color-red-1: #f4b8ad;
+  --color-red-main: #df0b00;
+  --color-text-standard: #171414;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  
+  /* -------------------------------------------------------------------------
+     Starlight Accent Scale (Bread Orange)
+     ------------------------------------------------------------------------- */
+  --color-accent-50: #fdf3ec;
+  --color-accent-100: #fae0cb;
+  --color-accent-200: #f5c09a;
+  --color-accent-300: #f09a66;
+  --color-accent-400: #eb7840;
+  --color-accent-500: #ea6023;
+  --color-accent-600: #d14a0f;
+  --color-accent-700: #b83c08;
+  --color-accent-800: #8c2d06;
+  --color-accent-900: #5e1e04;
+  --color-accent-950: #3a1202;
+  
+  /* -------------------------------------------------------------------------
+     Starlight Gray Scale (Warm Neutrals from Paper/Surface)
+     ------------------------------------------------------------------------- */
+  --color-gray-50: #fdfcf9;
+  --color-gray-100: #f6f3eb;
+  --color-gray-200: #f0ebe0;
+  --color-gray-300: #eae2d6;
+  --color-gray-400: #c8bfb0;
+  --color-gray-500: #808080;
+  --color-gray-600: #595959;
+  --color-gray-700: #3d3d3d;
+  --color-gray-800: #2a2a2a;
+  --color-gray-900: #1b201a;
+  --color-gray-950: #0f130f;
+  
+  /* -------------------------------------------------------------------------
+     Typography
+     ------------------------------------------------------------------------- */
+  --font-sans: "Bread Body", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+  --font-breadDisplay: var(--font-breadDisplay);
+  --font-breadBody: var(--font-breadBody);
+}
+
+/* ============================================================================
+   STARLIGHT CUSTOM PROPERTIES OVERRIDE
+   ============================================================================ */
+
+:root {
+  /* Typography */
+  --sl-font: "Bread Body", ui-sans-serif, system-ui, sans-serif;
+  --sl-font-mono: ui-monospace, monospace;
+  
+  /* Use Bread colors for Starlight's semantic properties */
+  --sl-color-text: var(--color-surface-ink);
+  --sl-color-text-accent: var(--color-primary-orange);
+  --sl-color-bg: var(--color-paper-0);
+  --sl-color-bg-nav: var(--color-paper-main);
+  --sl-color-bg-sidebar: var(--color-paper-1);
+  --sl-color-hairline: var(--color-paper-2);
+  --sl-color-hairline-shade: var(--color-paper-2);
+}
+
+/* Dark mode overrides - Monochromatic ink-based palette */
+[data-theme='dark'] {
+  --sl-color-text: #a8a095;         /* warm muted text - softer than white */
+  --sl-color-bg: #1b201a;           /* ink - main background */
+  --sl-color-bg-nav: #0f130f;       /* deeper black - header */
+  --sl-color-bg-sidebar: #1f241f;   /* slightly lighter ink - sidebar */
+  --sl-color-hairline: #3d3d3d;     /* muted borders - less glaring */
+}
+
+/* ============================================================================
+   TYPOGRAPHY UTILITY CLASSES
+   ============================================================================ */
+
+@layer components {
+  /* Display Typography */
+  .text-h1 {
+    font-family: var(--font-breadDisplay);
+    font-weight: 900;
+    font-size: 3rem;
+    line-height: 36px;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+  }
+  
+  @media (min-width: 768px) {
+    .text-h1 {
+      font-size: 96px;
+      line-height: 76px;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .text-h1 {
+      font-size: 7rem;
+      line-height: 83px;
+    }
+  }
+  
+  .text-h2 {
+    font-family: var(--font-breadDisplay);
+    font-weight: 900;
+    font-size: 3rem;
+    line-height: 36px;
+    letter-spacing: -0.05em;
+  }
+  
+  @media (min-width: 1280px) {
+    .text-h2 {
+      font-size: 80px;
+      line-height: 63px;
+    }
+  }
+  
+  .text-h3 {
+    font-family: var(--font-breadDisplay);
+    font-weight: 900;
+    font-size: 1.5rem;
+    line-height: 20px;
+    letter-spacing: -0.025em;
+  }
+  
+  @media (min-width: 768px) {
+    .text-h3 {
+      font-size: 2.5rem;
+      line-height: 36px;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .text-h3 {
+      font-size: 3rem;
+      line-height: 48px;
+    }
+  }
+  
+  .text-h4 {
+    font-family: var(--font-breadBody);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 24px;
+  }
+  
+  @media (min-width: 1280px) {
+    .text-h4 {
+      font-size: 2rem;
+      line-height: 2rem;
+    }
+  }
+  
+  .text-h5 {
+    font-family: var(--font-breadBody);
+    font-weight: 400;
+    font-size: 1rem;
+  }
+  
+  @media (min-width: 1280px) {
+    .text-h5 {
+      font-size: 1.5rem;
+      line-height: 24px;
+    }
+  }
+  
+  /* Body Typography */
+  .text-body {
+    font-family: var(--font-breadBody);
+    font-size: 1rem;
+  }
+  
+  .text-body-bold {
+    font-family: var(--font-breadBody);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  
+  .text-caption {
+    font-family: var(--font-breadBody);
+    font-size: 0.7rem;
+  }
+  
+  /* Font Family Utilities */
+  .font-breadDisplay {
+    font-family: var(--font-breadDisplay);
+  }
+  
+  .font-breadBody {
+    font-family: var(--font-breadBody);
+  }
+}
+
+/* ============================================================================
+   LIFTED BUTTON - Pure CSS Implementation
+   ============================================================================ */
+
+@layer components {
+  /* Base lifted button wrapper */
+  .lifted-button-wrapper {
+    position: relative;
+    display: inline-block;
+    user-select: none;
+  }
+  
+  .lifted-button-wrapper.block {
+    display: block;
+  }
+  
+  /* Shadow layer */
+  .lifted-button-shadow {
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-surface-grey-2);
+    transform: translateX(2px) translateY(2px);
+  }
+  
+  /* Button base */
+  .lifted-button {
+    position: relative;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 37px;
+    height: 3.5rem;
+    font-family: var(--font-breadBody);
+    font-size: 1rem;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    transform: translateX(-0.125rem) translateY(-0.125rem);
+    transition: all 300ms ease-out;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .lifted-button:hover {
+    background-color: var(--btn-hover-bg);
+    color: var(--btn-hover-text);
+  }
+  
+  .lifted-button:active {
+    transform: translateX(0.125rem) translateY(0.125rem);
+  }
+  
+  .lifted-button:disabled {
+    background-color: var(--color-surface-grey);
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .lifted-button.w-full {
+    width: 100%;
+  }
+  
+  /* Button Presets */
+  
+  /* Primary: Orange background, cream text */
+  .lifted-button-primary {
+    --btn-bg: var(--color-primary-orange);
+    --btn-text: var(--color-paper-main);
+    --btn-hover-bg: var(--color-orange-1);
+    --btn-hover-text: #ffffff;
+  }
+  
+  /* Secondary: Light peach background, orange text */
+  .lifted-button-secondary {
+    --btn-bg: #FBDED1;
+    --btn-text: var(--color-primary-orange);
+    --btn-hover-bg: #FFF1EA;
+    --btn-hover-text: var(--color-primary-orange);
+  }
+  
+  /* Stroke: Paper background, ink text */
+  .lifted-button-stroke {
+    --btn-bg: var(--color-paper-main);
+    --btn-text: var(--color-surface-ink);
+    --btn-hover-bg: var(--color-paper-2);
+    --btn-hover-text: var(--color-surface-ink);
+  }
+  
+  /* Destructive: Red background, cream text */
+  .lifted-button-destructive {
+    --btn-bg: var(--color-system-red);
+    --btn-text: var(--color-paper-main);
+    --btn-hover-bg: #BF0A00;
+    --btn-hover-text: #ffffff;
+  }
+  
+  /* Positive: Green background, cream text */
+  .lifted-button-positive {
+    --btn-bg: var(--color-system-green);
+    --btn-text: var(--color-paper-main);
+    --btn-hover-bg: #2B8F00;
+    --btn-hover-text: #ffffff;
+  }
+  
+  /* Burn: Light red background, red text */
+  .lifted-button-burn {
+    --btn-bg: var(--color-red-0);
+    --btn-text: var(--color-red-main);
+    --btn-hover-bg: var(--color-red-1);
+    --btn-hover-text: var(--color-red-main);
+  }
+}
+
+/* ============================================================================
+   STARLIGHT SPECIFIC OVERRIDES
+   ============================================================================ */
+
+/* Apply Bread fonts to Starlight headings */
+.sl-markdown-content h1,
+.sl-markdown-content h2 {
+  font-family: var(--font-breadDisplay);
+  font-weight: 900;
+}
+
+.sl-markdown-content h3 {
+  font-family: var(--font-breadDisplay);
+  font-weight: 900;
+}
+
+.sl-markdown-content h4,
+.sl-markdown-content h5,
+.sl-markdown-content h6 {
+  font-family: var(--font-breadBody);
+  font-weight: 700;
+}
+
+/* Site title in header */
+.sl-flex.sl-items-center a {
+  font-family: var(--font-breadDisplay);
+  font-weight: 700;
+}
+
+/* Navigation items */
+.sl-nav-wrapper a {
+  font-family: var(--font-breadBody);
+}
+
+/* Sidebar navigation */
+.sl-sidebar-content a {
+  font-family: var(--font-breadBody);
+}
+
+/* Active/hover states using Bread orange */
+.sl-sidebar-content [aria-current="page"] {
+  color: var(--color-primary-orange);
+}
+
+/* Links */
+.sl-markdown-content a {
+  color: var(--color-primary-orange);
+}
+
+.sl-markdown-content a:hover {
+  color: var(--color-orange-1);
+}
+
+/* Button styling for Starlight buttons */
+.sl-button {
+  font-family: var(--font-breadBody);
+}
+
+/* Code blocks */
+.sl-markdown-content code {
+  font-family: var(--sl-font-mono);
+}
+
+/* Tables */
+.sl-markdown-content table {
+  font-family: var(--font-breadBody);
+}
+
+/* ============================================================================
+   PAGE BACKGROUND
+   ============================================================================ */
+
+body {
+  background-color: var(--color-paper-0);
+  color: var(--color-surface-ink);
+}
+
+[data-theme='dark'] body {
+  background-color: var(--color-surface-ink);
+  color: var(--color-paper-0);
+}
