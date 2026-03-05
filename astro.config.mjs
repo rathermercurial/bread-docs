@@ -8,8 +8,19 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   integrations: [
       starlight({
-          title: 'My Docs',
-          social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+          title: 'Bread Docs',
+          customCss: [
+              // Path to Tailwind CSS entry with Starlight integration
+              './src/styles/global.css',
+          ],
+          components: {
+              // Override SiteTitle with Bread logo
+              SiteTitle: './src/overrides/SiteTitle.astro',
+          },
+          social: [
+              { icon: 'github', label: 'GitHub', href: 'https://github.com/BreadchainCoop' },
+              { icon: 'discord', label: 'Discord', href: 'https://discord.gg/bread' },
+          ],
           sidebar: [
               {
                   label: 'Guides',
