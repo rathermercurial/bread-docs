@@ -1,49 +1,96 @@
-# Starlight Starter Kit: Basics
+# bread-docs
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+Documentation website for [Bread Cooperative](https://bread.coop), built with [Astro Starlight](https://starlight.astro.build). Deployed at **docs.bread.coop**.
 
-```
-npm create astro@latest -- --template starlight
-```
+## Stack
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- [Astro](https://astro.build) — static site framework
+- [Starlight](https://starlight.astro.build) — documentation theme
+- [Tailwind CSS v4](https://tailwindcss.com) — utility-first styling
+- Content via Astro Content Collections (`src/content/docs/`)
 
-## 🚀 Project Structure
+## Dev Commands
 
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   └── docs/
-│   └── content.config.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
+```bash
+npm install       # install dependencies
+npm run dev       # dev server at localhost:4321
+npm run build     # build to ./dist/
+npm run preview   # preview production build
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+## Project Structure
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+```
+src/
+├── content/docs/       # Markdown documentation (one file = one page)
+├── overrides/          # Custom Starlight component overrides
+├── styles/global.css   # Bread design system + Starlight theme overrides
+└── content.config.ts   # Content collection schema
+astro.config.mjs        # Starlight config: sidebar, plugins, overrides
+```
 
-Static assets, like favicons, can be placed in the `public/` directory.
+Content is organized into three sidebar sections:
 
-## 🧞 Commands
+| Section | Directory |
+|---------|-----------|
+| About | `src/content/docs/about/` |
+| Solidarity Primitives | `src/content/docs/solidarity-primitives/` |
+| Bread Cooperative | `src/content/docs/bread-cooperative/` |
 
-All commands are run from the root of the project, from a terminal:
+## Customizations
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+This project uses several custom plugins and configurations beyond standard Starlight:
 
-## 👀 Want to learn more?
+### Sidebar Configuration (`_meta.yml`)
 
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+Sidebar labels, ordering, and collapsed states are controlled via `_meta.yml` files in each directory (powered by [`starlight-auto-sidebar`](https://github.com/HiDeoo/starlight-auto-sidebar)):
+
+```yaml
+# src/content/docs/about/_meta.yml
+label: About          # Sidebar label
+order: 0              # Position in parent
+collapsed: true       # Collapse by default (subdirs only)
+```
+
+**Key behaviors:**
+- Top-level sections (About, Solidarity Primitives, Bread Cooperative) are **expanded** by default
+- All nested subdirectories are **collapsed** by default
+- Files appear **before** folders in the sidebar (via custom plugin)
+
+### Custom Plugins
+
+**`starlightFilesBeforeFolders`** (`src/plugins/`)
+- Custom Starlight plugin that reorders sidebar entries
+- Ensures files (links) appear before folders (groups) at all nesting levels
+- Uses route data middleware with `await next()` to run after `starlight-auto-sidebar`
+
+**`starlight-page-actions`**
+- Adds share buttons (LinkedIn, X, Threads, Bluesky, etc.) and AI prompt buttons to each page
+- Configured in `astro.config.mjs`
+
+**`starlight-markdown-blocks`**
+- Enables custom admonition blocks like `:::draft`
+
+### URL Redirects
+
+Astro redirects maintain backward compatibility with old short URLs:
+
+| Old URL | Redirects To |
+|---------|--------------|
+| `/token` | `/about/bread-token` |
+| `/marketplace` | `/about/bread-token/marketplace` |
+| `/solidarity-fund` | `/solidarity-primitives/crowdstaking` |
+| `/angel-minters` | `/solidarity-primitives/crowdstaking/angel-minters` |
+| `/member-projects` | `/solidarity-primitives/crowdstaking/member-projects` |
+
+Custom `slug:` frontmatter has been removed from index files; URLs now follow the directory structure.
+
+### Design System
+
+- **Fonts**: Pogaca (Bread Display & Bread Body) — custom WOFF2 files in `public/fonts/`
+- **Colors**: Defined in `src/styles/global.css` with CSS custom properties
+- **Dark mode**: Fully supported via `[data-theme='dark']` selectors
+
+## Contributing
+
+See [AGENTS.md](./AGENTS.md) for a full reference on how this project is structured, how to add content, and the design system conventions.

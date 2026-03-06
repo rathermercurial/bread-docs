@@ -1,7 +1,5 @@
 ---
 title: Yield Governance
-sidebar:
-  order: 0
 ---
 
 The Bread Cooperative Network is funded by users baking BREAD by giving xDAI which is then converted into sDAI (a yield bearing asset) which BREAD holders can then vote on how the yield is distributed among [member projects](/member-projects/). In this way, our yield governance is similar to a credit union, except in this credit union we make it completely transparent where people are able to vote in 30-day cycles where to put the yield generated towards and can still use their money through BREAD. Since the general ethos of the Bread Cooperative Network is geared towards post-capitalism, it’s like a **post-capitalist credit union** that uses participatory budgeting.
