@@ -1,6 +1,5 @@
 ---
 title: $BREAD Community Currency
-slug: "token"
 ---
 
 BREAD is the community currency for the Bread Cooperative ecosystem which exists on Gnosis Chain. All BREAD is created through the [Solidarity Fund](/solidarity-fund/) which anyone with xDAI on Gnosis Chain is able to use to have some BREAD for themselves.

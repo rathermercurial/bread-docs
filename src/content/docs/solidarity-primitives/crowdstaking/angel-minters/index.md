@@ -1,8 +1,5 @@
 ---
 title: Angel Minter Program
-slug: "angel-minters"
-sidebar:
-  order: 1
 ---
 
 **TLDR;** We’re inviting aligned individuals and organizations to **[mint a minimum of 10,000 BREAD](https://app.breadchain.xyz/)** to help bootstrap the Bread Cooperative ecosystem. Your contribution will enable us to build essential infrastructure and applications for a post-capitalist Web3 and you / your organization will join the first Angel Minter’s cohort. **This mint is low risk and always fully backed**—your xDAI can be reclaimed anytime, while helping to accumulate low-risk, stable funding for the ecosystem through [sDAI](https://defillama.com/protocol/sdai#information). You can think of it as a **lossless donation.** 🍞 ⛓️

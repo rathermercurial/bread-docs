@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightPageActions from 'starlight-page-actions';
 import starlightMarkdownBlocks, { Draft } from 'starlight-markdown-blocks';
+import starlightAutoSidebar from 'starlight-auto-sidebar';
+import starlightFilesBeforeFolders from './src/plugins/starlightFilesBeforeFolders.ts';
 import { remarkStripObsidianComments } from './remarkStripObsidianComments.mjs';
 
 import tailwindcss from '@tailwindcss/vite';
@@ -12,6 +14,8 @@ export default defineConfig({
   integrations: [
       starlight({
           plugins: [
+              starlightAutoSidebar(),
+              starlightFilesBeforeFolders(),
               starlightPageActions({
                   baseUrl: 'https://docs.bread.coop/',
                   share: true,
@@ -49,7 +53,7 @@ export default defineConfig({
               { label: 'Bread Cooperative', autogenerate: { directory: 'bread-cooperative' } },
           ],
       }),
-	],
+  	],
 
   markdown: {
     remarkPlugins: [remarkStripObsidianComments],
@@ -57,5 +61,18 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+  },
+
+  redirects: {
+    '/token': '/about/bread-token',
+    '/token/': '/about/bread-token/',
+    '/marketplace': '/about/bread-token/marketplace',
+    '/marketplace/': '/about/bread-token/marketplace/',
+    '/solidarity-fund': '/solidarity-primitives/crowdstaking',
+    '/solidarity-fund/': '/solidarity-primitives/crowdstaking/',
+    '/angel-minters': '/solidarity-primitives/crowdstaking/angel-minters',
+    '/angel-minters/': '/solidarity-primitives/crowdstaking/angel-minters/',
+    '/member-projects': '/solidarity-primitives/crowdstaking/member-projects',
+    '/member-projects/': '/solidarity-primitives/crowdstaking/member-projects/',
   },
 });

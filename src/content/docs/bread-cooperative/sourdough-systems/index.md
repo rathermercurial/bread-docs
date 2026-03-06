@@ -1,6 +1,5 @@
 ---
 title: Sourdough Systems
-folderOrder:
 ---
 
 Sourdough Systems is the for-profit arm of Bread Cooperative where the Core Team can also be hired as a development studio to help you build your own product. We run this arm similar to our non-profit work in that it is a worker cooperative where every member has a vote towards the operation of the organization.
