@@ -65,14 +65,9 @@ export default defineConfig({
 
   redirects: {
     '/token': '/about/bread-token',
-    '/token/': '/about/bread-token/',
     '/marketplace': '/about/bread-token/marketplace',
-    '/marketplace/': '/about/bread-token/marketplace/',
     '/solidarity-fund': '/solidarity-primitives/crowdstaking',
-    '/solidarity-fund/': '/solidarity-primitives/crowdstaking/',
     '/angel-minters': '/solidarity-primitives/crowdstaking/angel-minters',
-    '/angel-minters/': '/solidarity-primitives/crowdstaking/angel-minters/',
     '/member-projects': '/solidarity-primitives/crowdstaking/member-projects',
-    '/member-projects/': '/solidarity-primitives/crowdstaking/member-projects/',
   },
 });
