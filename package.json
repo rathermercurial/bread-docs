@@ -6,10 +6,13 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "preview": "npm run build && wrangler dev",
+    "astro": "astro",
+    "deploy": "npm run build && wrangler deploy",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/starlight": "^0.37.6",
     "@astrojs/starlight-tailwind": "^4.0.2",
     "@tailwindcss/vite": "^4.2.1",
@@ -18,5 +21,8 @@
     "starlight-markdown-blocks": "^0.1.0",
     "starlight-page-actions": "^0.5.0",
     "tailwindcss": "^4.2.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.71.0"
   }
 }

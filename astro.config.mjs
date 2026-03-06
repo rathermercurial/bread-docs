@@ -7,6 +7,8 @@ import { remarkStripObsidianComments } from './remarkStripObsidianComments.mjs';
 
 import tailwindcss from '@tailwindcss/vite';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [
@@ -49,7 +51,7 @@ export default defineConfig({
               { label: 'Bread Cooperative', autogenerate: { directory: 'bread-cooperative' } },
           ],
       }),
-	],
+    ],
 
   markdown: {
     remarkPlugins: [remarkStripObsidianComments],
@@ -58,4 +60,6 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+
+  adapter: cloudflare(),
 });
