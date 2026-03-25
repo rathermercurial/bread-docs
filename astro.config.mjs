@@ -5,7 +5,6 @@ import starlightPageActions from 'starlight-page-actions';
 import starlightMarkdownBlocks, { Draft } from 'starlight-markdown-blocks';
 import starlightAutoSidebar from 'starlight-auto-sidebar';
 import starlightFilesBeforeFolders from './src/plugins/starlightFilesBeforeFolders.ts';
-import { remarkStripObsidianComments } from './remarkStripObsidianComments.mjs';
 import react from '@astrojs/react';
 import markdoc from '@astrojs/markdoc';
 import keystatic from '@keystatic/astro';
@@ -62,9 +61,7 @@ export default defineConfig({
       }),
   	],
 
-  markdown: {
-    remarkPlugins: [remarkStripObsidianComments],
-  },
+  
 
   vite: {
     plugins: [tailwindcss()],
