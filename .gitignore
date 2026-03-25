@@ -25,6 +25,3 @@ temp/
 
 # macOS-specific files
 .DS_Store
-
-# cartography files
-.slim/cartography.json

@@ -2,6 +2,9 @@
   "name": "bread-docs",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=24.14.0"
+  },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -9,15 +12,49 @@
     "preview": "astro preview",
     "astro": "astro"
   },
+  "contributes": {
+    "themes": [
+      {
+        "label": "Bread Cooperative",
+        "uiTheme": "vs",
+        "path": "./.vscode/themes/bread-color-theme.json"
+      }
+    ]
+  },
   "dependencies": {
-    "@astrojs/starlight": "^0.37.6",
+    "@astrojs/markdoc": "^0.15.11",
+    "@astrojs/react": "^5.0.0",
+    "@astrojs/starlight": "^0.37.7",
     "@astrojs/starlight-tailwind": "^4.0.2",
+    "@keystatic/astro": "^5.0.6",
+    "@keystatic/core": "^0.5.48",
     "@tailwindcss/vite": "^4.2.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "astro": "^5.6.1",
+    "canvas": "^3.2.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "sharp": "^0.34.2",
     "starlight-auto-sidebar": "^0.1.4",
     "starlight-markdown-blocks": "^0.1.0",
     "starlight-page-actions": "^0.5.0",
     "tailwindcss": "^4.2.1"
+  },
+  "description": "Documentation website for [Bread Cooperative](https://bread.coop), built with [Astro Starlight](https://starlight.astro.build). Deployed at **docs.bread.coop**.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rathermercurial/bread-docs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rathermercurial/bread-docs/issues"
+  },
+  "homepage": "https://github.com/rathermercurial/bread-docs#readme",
+  "devDependencies": {
+    "unist-util-visit": "^5.1.0"
   }
 }
