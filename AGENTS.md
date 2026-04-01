@@ -10,10 +10,10 @@ Documentation website for Bread Cooperative. Built with **Astro + Starlight**, d
 |-------|------|
 | Framework | Astro (`astro.config.mjs`) |
 | Docs theme | `@astrojs/starlight` |
+| CMS | Keystatic (`@keystatic/astro`) |
 | Styling | Tailwind CSS v4 (`@tailwindcss/vite`) + `@astrojs/starlight-tailwind` |
 | Content | Astro Content Collections (`src/content/docs/`) |
-| Plugins | `starlight-page-actions`, `starlight-markdown-blocks` |
-| Markdown | Remark plugin strips Obsidian `%%comments%%` |
+| Plugins | `starlight-page-actions`, `starlight-markdown-blocks`, `starlight-auto-sidebar` |
 
 ---
 
@@ -22,7 +22,6 @@ Documentation website for Bread Cooperative. Built with **Astro + Starlight**, d
 ```
 bread-docs/
 ├── astro.config.mjs              # Starlight config, sidebar, plugins, component overrides
-├── remarkStripObsidianComments.mjs  # Remark plugin: removes %% Obsidian comments %%
 ├── src/
 │   ├── content.config.ts         # Astro content collection (docsLoader + docsSchema)
 │   ├── content/docs/             # All markdown content — one file = one page
@@ -32,6 +31,9 @@ bread-docs/
 │   │   └── bread-cooperative/
 │   ├── overrides/
 │   │   └── SiteTitle.astro       # Replaces Starlight header title with Bread logo
+│   ├── plugins/
+│   │   ├── starlightFilesBeforeFolders.ts  # Sidebar ordering plugin
+│   │   └── filesBeforeFolders.ts           # Shared utility
 │   └── styles/
 │       └── global.css            # Full design system: fonts, tokens, Starlight overrides
 └── public/
@@ -162,6 +164,31 @@ Adds share/AI-prompt buttons to each page. Config in `astro.config.mjs`:
 Enables custom admonition blocks. Currently registers:
 - `draft` — marks content as a draft (use `:::draft` in markdown)
 
+### `starlightFilesBeforeFolders`
+
+Custom plugin that reorders sidebar entries so files appear before folders. Ensures links appear before groups at all nesting levels. Uses route data middleware with `await next()` to run after `starlight-auto-sidebar`.
+
+### `starlight-auto-sidebar`
+
+Reads `_meta.yml` files in each directory to configure sidebar labels, ordering, and collapsed states. See [_meta.yml section](#sidebar-structure) above.
+
+---
+
+## Keystatic CMS
+
+[Keystatic](https://keystatic.com) provides a local/admin CMS for content editing.
+
+| Environment | CMS Status | URL |
+|-------------|------------|-----|
+| Development (`npm run dev`) | Enabled | `http://localhost:4321/keystatic` |
+| Production | Disabled | N/A |
+
+CMS is configured in `keystatic.config.tsx` and integrated via `@keystatic/astro`. It is disabled in production builds via the condition:
+
+```js
+...(process.env.NODE_ENV !== 'production' ? [keystatic()] : [])
+```
+
 ---
 
 ## Dev Commands
@@ -178,6 +205,5 @@ npm run preview   # preview production build
 
 - **TypeScript** for all `.ts` / `.astro` config files
 - **Markdown** (not MDX) for all content — `.md` files only
-- Obsidian-style `%%comments%%` are stripped at build time and safe to leave in source
 - Conventional commits: `docs:`, `feat:`, `fix:`, `chore:`
 - Do not modify `node_modules/`, `dist/`, or `.astro/`
