@@ -25,3 +25,6 @@ temp/
 
 # macOS-specific files
 .DS_Store
+
+# Local Netlify folder
+.netlify
