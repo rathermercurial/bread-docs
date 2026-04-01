@@ -6,8 +6,13 @@ Documentation website for [Bread Cooperative](https://bread.coop), built with [A
 
 - [Astro](https://astro.build) — static site framework
 - [Starlight](https://starlight.astro.build) — documentation theme
+- [Keystatic](https://keystatic.com) — admin CMS
 - [Tailwind CSS v4](https://tailwindcss.com) — utility-first styling
 - Content via Astro Content Collections (`src/content/docs/`)
+
+## Requirements
+
+- Node 24.14.0 or higher (see `.nvmrc`)
 
 ## Dev Commands
 
@@ -24,6 +29,7 @@ npm run preview   # preview production build
 src/
 ├── content/docs/       # Markdown documentation (one file = one page)
 ├── overrides/          # Custom Starlight component overrides
+├── plugins/            # Custom Starlight plugins
 ├── styles/global.css   # Bread design system + Starlight theme overrides
 └── content.config.ts   # Content collection schema
 astro.config.mjs        # Starlight config: sidebar, plugins, overrides
@@ -90,6 +96,18 @@ Custom `slug:` frontmatter has been removed from index files; URLs now follow th
 - **Fonts**: Pogaca (Bread Display & Bread Body) — custom WOFF2 files in `public/fonts/`
 - **Colors**: Defined in `src/styles/global.css` with CSS custom properties
 - **Dark mode**: Fully supported via `[data-theme='dark']` selectors
+
+## Deployment
+
+Deployed to Netlify.
+
+| Setting | Value |
+|---------|-------|
+| Build command | `npm run build` |
+| Publish directory | `dist` |
+| Node version | 24 |
+
+The site runs in static mode — Keystatic CMS is disabled in production.
 
 ## Contributing
 
