@@ -99,7 +99,7 @@ Custom `slug:` frontmatter has been removed from index files; URLs now follow th
 
 ## Deployment
 
-This site is deployed to Netlify.
+Deployed to Netlify.
 
 | Setting | Value |
 |---------|-------|
