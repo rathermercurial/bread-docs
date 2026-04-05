@@ -2,11 +2,29 @@
 /wiki/*          /:splat          301
 /attachments/*   /images/:splat   301
 
-# Manual redirects (also in astro config, but here for redundancy/consistency)
+# Permalinks (Canonical URLs)
+/about/manifesto                                                    /manifesto 301
+/solidarity-primitives/crowdstaking/how-to-become-a-member-project  /how-to-become-a-member-project 301
+/solidarity-primitives/crowdstaking/yield-governance/voting-power   /voting-power 301
+
+# Aliases & Legacy short-paths
 /token           /about/bread-token 301
 /marketplace     /about/bread-token/marketplace 301
 /solidarity-fund /solidarity-primitives/crowdstaking 301
 /angel-minters   /solidarity-primitives/crowdstaking/angel-minters 301
 /member-projects /solidarity-primitives/crowdstaking/member-projects 301
 /bread-token     /about/bread-token 301
-/manifesto       /manifesto 301
+
+# Index path handling (for links explicitly including /index)
+/about/bread-token/index                                    /about/bread-token 301
+/about/bread-token/marketplace/index                        /about/bread-token/marketplace 301
+/about/index                                                /about 301
+/solidarity-primitives/crowdstaking/yield-governance/index  /solidarity-primitives/crowdstaking/yield-governance 301
+/solidarity-primitives/crowdstaking/angel-minters/index     /solidarity-primitives/crowdstaking/angel-minters 301
+/solidarity-primitives/crowdstaking/index                   /solidarity-primitives/crowdstaking 301
+/solidarity-primitives/crowdstaking/member-projects/index   /solidarity-primitives/crowdstaking/member-projects 301
+/solidarity-primitives/index                                /solidarity-primitives 301
+/bread-cooperative/sourdough-systems/index                  /bread-cooperative/sourdough-systems 301
+/bread-cooperative/governance/index                         /bread-cooperative/governance 301
+/bread-cooperative/contributors/index                       /bread-cooperative/contributors 301
+/bread-cooperative/index                                    /bread-cooperative 301
