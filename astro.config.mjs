@@ -69,10 +69,29 @@ export default defineConfig({
   },
 
   redirects: {
+    // Permalinks (Root level canonical URLs)
+    '/about/manifesto': '/manifesto',
+    '/solidarity-primitives/crowdstaking/how-to-become-a-member-project': '/how-to-become-a-member-project',
+    '/solidarity-primitives/crowdstaking/yield-governance/voting-power': '/voting-power',
+    // Aliases & Legacy short-paths
+    '/bread-token': '/about/bread-token',
     '/token': '/about/bread-token',
     '/marketplace': '/about/bread-token/marketplace',
     '/solidarity-fund': '/solidarity-primitives/crowdstaking',
     '/angel-minters': '/solidarity-primitives/crowdstaking/angel-minters',
     '/member-projects': '/solidarity-primitives/crowdstaking/member-projects',
+    // Index path handling (for links explicitly including /index)
+    '/about/bread-token/index': '/about/bread-token',
+    '/about/bread-token/marketplace/index': '/about/bread-token/marketplace',
+    '/about/index': '/about',
+    '/solidarity-primitives/crowdstaking/yield-governance/index': '/solidarity-primitives/crowdstaking/yield-governance',
+    '/solidarity-primitives/crowdstaking/angel-minters/index': '/solidarity-primitives/crowdstaking/angel-minters',
+    '/solidarity-primitives/crowdstaking/index': '/solidarity-primitives/crowdstaking',
+    '/solidarity-primitives/crowdstaking/member-projects/index': '/solidarity-primitives/crowdstaking/member-projects',
+    '/solidarity-primitives/index': '/solidarity-primitives',
+    '/bread-cooperative/sourdough-systems/index': '/bread-cooperative/sourdough-systems',
+    '/bread-cooperative/governance/index': '/bread-cooperative/governance',
+    '/bread-cooperative/contributors/index': '/bread-cooperative/contributors',
+    '/bread-cooperative/index': '/bread-cooperative',
   },
 });

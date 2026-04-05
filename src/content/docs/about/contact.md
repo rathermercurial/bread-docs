@@ -1,6 +1,5 @@
 ---
 title: Contacts and Links
-slug: "contact"
 ---
 
 ### Contact **Bread Cooperative** at the following
