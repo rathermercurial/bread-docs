@@ -1,6 +1,5 @@
 ---
 title: Bread Garden Pool Setup
-slug: "gardens-setup"
 ---
   
 

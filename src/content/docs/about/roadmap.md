@@ -1,7 +1,6 @@
 ---
 title: Roadmap
 description: The evolving roadmap of the Bread Cooperative project
-slug: "roadmap"
 ---
 
 This is our current high level **roadmap** for continuing to build Bread Cooperative.
