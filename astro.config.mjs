@@ -69,8 +69,6 @@ export default defineConfig({
   },
 
   redirects: {
-    '/wiki/[...slug]': '/[slug]',
-    '/attachments/[...path]': '/images/[path]',
     // Permalinks (Root level canonical URLs)
     '/about/manifesto': '/manifesto',
     '/solidarity-primitives/crowdstaking/how-to-become-a-member-project': '/how-to-become-a-member-project',

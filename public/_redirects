@@ -1,0 +1,12 @@
+# Wildcard redirects for legacy Quartz support
+/wiki/*          /:splat          301
+/attachments/*   /images/:splat   301
+
+# Manual redirects (also in astro config, but here for redundancy/consistency)
+/token           /about/bread-token 301
+/marketplace     /about/bread-token/marketplace 301
+/solidarity-fund /solidarity-primitives/crowdstaking 301
+/angel-minters   /solidarity-primitives/crowdstaking/angel-minters 301
+/member-projects /solidarity-primitives/crowdstaking/member-projects 301
+/bread-token     /about/bread-token 301
+/manifesto       /manifesto 301
