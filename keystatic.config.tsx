@@ -27,15 +27,71 @@ export default config({
           </svg>
         );
       }
-    } 
+    },
+    navigation: {
+      'Documentation': ['home', 'about', 'solidarityPrimitives', 'breadCooperative'],
+    },
   },
 
   collections: {
-    docs: collection({
-      label: 'Docs',
+    home: collection({
+      label: 'Home',
       slugField: 'title',
-      path: 'src/content/docs/**',
+      path: 'src/content/docs/*',
       format: { contentField: 'content' },
+      columns: ['title', 'description'],
+      entryLayout: 'content',
+      schema: {
+        title: fields.slug({ name: { label: 'Title' } }),
+        description: fields.text({ label: 'Description' }),
+        slug: fields.text({ label: 'Slug override' }),
+        url: fields.url({ label: 'External URL' }),
+        draft: fields.checkbox({ label: 'Draft', defaultValue: false }),
+        content: fields.markdoc({ label: 'Content', extension: 'md' }),
+      },
+    }),
+
+    about: collection({
+      label: 'About',
+      slugField: 'title',
+      path: 'src/content/docs/about/**',
+      format: { contentField: 'content' },
+      columns: ['title', 'description'],
+      entryLayout: 'content',
+      schema: {
+        title: fields.slug({ name: { label: 'Title' } }),
+        description: fields.text({ label: 'Description' }),
+        slug: fields.text({ label: 'Slug override' }),
+        url: fields.url({ label: 'External URL' }),
+        draft: fields.checkbox({ label: 'Draft', defaultValue: false }),
+        content: fields.markdoc({ label: 'Content', extension: 'md' }),
+      },
+    }),
+
+    solidarityPrimitives: collection({
+      label: 'Solidarity Primitives',
+      slugField: 'title',
+      path: 'src/content/docs/solidarity-primitives/**',
+      format: { contentField: 'content' },
+      columns: ['title', 'description'],
+      entryLayout: 'content',
+      schema: {
+        title: fields.slug({ name: { label: 'Title' } }),
+        description: fields.text({ label: 'Description' }),
+        slug: fields.text({ label: 'Slug override' }),
+        url: fields.url({ label: 'External URL' }),
+        draft: fields.checkbox({ label: 'Draft', defaultValue: false }),
+        content: fields.markdoc({ label: 'Content', extension: 'md' }),
+      },
+    }),
+
+    breadCooperative: collection({
+      label: 'Bread Cooperative',
+      slugField: 'title',
+      path: 'src/content/docs/bread-cooperative/**',
+      format: { contentField: 'content' },
+      columns: ['title', 'description'],
+      entryLayout: 'content',
       schema: {
         title: fields.slug({ name: { label: 'Title' } }),
         description: fields.text({ label: 'Description' }),
