@@ -176,18 +176,51 @@ Reads `_meta.yml` files in each directory to configure sidebar labels, ordering,
 
 ## Keystatic CMS
 
-[Keystatic](https://keystatic.com) provides a local/admin CMS for content editing.
+[Keystatic](https://keystatic.com) provides a web-based interface for managing content. It runs in **cloud mode**, authenticating via [Keystatic Cloud](https://keystatic.cloud) so team members can edit content through the admin UI without needing individual GitHub accounts or a custom GitHub App.
+
+### Prerequisites
+
+Before using Keystatic Cloud, a team admin must:
+1. Register at [keystatic.cloud](https://keystatic.cloud) and create a team named `bread`
+2. Create a project named `bread-docs` within that team
+3. Connect the `BreadchainCoop/bread-docs` GitHub repository to the project
+4. Invite team members (free plan: up to 3 users per team; Pro: $10/mo + $5/user for more)
+
+### Documentation Links
+- [Keystatic Official Docs](https://keystatic.com/docs)
+- [Keystatic Cloud Guide](https://keystatic.com/docs/cloud)
+- [GitHub Mode Guide](https://keystatic.com/docs/github-mode) (alternative auth, requires custom GitHub App)
+- [Collections & Fields](https://keystatic.com/docs/collections)
+
+### Usage
 
 | Environment | CMS Status | URL |
 |-------------|------------|-----|
-| Development (`npm run dev`) | Enabled | `http://localhost:4321/keystatic` |
+| Development (`npm run dev`) | Enabled (Cloud Mode) | `http://localhost:4321/keystatic` |
 | Production | Disabled | N/A |
 
-CMS is configured in `keystatic.config.tsx` and integrated via `@keystatic/astro`. It is disabled in production builds via the condition:
+### Workflow
+1. **Launch**: Start the dev server with `npm run dev`.
+2. **Authenticate**: Open the Admin UI at `/keystatic`. Log in via Keystatic Cloud (GitHub OAuth).
+3. **Edit**: Make content changes in the admin UI.
+4. **Save**: Click **Save**. Keystatic Cloud commits changes to the GitHub repository via the GitHub API.
+5. **Deploy**: Netlify auto-deploys from the GitHub repository after each commit.
+
+CMS configuration is located in `keystatic.config.tsx`. It is integrated into Astro via `@keystatic/astro` and is conditionally disabled for production builds via:
 
 ```js
 ...(process.env.NODE_ENV !== 'production' ? [keystatic()] : [])
 ```
+
+### Fallback to Local Mode
+
+If Keystatic Cloud is unavailable or for quick local edits, temporarily switch to local mode in `keystatic.config.tsx`:
+
+```tsx
+storage: { kind: 'local' },  // Direct file writes, no GitHub API
+```
+
+Remember to switch back to `cloud` before committing, as cloud mode is the team standard.
 
 ---
 

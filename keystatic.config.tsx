@@ -1,12 +1,10 @@
 import { config, fields, collection } from '@keystatic/core'
 
 export default config({
-  storage: import.meta.env.PROD
-    ? { kind: 'cloud' }
-    : { kind: 'local' },
+  storage: { kind: 'cloud' },
 
-  // Populated after Keystatic Cloud project is registered:
-  cloud: { project: 'bread/docs-test' },
+  // Keystatic Cloud project: bread/bread-docs
+  cloud: { project: 'bread/bread-docs' },
 
   ui: { 
     brand: { 

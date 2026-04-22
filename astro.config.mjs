@@ -16,7 +16,7 @@ export default defineConfig({
   site: 'https://docs.bread.coop',
   trailingSlash: 'never',
   integrations: [
-      react({ include: ['**/keystatic/**'] }),
+      react(),
       markdoc(),
       ...(process.env.NODE_ENV !== 'production' ? [keystatic()] : []),
       starlight({

@@ -45,15 +45,15 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rathermercurial/bread-docs.git"
+    "url": "git+https://github.com/BreadchainCoop/bread-docs.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/rathermercurial/bread-docs/issues"
+    "url": "https://github.com/BreadchainCoop/bread-docs/issues"
   },
-  "homepage": "https://github.com/rathermercurial/bread-docs#readme",
+  "homepage": "https://github.com/BreadchainCoop/bread-docs#readme",
   "devDependencies": {
     "unist-util-visit": "^5.1.0"
   }
