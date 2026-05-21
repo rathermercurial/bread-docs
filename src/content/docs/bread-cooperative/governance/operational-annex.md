@@ -8,12 +8,15 @@ Member projects are the organizations that make up the Bread Cooperative.
 
 Current Member Projects are:
 
-- Bread Core Team
-- Symbiota Coop
-- LaborDAO
+- Bread Coop Core
+- Symbiota
 - Crypto Commons Association
 - Citizen Wallet
-- ReFi DAO
+- Regen Coordination
+- Traditional Dream Factory
+- Gardens
+
+The live list and current voting cycle results can be seen at [fund.bread.coop/governance](https://fund.bread.coop/governance).
 
 ## Eligibility
 

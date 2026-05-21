@@ -39,23 +39,28 @@ The Crypto Commons Association (CCA) is a non-profit organization, hosted on Ope
 [https://www.crypto-commons.org/](https://www.crypto-commons.org/)  
 :::
 
-:::note[ReFi DAO]
-A NETWORK SOCIETY TO REGENERATE THE EARTH  
-[https://www.refidao.com/](https://www.refidao.com/)  
+:::note[Regen Coordination]
+Global network driving the Regenerative Finance movement.  
+[https://www.regencoordination.xyz/](https://www.regencoordination.xyz/)  
 :::
 
 :::note[Symbiota]
-The word "symbiosis" comes from the Greek words "syn" (together) and "biosis" (living), and describes the close relationship between two or more different species.  
+Event-focused organisations devoted to new forms of culture and enquiry.  
 [https://symbiota.coop/](https://symbiota.coop/)  
 :::
 
-:::note[The LaborDAO]
-The UnionBase core team is launching a global community called LaborDAO that will be the first decentralized community to support workers who want to organize, strike and collectively bargain.  
-[https://www.thelabordao.com/](https://www.thelabordao.com/)  
+:::note[Traditional Dream Factory]
+Web3-enabled regenerative ecovillage in Portugal for collective living.  
+[https://traditionaldreamfactory.com/](https://traditionaldreamfactory.com/)  
+:::
+
+:::note[Gardens]
+Next generation community governance.  
+[https://gardens.fund/](https://gardens.fund/)  
 :::
 
 :::note[Citizen Wallet]
-The Citizen Wallet is an open source crypto wallet that you can preconfigure for your community token.  
+Open source tool stack to support Web3 community currencies.  
 [https://citizenwallet.xyz/](https://citizenwallet.xyz/)  
 :::
 

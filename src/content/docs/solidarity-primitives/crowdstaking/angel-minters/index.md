@@ -7,7 +7,7 @@ title: Angel Minter Program
 **In summary:**
 
 - The deadline is to mint at least $10k by end of 2024 in order to join this first cohort as an organization or individual 🤝
-- Only the monthly yield from the underlying sDAI is distributed to the network of projects and Bread Commons based on a monthly vote (Crypto Commons Association, Citizen Wallet, Symbiota Coop, LaborDAO, and more) 🏴
+- Only the monthly yield from the underlying sDAI is distributed to the network of projects and Bread Commons based on a monthly vote (Symbiota, Crypto Commons Association, Citizen Wallet, Regen Coordination, Traditional Dream Factory, Gardens, and more) 🏴
 - Your funds are safe and always 100% backed, with minimal risk 🤑
 
 ![image](/images/image.webp)

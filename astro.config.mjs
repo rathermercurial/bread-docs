@@ -80,6 +80,8 @@ export default defineConfig({
     '/solidarity-fund': '/solidarity-primitives/crowdstaking',
     '/angel-minters': '/solidarity-primitives/crowdstaking/angel-minters',
     '/member-projects': '/solidarity-primitives/crowdstaking/member-projects',
+    // Renamed: ReFi DAO → Regen Coordination
+    '/solidarity-primitives/crowdstaking/member-projects/refi-dao': '/solidarity-primitives/crowdstaking/member-projects/regen-coordination',
     // Index path handling (for links explicitly including /index)
     '/about/bread-token/index': '/about/bread-token',
     '/about/bread-token/marketplace/index': '/about/bread-token/marketplace',
